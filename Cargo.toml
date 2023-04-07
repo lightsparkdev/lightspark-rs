@@ -1,8 +1,12 @@
 [package]
 name = "lightspark"
 description = "Lightspark Rust SDK"
+authors = ["Lightspark Group, Inc. <info@lightspark.com>"]
 version = "0.1.0"
 edition = "2021"
+documentation = "https://app.lightspark.com/docs/sdk"
+homepage = "https://www.lightspark.com/"
+repository = "https://github.com/lightsparkdev/lightspark-rs"
 license = "Apache-2.0"
 readme = "README.md"
 

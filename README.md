@@ -6,7 +6,7 @@ The Lightspark Rust SDK provides a convenient way to interact with the Lightspar
 
 ## Documentation
 
-// TODO: add doc url.
+The documentation for this SDK (installation, usage, etc.) is available at https://app.lightspark.com/docs/sdk
 
 ## Sample code
 

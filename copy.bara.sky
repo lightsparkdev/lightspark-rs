@@ -108,7 +108,7 @@ core.workflow(
     # Switch to ITERATIVE mode to import each commit separately.
     mode = "SQUASH",
 
-    origin_files = glob(["lightspark-rs/**", "copy.bara.sky"]),
+    origin_files = glob(["rust-sdk/lightspark/**", "copy.bara.sky"]),
 
     authoring = authoring.pass_thru("Lightspark Eng <engineering@lightspark.com>"),
     transformations = [
@@ -117,7 +117,7 @@ core.workflow(
         core.todo_replace(
           mode = 'SCRUB_NAMES'
         ),
-        core.move("lightspark-rs/", "")
+        core.move("rust-sdk/lightspark/", "")
     ],
 )
 
