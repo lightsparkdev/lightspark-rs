@@ -14,6 +14,7 @@ use crate::objects::fee_estimate::FeeEstimate;
 use crate::objects::invoice;
 use crate::objects::invoice::Invoice;
 use crate::objects::invoice_data::InvoiceData;
+use crate::objects::invoice_type::InvoiceType;
 use crate::objects::lightning_fee_estimate_output::LightningFeeEstimateOutput;
 use crate::objects::outgoing_payment::OutgoingPayment;
 use crate::objects::permission::Permission;
@@ -278,17 +279,20 @@ impl LightsparkClient {
         node_id: &str,
         amount_msats: i64,
         memo: Option<&str>,
+        invoice_type: Option<InvoiceType>,
     ) -> Result<Invoice, Error> {
         let operation = format!(
             "mutation CreateInvoice(
                 $node_id: ID!
                 $amount_msats: Long!
                 $memo: String
+                $invoice_type: InvoiceType
             ) {{
                 create_invoice(input: {{
                     node_id: $node_id
                     amount_msats: $amount_msats
                     memo: $memo
+                    invoice_type: $invoice_type
                 }}) {{
                     invoice {{
                         ...InvoiceFragment
@@ -305,6 +309,7 @@ impl LightsparkClient {
         variables.insert("node_id", node_id.into());
         variables.insert("memo", memo.into());
         variables.insert("amount_msats", amount_msats.into());
+        variables.insert("invoice_type", invoice_type.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self

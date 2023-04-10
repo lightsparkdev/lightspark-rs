@@ -31,7 +31,9 @@ async fn main() {
     let api_id = std::env::var("LIGHTSPARK_API_TOKEN_CLIENT_ID").unwrap();
     let api_token = std::env::var("LIGHTSPARK_API_TOKEN_CLIENT_SECRET").unwrap();
 
-    let node_password = std::env::var("LIGHTSPARK_TEST_NODE_PASSWORD").unwrap();
+    let node_1 = std::env::var("LIGHTSPARK_EXAMPLE_NODE_1_NAME").unwrap();
+    let node_2 = std::env::var("LIGHTSPARK_EXAMPLE_NODE_2_NAME").unwrap();
+    let node_2_password = std::env::var("LIGHTSPARK_EXAMPLE_NODE_2_PASSWORD").unwrap();
 
     let auth_provider = AccountAuthProvider::new(api_id, api_token);
     let client = match LightsparkClient::new(auth_provider) {
@@ -159,25 +161,34 @@ async fn main() {
     };
     println!("You have {} node(s).", node_connections.count);
 
-    let mut node_id: Option<String> = None;
-    let mut node_name: Option<String> = None;
-    println!("{}", node_connections.entities.len());
+    let mut node_1_id: Option<String> = None;
+    let mut node_1_public_key: Option<String> = None;
+    let mut node_2_id: Option<String> = None;
     for node in node_connections.entities {
-        println!("node info");
-        node_name = Some(node.display_name.clone());
-        node_id = Some(node.id.clone());
-        println!("{} {}", node.display_name, node.id);
+        let name = node.alias.unwrap_or("".to_owned());
+        println!("    - {} ({})", name, node.status.unwrap());
+        println!("{} {}", node_2, name);
+        if name == node_1 {
+            node_1_id = Some(node.id.clone());
+            node_1_public_key = Some(node.public_key.unwrap().clone());
+        } else if name == node_2 {
+            node_2_id = Some(node.id.clone());
+        }
     }
     println!();
 
-    let node_id = node_id.unwrap();
-    let node_name = node_name.unwrap();
+    if node_1_id.is_none() || node_2_id.is_none() {
+        panic!("Couldn't find the nodes.");
+    }
 
-    match client.fund_node(node_id.as_str(), 10000).await {
+    let node_1_id = node_1_id.unwrap();
+    let node_2_id = node_2_id.unwrap();
+
+    match client.fund_node(node_1_id.as_str(), 10000).await {
         Ok(amount) => {
             println!(
                 "Found {} {} to {}",
-                amount.preferred_currency_value_approx, amount.preferred_currency_unit, node_name
+                amount.preferred_currency_value_approx, amount.preferred_currency_unit, node_1
             );
         }
         Err(err) => {
@@ -338,7 +349,7 @@ async fn main() {
     }
 
     let invoice = match client
-        .create_invoice(&node_id, 42000, Some("Pizza"), None)
+        .create_invoice(&node_1_id, 42000, Some("Pizza"), None)
         .await
     {
         Ok(v) => v,
@@ -347,7 +358,7 @@ async fn main() {
             return;
         }
     };
-    println!("Invoice created from {}:", node_name);
+    println!("Invoice created from {}:", node_1);
     println!(
         "Encoded invoice = {}",
         invoice.data.encoded_payment_request.clone()
@@ -380,11 +391,11 @@ async fn main() {
     println!();
 
     match client
-        .recover_node_signing_key(node_id.as_str(), node_password.as_str())
+        .recover_node_signing_key(node_2_id.as_str(), node_2_password.as_str())
         .await
     {
         Ok(v) => {
-            println!("{}'s signing key has been loaded.", node_name);
+            println!("{}'s signing key has been loaded.", node_2);
             v
         }
         Err(err) => {
@@ -393,103 +404,96 @@ async fn main() {
         }
     };
 
-    // Lightning Fee Estimate
-    //
-    // match client
-    //     .get_lightning_fee_estimate_for_invoice(
-    //         node_id.as_str(),
-    //         /* Encoded Invoice */,
-    //         /* Amount */,
-    //     )
-    //     .await
-    // {
-    //     Ok(amount) => {
-    //         println!(
-    //             "Estimate fee for paying this invoice is {} {}",
-    //             amount.preferred_currency_value_approx, amount.preferred_currency_unit
-    //         );
-    //     }
-    //     Err(err) => {
-    //         println!("{}", err);
-    //     }
-    // };
+    match client
+        .get_lightning_fee_estimate_for_invoice(
+            node_2_id.as_str(),
+            invoice.data.encoded_payment_request.as_str(),
+            500000,
+        )
+        .await
+    {
+        Ok(amount) => {
+            println!(
+                "Estimate fee for paying this invoice is {} {}",
+                amount.preferred_currency_value_approx, amount.preferred_currency_unit
+            );
+        }
+        Err(err) => {
+            println!("{}", err);
+        }
+    };
 
-    // Pay Invoice
-    //
-    // let payment = match client
-    //     .pay_invoice(
-    //         node_id.as_str(),
-    //         /* Encoded Invoice */,
-    //         60,
-    //         None,
-    //         /* Payment Amount */,
-    //     )
-    //     .await
-    // {
-    //     Ok(v) => v,
-    //     Err(err) => {
-    //         println!("{}", err);
-    //         return;
-    //     }
-    // };
-
-    // Key Send
-    //
-    // match client
-    //     .get_lightning_fee_estimate_for_node(
-    //        node_id.as_str(), 
-    //        /* Node Public Key */, 
-    //        500000)
-    //     .await
-    // {
-    //     Ok(amount) => {
-    //         println!(
-    //             "Estimate fee for paying this node is {} {}",
-    //             amount.preferred_currency_value_approx, amount.preferred_currency_unit
-    //         );
-    //     }
-    //     Err(err) => {
-    //         println!("{}", err);
-    //     }
-    // };
-    
-    // Key Send
-    //
-    // let payment = match client
-    //     .send_payment(
-    //         node_id.as_str(),
-    //         /* Node Public Key */,
-    //         60,
-    //         2000000,
-    //         500,
-    //     )
-    //     .await
-    // {
-    //     Ok(v) => v,
-    //     Err(err) => {
-    //         println!("{}", err);
-    //         return;
-    //     }
-    // };
-    // println!(
-    //     "Payment directly to node without invoice done with ID = {}",
-    //     payment.id
-    // );
-    // println!();
-
-    let address = match client.create_node_wallet_address(&node_id).await {
+    let payment = match client
+        .pay_invoice(
+            node_2_id.as_str(),
+            invoice.data.encoded_payment_request.as_str(),
+            60,
+            None,
+            500000,
+        )
+        .await
+    {
         Ok(v) => v,
         Err(err) => {
             println!("{}", err);
             return;
         }
     };
-    println!("Got a bitcoin address for {}: {}", node_name, address);
+    println!("Payment to the invoice done with ID = {}", payment.id);
+    println!();
+
+    let node_1_public_key = node_1_public_key.unwrap();
+
+    match client
+        .get_lightning_fee_estimate_for_node(node_2_id.as_str(), node_1_public_key.as_str(), 500000)
+        .await
+    {
+        Ok(amount) => {
+            println!(
+                "Estimate fee for paying this node is {} {}",
+                amount.preferred_currency_value_approx, amount.preferred_currency_unit
+            );
+        }
+        Err(err) => {
+            println!("{}", err);
+        }
+    };
+
+    let payment = match client
+        .send_payment(
+            node_2_id.as_str(),
+            node_1_public_key.as_str(),
+            60,
+            2000000,
+            500,
+        )
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!(
+        "Payment directly to node without invoice done with ID = {}",
+        payment.id
+    );
+    println!();
+
+    let address = match client.create_node_wallet_address(&node_1_id).await {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!("Got a bitcoin address for {}: {}", node_1, address);
     println!();
 
     if let Ok(withdrawal_request) = client
         .request_withdrawal(
-            node_id.as_str(),
+            node_2_id.as_str(),
             address.as_str(),
             1000,
             WithdrawalMode::WalletOnly,
@@ -505,7 +509,7 @@ async fn main() {
 
     // Fetch the channels for Node 1
     let node = match client
-        .get_entity::<LightsparkNode>(node_id.as_str())
+        .get_entity::<LightsparkNode>(node_1_id.as_str())
         .await
     {
         Ok(v) => v,
@@ -515,7 +519,7 @@ async fn main() {
         }
     };
     if let Ok(channels_connection) = node.get_channels(&client.requester, Some(10), None).await {
-        println!("{} has {} channel(s):", node_name, channels_connection.count);
+        println!("{} has {} channel(s):", node_1, channels_connection.count);
         for channel in channels_connection.entities {
             if let Some(node_entity) = channel.remote_node {
                 if let Ok(remote_node) = client
