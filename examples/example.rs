@@ -8,7 +8,6 @@ use lightspark::objects::currency_amount::CurrencyAmount;
 use lightspark::objects::deposit::Deposit;
 use lightspark::objects::lightspark_node::LightsparkNode;
 use lightspark::objects::outgoing_payment::OutgoingPayment;
-use lightspark::objects::permission::Permission;
 use lightspark::objects::transaction::Transaction;
 use lightspark::objects::withdrawal::Withdrawal;
 use lightspark::objects::withdrawal_mode::WithdrawalMode;
@@ -28,11 +27,13 @@ fn print_fees(fees: Option<CurrencyAmount>) {
 
 #[tokio::main]
 async fn main() {
+    // Setting up the account.
     let api_id = std::env::var("LIGHTSPARK_API_TOKEN_CLIENT_ID").unwrap();
     let api_token = std::env::var("LIGHTSPARK_API_TOKEN_CLIENT_SECRET").unwrap();
 
     let node_password = std::env::var("LIGHTSPARK_TEST_NODE_PASSWORD").unwrap();
 
+    // Create LightsparkClient
     let auth_provider = AccountAuthProvider::new(api_id, api_token);
     let client = match LightsparkClient::new(auth_provider) {
         Ok(value) => value,
@@ -42,6 +43,7 @@ async fn main() {
         }
     };
 
+    // Bitcoin Fee estimate
     if let Ok(fee_estimate) = client
         .get_bitcoin_fee_estimates(BitcoinNetwork::Regtest)
         .await
@@ -60,6 +62,7 @@ async fn main() {
     }
     println!();
 
+    // Get current account
     let account = match client.get_current_account().await {
         Ok(v) => v,
         Err(err) => {
@@ -72,6 +75,7 @@ async fn main() {
         println!("You account name is {}", name);
     }
 
+    // Get current account's API tokens
     let connection = match account.get_api_tokens(&client.requester, None).await {
         Ok(v) => v,
         Err(err) => {
@@ -85,10 +89,8 @@ async fn main() {
     );
     println!();
 
-    if let Ok(new_api_token) = client
-        .create_api_token("Test token", Some(vec![Permission::All]))
-        .await
-    {
+    // Create a new API Token
+    if let Ok(new_api_token) = client.create_api_token("Test token", true, true).await {
         println!("Created API token {}.", new_api_token.0.id);
 
         let connection = match account.get_api_tokens(&client.requester, None).await {
@@ -101,6 +103,7 @@ async fn main() {
         println!("You now have {} active API token(s).", connection.count);
         println!();
 
+        // Delete the created API token
         match client.delete_api_token(new_api_token.0.id.as_str()).await {
             Ok(()) => println!("Deleted API token {}", new_api_token.0.id),
             Err(err) => {
@@ -123,6 +126,7 @@ async fn main() {
         println!();
     }
 
+    // Get account balance
     let local_balance = account
         .get_local_balance(&client.requester, Some(vec![BitcoinNetwork::Regtest]), None)
         .await;
@@ -145,6 +149,7 @@ async fn main() {
 
     println!();
 
+    // Get nodes in the account.
     let node_connections = match account
         .get_nodes(
             &client.requester,
@@ -173,6 +178,7 @@ async fn main() {
     let node_id = node_id.unwrap();
     let node_name = node_name.unwrap();
 
+    // Fund node in test mode.
     match client.fund_node(node_id.as_str(), 10000).await {
         Ok(amount) => {
             println!(
@@ -185,6 +191,7 @@ async fn main() {
         }
     }
 
+    // Get transactions in the account
     let transactions_connection = match account
         .get_transactions(
             &client.requester,
@@ -243,6 +250,7 @@ async fn main() {
 
     println!();
 
+    // Pagination
     let page_size = 10;
     let mut iterations = 0;
     let mut has_next = true;
@@ -288,6 +296,7 @@ async fn main() {
     }
     println!();
 
+    // Get transactions in the past 24 hours
     let time = Utc::now() - Duration::hours(24);
     let transactions_connection = match account
         .get_transactions(
@@ -315,6 +324,7 @@ async fn main() {
         transactions_connection.count
     );
 
+    // Get a transaction detail.
     if let Some(deposit_transaction_id) = deposit_transaction_id {
         let deposit: Deposit = match client
             .get_entity::<Deposit>(deposit_transaction_id.as_str())
@@ -337,6 +347,7 @@ async fn main() {
         println!();
     }
 
+    // Create a lightning invoice
     let invoice = match client
         .create_invoice(&node_id, 42000, Some("Pizza"), None)
         .await
@@ -354,6 +365,7 @@ async fn main() {
     );
     println!();
 
+    // Decode a payment request
     let decoded_request = match client
         .get_decoded_payment_request(invoice.data.encoded_payment_request.as_str())
         .await
@@ -379,6 +391,7 @@ async fn main() {
     }
     println!();
 
+    // Unlock the node
     match client
         .recover_node_signing_key(node_id.as_str(), node_password.as_str())
         .await
@@ -437,8 +450,8 @@ async fn main() {
     //
     // match client
     //     .get_lightning_fee_estimate_for_node(
-    //        node_id.as_str(), 
-    //        /* Node Public Key */, 
+    //        node_id.as_str(),
+    //        /* Node Public Key */,
     //        500000)
     //     .await
     // {
@@ -452,7 +465,7 @@ async fn main() {
     //         println!("{}", err);
     //     }
     // };
-    
+
     // Key Send
     //
     // let payment = match client
@@ -503,11 +516,8 @@ async fn main() {
         println!();
     }
 
-    // Fetch the channels for Node 1
-    let node = match client
-        .get_entity::<LightsparkNode>(node_id.as_str())
-        .await
-    {
+    // Fetch the channels for the node
+    let node = match client.get_entity::<LightsparkNode>(node_id.as_str()).await {
         Ok(v) => v,
         Err(err) => {
             println!("{}", err);
@@ -515,7 +525,10 @@ async fn main() {
         }
     };
     if let Ok(channels_connection) = node.get_channels(&client.requester, Some(10), None).await {
-        println!("{} has {} channel(s):", node_name, channels_connection.count);
+        println!(
+            "{} has {} channel(s):",
+            node_name, channels_connection.count
+        );
         for channel in channels_connection.entities {
             if let Some(node_entity) = channel.remote_node {
                 if let Ok(remote_node) = client
@@ -540,6 +553,7 @@ async fn main() {
     }
     println!();
 
+    // Execute a custom graphql operation
     let mut variables: HashMap<&str, Value> = HashMap::new();
     variables.insert("networks", BitcoinNetwork::Regtest.into());
 

@@ -184,7 +184,8 @@ impl LightsparkClient {
     pub async fn create_api_token(
         &self,
         name: &str,
-        permission: Option<Vec<Permission>>,
+        transact: bool,
+        test_mode: bool,
     ) -> Result<(ApiToken, String), Error> {
         let operation = format!(
             "
@@ -209,11 +210,13 @@ impl LightsparkClient {
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("name", name.into());
-        if permission.is_none() {
-            variables.insert("permissions", vec![Permission::All].into());
-        } else {
-            variables.insert("permissions", permission.into());
-        }
+        let permission = match (test_mode, transact) {
+            (true, true) => vec![Permission::RegtestView, Permission::RegtestTransact],
+            (true, false) => vec![Permission::RegtestView],
+            (false, true) => vec![Permission::MainnetView, Permission::MainnetTransact],
+            (false, false) => vec![Permission::MainnetView],
+        };
+        variables.insert("permissions", permission.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
@@ -492,7 +495,9 @@ impl LightsparkClient {
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("node_id", node_id.clone().into());
         variables.insert("encoded_invoice", encoded_invoice.clone().into());
-        variables.insert("amount_msats", amount_msats.into());
+        if let Some(amount_msats) = amount_msats {
+            variables.insert("amount_msats", amount_msats.into());
+        }
         variables.insert("timeout_secs", timeout_secs.into());
         variables.insert("maximum_fees_msats", maximum_fees_msats.into());
 
@@ -625,7 +630,7 @@ impl LightsparkClient {
             "
         mutation RequestWithdrawal(
             $node_id: ID!
-            $amount_sats: Int!
+            $amount_sats: Long!
             $bitcoin_address: String!
             $withdrawal_mode: WithdrawalMode!
         ) {{
@@ -659,7 +664,6 @@ impl LightsparkClient {
             .await
             .map_err(Error::ClientError)?;
 
-        println!("{}", json);
         let result = serde_json::from_value(json["request_withdrawal"]["request"].clone())
             .map_err(Error::JsonError)?;
         Ok(result)

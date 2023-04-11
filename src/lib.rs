@@ -10,7 +10,13 @@
 //! let api_id = <your api token id>;
 //! let api_token = <your api token secret>;
 //! let auth_provider = AccountAuthProvider::new(api_id, api_token);
-//! let client = LightsparkClient::new(auth_provider);
+//! let client = match LightsparkClient::new(auth_provider) {
+//!    Ok(value) => value,
+//!    Err(err) => {
+//!       println!("{}", err);
+//!       return;
+//!    }
+//! };
 //! ```
 //!
 //! You are now ready to use the Lightspark SDK!
