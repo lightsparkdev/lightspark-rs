@@ -5,6 +5,7 @@ use crate::objects::account_to_channels_connection::AccountToChannelsConnection;
 use crate::objects::account_to_nodes_connection::AccountToNodesConnection;
 use crate::objects::account_to_payment_requests_connection::AccountToPaymentRequestsConnection;
 use crate::objects::account_to_transactions_connection::AccountToTransactionsConnection;
+use crate::objects::account_to_wallets_connection::AccountToWalletsConnection;
 use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
@@ -846,6 +847,7 @@ impl Account {
                                 }
                                 invoice_data_created_at: created_at
                                 invoice_data_expires_at: expires_at
+                                invoice_data_memo: memo
                                 invoice_data_destination: destination {
                                     __typename
                                     ... on GraphNode {
@@ -966,7 +968,6 @@ impl Account {
                                         lightspark_node_status: status
                                     }
                                 }
-                                invoice_data_memo: memo
                             }
                         }
                         outgoing_payment_failure_reason: failure_reason
@@ -1118,6 +1119,7 @@ impl Account {
                             }
                             invoice_data_created_at: created_at
                             invoice_data_expires_at: expires_at
+                            invoice_data_memo: memo
                             invoice_data_destination: destination {
                                 __typename
                                 ... on GraphNode {
@@ -1238,7 +1240,6 @@ impl Account {
                                     lightspark_node_status: status
                                 }
                             }
-                            invoice_data_memo: memo
                         }
                         invoice_status: status
                         invoice_amount_paid: amount_paid {
@@ -1277,6 +1278,77 @@ impl Account {
             .await
             .map_err(|err| Error::ClientError(err))?;
         let json = result["entity"]["payment_requests"].clone();
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        Ok(result)
+    }
+
+    pub async fn get_wallets(
+        &self,
+        requester: &Requester,
+        first: Option<i64>,
+    ) -> Result<AccountToWalletsConnection, Error> {
+        let query = "query FetchAccountToWalletsConnection($entity_id: ID!, $first: Int) {
+    entity(id: $entity_id) {
+        ... on Account {
+            wallets(, first: $first) {
+                __typename
+                account_to_wallets_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
+                account_to_wallets_connection_count: count
+                account_to_wallets_connection_entities: entities {
+                    __typename
+                    wallet_id: id
+                    wallet_created_at: created_at
+                    wallet_updated_at: updated_at
+                    wallet_last_login_at: last_login_at
+                    wallet_balances: balances {
+                        __typename
+                        balances_owned_balance: owned_balance {
+                            __typename
+                            currency_amount_original_value: original_value
+                            currency_amount_original_unit: original_unit
+                            currency_amount_preferred_currency_unit: preferred_currency_unit
+                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                        }
+                        balances_available_to_send_balance: available_to_send_balance {
+                            __typename
+                            currency_amount_original_value: original_value
+                            currency_amount_original_unit: original_unit
+                            currency_amount_preferred_currency_unit: preferred_currency_unit
+                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                        }
+                        balances_available_to_withdraw_balance: available_to_withdraw_balance {
+                            __typename
+                            currency_amount_original_value: original_value
+                            currency_amount_original_unit: original_unit
+                            currency_amount_preferred_currency_unit: preferred_currency_unit
+                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                        }
+                    }
+                    wallet_third_party_identifier: third_party_identifier
+                }
+            }
+        }
+    }
+}";
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("entity_id", self.id.clone().into());
+        variables.insert("first", first.into());
+
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester
+            .execute_graphql(&query, Some(value))
+            .await
+            .map_err(|err| Error::ClientError(err))?;
+        let json = result["entity"]["wallets"].clone();
         let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }

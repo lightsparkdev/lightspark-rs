@@ -12,7 +12,7 @@ use reqwest::{
 };
 use serde_json::{json, to_string, Value};
 
-const DEFAULT_BASE_URL: &str = "https://api.lightspark.com/graphql/2023-04-04";
+const DEFAULT_BASE_URL: &str = "https://api.lightspark.com/graphql/server/2023-04-04";
 
 #[derive(Debug)]
 pub enum RequesterError {

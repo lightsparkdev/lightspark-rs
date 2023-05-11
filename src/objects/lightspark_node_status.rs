@@ -26,6 +26,9 @@ pub enum LightsparkNodeStatus {
     #[serde(rename = "TERMINATED")]
     Terminated,
 
+    #[serde(rename = "TERMINATING")]
+    Terminating,
+
     #[serde(rename = "WALLET_LOCKED")]
     WalletLocked,
 
@@ -49,6 +52,7 @@ impl fmt::Display for LightsparkNodeStatus {
             Self::Ready => write!(f, "READY"),
             Self::Stopped => write!(f, "STOPPED"),
             Self::Terminated => write!(f, "TERMINATED"),
+            Self::Terminating => write!(f, "TERMINATING"),
             Self::WalletLocked => write!(f, "WALLET_LOCKED"),
             Self::FailedToDeploy => write!(f, "FAILED_TO_DEPLOY"),
         }

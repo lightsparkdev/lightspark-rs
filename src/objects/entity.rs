@@ -15,6 +15,7 @@ use super::lightspark_node::LightsparkNode;
 use super::outgoing_payment::OutgoingPayment;
 use super::outgoing_payment_attempt::OutgoingPaymentAttempt;
 use super::routing_transaction::RoutingTransaction;
+use super::wallet::Wallet;
 use super::withdrawal::Withdrawal;
 use super::withdrawal_request::WithdrawalRequest;
 use chrono::{DateTime, Utc};
@@ -128,6 +129,12 @@ impl<'de> Deserialize<'de> for Box<dyn Entity> {
                 }
                 "RoutingTransaction" => {
                     let obj = RoutingTransaction::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(Box::new(obj))
+                }
+                "Wallet" => {
+                    let obj = Wallet::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
                     Ok(Box::new(obj))

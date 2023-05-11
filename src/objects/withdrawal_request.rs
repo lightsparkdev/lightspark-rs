@@ -34,6 +34,10 @@ pub struct WithdrawalRequest {
     #[serde(rename = "withdrawal_request_amount")]
     pub amount: CurrencyAmount,
 
+    /// If the requested amount is `-1` (i.e. everything), this field may contain an estimate of the amount for the withdrawal.
+    #[serde(rename = "withdrawal_request_estimated_amount")]
+    pub estimated_amount: Option<CurrencyAmount>,
+
     /// The bitcoin address where the funds should be sent.
     #[serde(rename = "withdrawal_request_bitcoin_address")]
     pub bitcoin_address: String,
@@ -104,6 +108,14 @@ fragment WithdrawalRequestFragment on WithdrawalRequest {
     withdrawal_request_created_at: created_at
     withdrawal_request_updated_at: updated_at
     withdrawal_request_amount: amount {
+        __typename
+        currency_amount_original_value: original_value
+        currency_amount_original_unit: original_unit
+        currency_amount_preferred_currency_unit: preferred_currency_unit
+        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+    }
+    withdrawal_request_estimated_amount: estimated_amount {
         __typename
         currency_amount_original_value: original_value
         currency_amount_original_unit: original_unit

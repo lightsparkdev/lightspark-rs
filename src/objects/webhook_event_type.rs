@@ -10,6 +10,21 @@ pub enum WebhookEventType {
 
     #[serde(rename = "NODE_STATUS")]
     NodeStatus,
+
+    #[serde(rename = "WALLET_STATUS")]
+    WalletStatus,
+
+    #[serde(rename = "WALLET_OUTGOING_PAYMENT_FINISHED")]
+    WalletOutgoingPaymentFinished,
+
+    #[serde(rename = "WALLET_INCOMING_PAYMENT_FINISHED")]
+    WalletIncomingPaymentFinished,
+
+    #[serde(rename = "WALLET_WITHDRAWAL_FINISHED")]
+    WalletWithdrawalFinished,
+
+    #[serde(rename = "WALLET_FUNDS_RECEIVED")]
+    WalletFundsReceived,
 }
 
 impl Into<Value> for WebhookEventType {
@@ -23,6 +38,11 @@ impl fmt::Display for WebhookEventType {
         match self {
             Self::PaymentFinished => write!(f, "PAYMENT_FINISHED"),
             Self::NodeStatus => write!(f, "NODE_STATUS"),
+            Self::WalletStatus => write!(f, "WALLET_STATUS"),
+            Self::WalletOutgoingPaymentFinished => write!(f, "WALLET_OUTGOING_PAYMENT_FINISHED"),
+            Self::WalletIncomingPaymentFinished => write!(f, "WALLET_INCOMING_PAYMENT_FINISHED"),
+            Self::WalletWithdrawalFinished => write!(f, "WALLET_WITHDRAWAL_FINISHED"),
+            Self::WalletFundsReceived => write!(f, "WALLET_FUNDS_RECEIVED"),
         }
     }
 }

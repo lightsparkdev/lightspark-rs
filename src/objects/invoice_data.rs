@@ -16,23 +16,29 @@ pub struct InvoiceData {
     #[serde(rename = "invoice_data_bitcoin_network")]
     pub bitcoin_network: BitcoinNetwork,
 
+    /// The payment hash of this invoice.
     #[serde(rename = "invoice_data_payment_hash")]
     pub payment_hash: String,
 
+    /// The requested amount in this invoice. If it is equal to 0, the sender should choose the amount to send.
     #[serde(rename = "invoice_data_amount")]
     pub amount: CurrencyAmount,
 
+    /// The date and time when this invoice was created.
     #[serde(with = "custom_date_format", rename = "invoice_data_created_at")]
     pub created_at: DateTime<Utc>,
 
+    /// The date and time when this invoice will expire.
     #[serde(with = "custom_date_format", rename = "invoice_data_expires_at")]
     pub expires_at: DateTime<Utc>,
 
-    #[serde(rename = "invoice_data_destination")]
-    pub destination: Box<dyn Node>,
-
+    /// A short, UTF-8 encoded, description of the purpose of this invoice.
     #[serde(rename = "invoice_data_memo")]
     pub memo: Option<String>,
+
+    /// The lightning node that will be paid when fulfilling this invoice.
+    #[serde(rename = "invoice_data_destination")]
+    pub destination: Box<dyn Node>,
 }
 
 impl PaymentRequestData for InvoiceData {
@@ -65,6 +71,7 @@ fragment InvoiceDataFragment on InvoiceData {
     }
     invoice_data_created_at: created_at
     invoice_data_expires_at: expires_at
+    invoice_data_memo: memo
     invoice_data_destination: destination {
         __typename
         ... on GraphNode {
@@ -185,6 +192,5 @@ fragment InvoiceDataFragment on InvoiceData {
             lightspark_node_status: status
         }
     }
-    invoice_data_memo: memo
 }
 ";
