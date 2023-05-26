@@ -668,4 +668,96 @@ impl LightsparkClient {
             .map_err(Error::JsonError)?;
         Ok(result)
     }
+
+    pub async fn create_test_mode_invoice(
+        &self,
+        node_id: &str,
+        amount_msats: i64,
+        memo: Option<&str>,
+        invoice_type: Option<InvoiceType>,
+    ) -> Result<String, Error> {
+        let mutation = "
+            mutation CreateTestModeInvoice(
+                $node_id: ID!
+                $amount_msats: Long!
+                $memo: String
+                $invoice_type: InvoiceType
+            ) {
+                create_test_mode_invoice(input: {
+                    local_node_id: $node_id
+                    amount_msats: $amount_msats
+                    memo: $memo
+                    invoice_type: $invoice_type
+                }) {
+                    encoded_payment_request
+                }
+            }";
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("node_id", node_id.into());
+        variables.insert("memo", memo.into());
+        variables.insert("amount_msats", amount_msats.into());
+        variables.insert("invoice_type", invoice_type.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+
+        let json = self
+            .requester
+            .execute_graphql(&mutation, Some(value))
+            .await
+            .map_err(Error::ClientError)?;
+
+        let result = json["create_test_mode_invoice"]["encoded_payment_request"].clone();
+        Ok(result.to_string())
+    }
+
+    pub async fn create_test_mode_payment(
+        &self,
+        node_id: &str,
+        encoded_invoice: &str,
+        amount_msats: Option<i64>,
+    ) -> Result<OutgoingPayment, Error> {
+        let mutation = format!(
+            "
+            mutation CreateTestModePayment(
+                $node_id: ID!
+                $encoded_invoice: String!
+                $amount_msats: Long
+            ) {{
+                create_test_mode_payment(input: {{
+                    local_node_id: $node_id
+                    encoded_invoice: $encoded_invoice
+                    amount_msats: $amount_msats
+                }}) {{
+                    payment {{
+                        ...OutgoingPaymentFragment
+                    }}
+                }}
+            }}
+
+            {}          
+            ",
+            outgoing_payment::FRAGMENT
+        );
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("node_id", node_id.clone().into());
+        variables.insert("encoded_invoice", encoded_invoice.clone().into());
+        if let Some(amount_msats) = amount_msats {
+            variables.insert("amount_msats", amount_msats.into());
+        }
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+
+        let signing_key = self.get_node_signing_key(node_id);
+        let json = self
+            .requester
+            .execute_graphql_signing(&mutation, Some(value), signing_key)
+            .await
+            .map_err(Error::ClientError)?;
+
+        let result = serde_json::from_value(json["pay_invoice"]["payment"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
 }

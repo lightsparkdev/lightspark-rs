@@ -365,6 +365,20 @@ async fn main() {
     );
     println!();
 
+    // Create a test invoice
+    let test_invoice = match client
+        .create_test_mode_invoice(&node_id, 42000, Some("Test"), None)
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!("Test invoice created from {}:", node_name);
+    println!("Encoded invoice = {}", test_invoice.clone());
+
     // Decode a payment request
     let decoded_request = match client
         .get_decoded_payment_request(invoice.data.encoded_payment_request.as_str())
