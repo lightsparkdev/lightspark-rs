@@ -6,15 +6,15 @@ use crate::objects::rich_text::RichText;
 use crate::objects::routing_transaction_failure_reason::RoutingTransactionFailureReason;
 use crate::objects::transaction::Transaction;
 use crate::objects::transaction_status::TransactionStatus;
-use crate::types::custom_date_format::custom_date_format;
-use crate::types::custom_date_format::custom_date_format_option;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-/// A transaction that was forwarded through a Lightspark node on the Lightning Network.
-#[derive(Deserialize)]
+/// This object represents a transaction that was forwarded through a Lightspark node on the Lightning Network, i.e., a routed transaction. You can retrieve this object to receive information about any transaction routed through your Lightspark Node.
+#[derive(Clone, Deserialize)]
 pub struct RoutingTransaction {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "routing_transaction_id")]
@@ -77,22 +77,22 @@ impl LightningTransaction for RoutingTransaction {
 impl Transaction for RoutingTransaction {
     /// The current status of this transaction.
     fn get_status(&self) -> TransactionStatus {
-        return self.status.clone();
+        self.status.clone()
     }
 
     /// The date and time when this transaction was completed or failed.
     fn get_resolved_at(&self) -> Option<DateTime<Utc>> {
-        return self.resolved_at;
+        self.resolved_at
     }
 
     /// The amount of money involved in this transaction.
     fn get_amount(&self) -> CurrencyAmount {
-        return self.amount.clone();
+        self.amount.clone()
     }
 
     /// The hash of this transaction, so it can be uniquely identified on the Lightning Network.
     fn get_transaction_hash(&self) -> Option<String> {
-        return self.transaction_hash.clone();
+        self.transaction_hash.clone()
     }
 
     fn type_name(&self) -> &'static str {
@@ -103,17 +103,17 @@ impl Transaction for RoutingTransaction {
 impl Entity for RoutingTransaction {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -123,7 +123,7 @@ impl Entity for RoutingTransaction {
 
 impl GetEntity for RoutingTransaction {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -135,7 +135,7 @@ impl GetEntity for RoutingTransaction {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 

@@ -2,7 +2,7 @@
 use crate::types::entity_wrapper::EntityWrapper;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct SendPaymentOutput {
     /// The payment that has been sent.
     #[serde(rename = "send_payment_output_payment")]

@@ -2,7 +2,7 @@
 use crate::objects::invoice_type::InvoiceType;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct CreateInvoiceInput {
     pub node_id: String,
 
@@ -11,4 +11,8 @@ pub struct CreateInvoiceInput {
     pub memo: Option<String>,
 
     pub invoice_type: Option<InvoiceType>,
+
+    pub payment_hash: Option<String>,
+
+    pub preimage_nonce: Option<String>,
 }

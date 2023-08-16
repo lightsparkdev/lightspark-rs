@@ -2,15 +2,15 @@
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::incoming_payment_attempt_status::IncomingPaymentAttemptStatus;
-use crate::types::custom_date_format::custom_date_format;
-use crate::types::custom_date_format::custom_date_format_option;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-/// An attempt for a payment over a route from sender node to recipient node.
-#[derive(Deserialize)]
+/// This object represents any attempted payment sent to a Lightspark node on the Lightning Network. You can retrieve this object to receive payment related information about a specific incoming payment attempt.
+#[derive(Clone, Deserialize)]
 pub struct IncomingPaymentAttempt {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "incoming_payment_attempt_id")]
@@ -53,17 +53,17 @@ pub struct IncomingPaymentAttempt {
 impl Entity for IncomingPaymentAttempt {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -73,7 +73,7 @@ impl Entity for IncomingPaymentAttempt {
 
 impl GetEntity for IncomingPaymentAttempt {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -85,7 +85,7 @@ impl GetEntity for IncomingPaymentAttempt {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 

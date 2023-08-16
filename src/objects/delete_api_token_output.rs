@@ -2,7 +2,7 @@
 use crate::types::entity_wrapper::EntityWrapper;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct DeleteApiTokenOutput {
     #[serde(rename = "delete_api_token_output_account")]
     pub account: EntityWrapper,

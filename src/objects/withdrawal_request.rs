@@ -6,9 +6,9 @@ use crate::objects::withdrawal_mode::WithdrawalMode;
 use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
 use crate::objects::withdrawal_request_to_channel_closing_transactions_connection::WithdrawalRequestToChannelClosingTransactionsConnection;
 use crate::objects::withdrawal_request_to_channel_opening_transactions_connection::WithdrawalRequestToChannelOpeningTransactionsConnection;
-use crate::requester::requester::Requester;
-use crate::types::custom_date_format::custom_date_format;
-use crate::types::custom_date_format::custom_date_format_option;
+use crate::request::requester::Requester;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
@@ -16,7 +16,8 @@ use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
 
-#[derive(Deserialize)]
+/// This object represents a request made for an L1 withdrawal from your Lightspark Node to any Bitcoin wallet. You can retrieve this object to receive detailed information about any withdrawal request made from your Lightspark account.
+#[derive(Clone, Deserialize)]
 pub struct WithdrawalRequest {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "withdrawal_request_id")]
@@ -65,17 +66,17 @@ pub struct WithdrawalRequest {
 impl Entity for WithdrawalRequest {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -85,7 +86,7 @@ impl Entity for WithdrawalRequest {
 
 impl GetEntity for WithdrawalRequest {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -97,7 +98,7 @@ impl GetEntity for WithdrawalRequest {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 
@@ -192,13 +193,13 @@ impl WithdrawalRequest {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["channel_closing_transactions"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
@@ -260,13 +261,13 @@ impl WithdrawalRequest {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["channel_opening_transactions"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

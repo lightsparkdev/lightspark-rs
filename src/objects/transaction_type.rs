@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum of the potential types of transactions that can be associated with your Lightspark Node.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum TransactionType {
     /// Transactions initiated from a Lightspark node on Lightning Network.
@@ -47,9 +48,9 @@ pub enum TransactionType {
     Route,
 }
 
-impl Into<Value> for TransactionType {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<TransactionType> for Value {
+    fn from(val: TransactionType) -> Self {
+        Value::from(val.to_string())
     }
 }
 

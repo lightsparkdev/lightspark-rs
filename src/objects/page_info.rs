@@ -1,7 +1,8 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+/// This is an object representing information about a page returned by the Lightspark API. For more information, please see the “Pagination” section of our API docs for more information about its usage.
+#[derive(Clone, Deserialize)]
 pub struct PageInfo {
     #[serde(rename = "page_info_has_next_page")]
     pub has_next_page: Option<bool>,

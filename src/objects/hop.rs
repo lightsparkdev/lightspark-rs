@@ -1,14 +1,14 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
-use crate::types::custom_date_format::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-/// One hop signifies a payment moving one node ahead on a payment route; a list of sequential hops defines the path from sender node to recipient node for a payment attempt.
-#[derive(Deserialize)]
+/// This object represents a specific node that existed on a particular payment route. You can retrieve this object to get information about a node on a particular payment path and all payment-relevant information for that node.
+#[derive(Clone, Deserialize)]
 pub struct Hop {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "hop_id")]
@@ -50,17 +50,17 @@ pub struct Hop {
 impl Entity for Hop {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -70,7 +70,7 @@ impl Entity for Hop {
 
 impl GetEntity for Hop {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -82,7 +82,7 @@ impl GetEntity for Hop {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 

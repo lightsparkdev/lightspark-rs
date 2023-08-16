@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum of the potential statuses that a Withdrawal can take.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum WithdrawalRequestStatus {
     #[serde(rename = "FAILED")]
@@ -15,9 +16,9 @@ pub enum WithdrawalRequestStatus {
     Successful,
 }
 
-impl Into<Value> for WithdrawalRequestStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<WithdrawalRequestStatus> for Value {
+    fn from(val: WithdrawalRequestStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

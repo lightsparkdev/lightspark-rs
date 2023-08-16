@@ -2,7 +2,7 @@
 
 use std::fmt;
 
-use crate::{crypto::CryptoError, requester::requester::RequesterError};
+use crate::{crypto::CryptoError, request::requester::RequesterError};
 
 #[derive(Debug)]
 pub enum Error {
@@ -11,6 +11,7 @@ pub enum Error {
     ClientError(RequesterError),
     ConversionError(serde_json::Error),
     CryptoError(CryptoError),
+    WebhookSignatureError,
 }
 
 impl fmt::Display for Error {
@@ -21,6 +22,9 @@ impl fmt::Display for Error {
             Self::ClientError(err) => write!(f, "Client error {}", err),
             Self::ConversionError(err) => write!(f, "Parameter conversion error {}", err),
             Self::CryptoError(err) => write!(f, "Crypto error {}", err),
+            Self::WebhookSignatureError => {
+                write!(f, "Webhook message hash does not match signature")
+            }
         }
     }
 }

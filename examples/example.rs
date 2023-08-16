@@ -2,18 +2,16 @@
 
 use chrono::{Duration, Utc};
 use lightspark::objects::bitcoin_network::BitcoinNetwork;
-use lightspark::objects::channel_closing_transaction::ChannelClosingTransaction;
-use lightspark::objects::channel_opening_transaction::ChannelOpeningTransaction;
+
 use lightspark::objects::currency_amount::CurrencyAmount;
 use lightspark::objects::deposit::Deposit;
+
 use lightspark::objects::lightspark_node::LightsparkNode;
-use lightspark::objects::outgoing_payment::OutgoingPayment;
 use lightspark::objects::transaction::Transaction;
-use lightspark::objects::withdrawal::Withdrawal;
 use lightspark::objects::withdrawal_mode::WithdrawalMode;
-use lightspark::{client::LightsparkClient, requester::auth_provider::AccountAuthProvider};
+use lightspark::{client::LightsparkClient, request::auth_provider::AccountAuthProvider};
 use serde_json::Value;
-use std::any::Any;
+
 use std::collections::HashMap;
 
 fn print_fees(fees: Option<CurrencyAmount>) {
@@ -76,7 +74,7 @@ async fn main() {
     }
 
     // Get current account's API tokens
-    let connection = match account.get_api_tokens(&client.requester, None).await {
+    let connection = match account.get_api_tokens(&client.requester, None, None).await {
         Ok(v) => v,
         Err(err) => {
             println!("{}", err);
@@ -93,7 +91,7 @@ async fn main() {
     if let Ok(new_api_token) = client.create_api_token("Test token", true, true).await {
         println!("Created API token {}.", new_api_token.0.id);
 
-        let connection = match account.get_api_tokens(&client.requester, None).await {
+        let connection = match account.get_api_tokens(&client.requester, None, None).await {
             Ok(v) => v,
             Err(err) => {
                 println!("{}", err);
@@ -220,32 +218,43 @@ async fn main() {
 
     let mut deposit_transaction_id: Option<String> = None;
     for transaction in transactions_connection.entities {
-        let type_name = Transaction::type_name(transaction.as_ref());
+        let mut fee: Option<CurrencyAmount> = None;
+        let inner: Box<dyn Transaction> = match transaction {
+            lightspark::objects::transaction::TransactionEnum::Deposit(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::Withdrawal(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::OutgoingPayment(t) => Box::new(t),
+            lightspark::objects::transaction::TransactionEnum::IncomingPayment(t) => Box::new(t),
+            lightspark::objects::transaction::TransactionEnum::ChannelOpeningTransaction(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::ChannelClosingTransaction(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::RoutingTransaction(t) => Box::new(t),
+        };
+        let type_name = Transaction::type_name(inner.as_ref());
         println!(
             "    - {} at {}: {} {} ({})",
             type_name,
-            transaction.get_created_at(),
-            transaction.get_amount().preferred_currency_value_approx,
-            transaction.get_amount().preferred_currency_unit,
-            transaction.get_status()
+            inner.get_created_at(),
+            inner.get_amount().preferred_currency_value_approx,
+            inner.get_amount().preferred_currency_unit,
+            inner.get_status()
         );
 
         if type_name == "Deposit" {
-            deposit_transaction_id = Some(transaction.get_id().clone());
+            deposit_transaction_id = Some(inner.get_id().clone());
         }
 
-        let transaction: Box<dyn Any> = Box::new(transaction);
-        if let Some(outgoing_payment) = transaction.downcast_ref::<OutgoingPayment>() {
-            print_fees(outgoing_payment.fees.clone());
-        } else if let Some(deposit) = transaction.downcast_ref::<Deposit>() {
-            print_fees(deposit.fees.clone());
-        } else if let Some(withdrawal) = transaction.downcast_ref::<Withdrawal>() {
-            print_fees(withdrawal.fees.clone());
-        } else if let Some(opening) = transaction.downcast_ref::<ChannelOpeningTransaction>() {
-            print_fees(opening.fees.clone());
-        } else if let Some(closing) = transaction.downcast_ref::<ChannelClosingTransaction>() {
-            print_fees(closing.fees.clone());
-        }
+        print_fees(fee);
     }
 
     println!();
@@ -391,10 +400,6 @@ async fn main() {
         }
     };
     println!("Decoded payment request:");
-    println!(
-        "    destination_public_key = {}",
-        decoded_request.destination.get_public_key().unwrap()
-    );
     println!(
         "    amount = {} {}",
         decoded_request.amount.preferred_currency_value_approx,

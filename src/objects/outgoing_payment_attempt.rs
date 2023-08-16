@@ -5,9 +5,9 @@ use crate::objects::entity::Entity;
 use crate::objects::htlc_attempt_failure_code::HtlcAttemptFailureCode;
 use crate::objects::outgoing_payment_attempt_status::OutgoingPaymentAttemptStatus;
 use crate::objects::outgoing_payment_attempt_to_hops_connection::OutgoingPaymentAttemptToHopsConnection;
-use crate::requester::requester::Requester;
-use crate::types::custom_date_format::custom_date_format;
-use crate::types::custom_date_format::custom_date_format_option;
+use crate::request::requester::Requester;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
@@ -15,8 +15,8 @@ use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;
 
-/// An attempt for a payment over a route from sender node to recipient node.
-#[derive(Deserialize)]
+/// This object represents an attempted Lightning Network payment sent from a Lightspark Node. You can retrieve this object to receive payment related information about any payment attempt sent from your Lightspark Node on the Lightning Network, including any potential reasons the payment may have failed.
+#[derive(Clone, Deserialize)]
 pub struct OutgoingPaymentAttempt {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "outgoing_payment_attempt_id")]
@@ -71,17 +71,17 @@ pub struct OutgoingPaymentAttempt {
 impl Entity for OutgoingPaymentAttempt {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -91,7 +91,7 @@ impl Entity for OutgoingPaymentAttempt {
 
 impl GetEntity for OutgoingPaymentAttempt {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -103,7 +103,7 @@ impl GetEntity for OutgoingPaymentAttempt {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 
@@ -187,13 +187,13 @@ impl OutgoingPaymentAttempt {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["hops"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

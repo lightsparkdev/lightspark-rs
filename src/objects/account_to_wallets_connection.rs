@@ -4,7 +4,7 @@ use crate::objects::wallet::Wallet;
 use serde::Deserialize;
 use std::vec::Vec;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct AccountToWalletsConnection {
     /// An object that holds pagination information about the objects in this connection.
     #[serde(rename = "account_to_wallets_connection_page_info")]

@@ -35,7 +35,30 @@ pub trait Entity {
     fn type_name(&self) -> &'static str;
 }
 
-impl<'de> Deserialize<'de> for Box<dyn Entity> {
+#[allow(clippy::large_enum_variant)]
+#[derive(Clone)]
+pub enum EntityEnum {
+    Account(Account),
+    ApiToken(ApiToken),
+    Channel(Channel),
+    ChannelClosingTransaction(ChannelClosingTransaction),
+    ChannelOpeningTransaction(ChannelOpeningTransaction),
+    Deposit(Deposit),
+    GraphNode(GraphNode),
+    Hop(Hop),
+    IncomingPayment(IncomingPayment),
+    IncomingPaymentAttempt(IncomingPaymentAttempt),
+    Invoice(Invoice),
+    LightsparkNode(LightsparkNode),
+    OutgoingPayment(OutgoingPayment),
+    OutgoingPaymentAttempt(OutgoingPaymentAttempt),
+    RoutingTransaction(RoutingTransaction),
+    Wallet(Wallet),
+    Withdrawal(Withdrawal),
+    WithdrawalRequest(WithdrawalRequest),
+}
+
+impl<'de> Deserialize<'de> for EntityEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -47,109 +70,109 @@ impl<'de> Deserialize<'de> for Box<dyn Entity> {
                     let obj = Account::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::Account(obj))
                 }
                 "ApiToken" => {
                     let obj = ApiToken::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::ApiToken(obj))
                 }
                 "Channel" => {
                     let obj = Channel::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::Channel(obj))
                 }
                 "ChannelClosingTransaction" => {
                     let obj = ChannelClosingTransaction::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::ChannelClosingTransaction(obj))
                 }
                 "ChannelOpeningTransaction" => {
                     let obj = ChannelOpeningTransaction::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::ChannelOpeningTransaction(obj))
                 }
                 "Deposit" => {
                     let obj = Deposit::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::Deposit(obj))
                 }
                 "GraphNode" => {
                     let obj = GraphNode::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::GraphNode(obj))
                 }
                 "Hop" => {
                     let obj = Hop::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::Hop(obj))
                 }
                 "IncomingPayment" => {
                     let obj = IncomingPayment::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::IncomingPayment(obj))
                 }
                 "IncomingPaymentAttempt" => {
                     let obj = IncomingPaymentAttempt::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::IncomingPaymentAttempt(obj))
                 }
                 "Invoice" => {
                     let obj = Invoice::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::Invoice(obj))
                 }
                 "LightsparkNode" => {
                     let obj = LightsparkNode::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::LightsparkNode(obj))
                 }
                 "OutgoingPayment" => {
                     let obj = OutgoingPayment::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::OutgoingPayment(obj))
                 }
                 "OutgoingPaymentAttempt" => {
                     let obj = OutgoingPaymentAttempt::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::OutgoingPaymentAttempt(obj))
                 }
                 "RoutingTransaction" => {
                     let obj = RoutingTransaction::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::RoutingTransaction(obj))
                 }
                 "Wallet" => {
                     let obj = Wallet::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::Wallet(obj))
                 }
                 "Withdrawal" => {
                     let obj = Withdrawal::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::Withdrawal(obj))
                 }
                 "WithdrawalRequest" => {
                     let obj = WithdrawalRequest::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(EntityEnum::WithdrawalRequest(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

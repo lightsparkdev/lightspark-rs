@@ -3,6 +3,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 
+use openssl::sha::sha256;
 use serde_json::Value;
 
 use crate::crypto::decrypt_private_key;
@@ -24,8 +25,8 @@ use crate::objects::{account, invoice_data};
 use crate::objects::{api_token, outgoing_payment};
 use crate::objects::{bitcoin_network, withdrawal_request};
 use crate::objects::{fee_estimate, lightning_fee_estimate_output};
-use crate::requester::auth_provider::AuthProvider;
-use crate::requester::requester::{Requester, RequesterError};
+use crate::request::auth_provider::AuthProvider;
+use crate::request::requester::{Requester, RequesterError};
 use crate::types::get_entity::GetEntity;
 
 pub struct LightsparkClient {
@@ -326,6 +327,53 @@ impl LightsparkClient {
         Ok(result)
     }
 
+    pub async fn create_lnurl_invoice(
+        &self,
+        node_id: &str,
+        amount_msats: i64,
+        metadata: &str,
+    ) -> Result<Invoice, Error> {
+        let operation = format!(
+            "mutation CreateLnurlInvoice(
+                $node_id: ID!
+                $amount_msats: Long!
+                $metadata_hash: String!
+            ) {{
+                create_lnurl_invoice(input: {{
+                    node_id: $node_id
+                    amount_msats: $amount_msats
+                    metadata_hash: $metadata_hash
+                }}) {{
+                    invoice {{
+                        ...InvoiceFragment
+                    }}
+                }}
+            }}
+            
+            {}
+            ",
+            invoice::FRAGMENT
+        );
+
+        let metadata_hash = hex::encode(sha256(metadata.as_bytes()));
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("node_id", node_id.into());
+        variables.insert("amount_msats", amount_msats.into());
+        variables.insert("metadata_hash", metadata_hash.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(&operation, Some(value))
+            .await
+            .map_err(Error::ClientError)?;
+
+        let result = serde_json::from_value(json["create_lnurl_invoice"]["invoice"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
     pub async fn fund_node(
         &self,
         node_id: &str,
@@ -431,7 +479,7 @@ impl LightsparkClient {
         .to_string();
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
-        variables.insert("node_id", node_id.clone().into());
+        variables.insert("node_id", node_id.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
@@ -453,7 +501,7 @@ impl LightsparkClient {
 
         let decrypted_private_key = decrypt_private_key(cipher, encrypted_key, node_password)
             .map_err(Error::CryptoError)?;
-        self.load_node_signing_key(node_id.clone(), decrypted_private_key.clone());
+        self.load_node_signing_key(node_id, decrypted_private_key.clone());
         Ok(decrypted_private_key)
     }
 
@@ -493,8 +541,8 @@ impl LightsparkClient {
         );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
-        variables.insert("node_id", node_id.clone().into());
-        variables.insert("encoded_invoice", encoded_invoice.clone().into());
+        variables.insert("node_id", node_id.into());
+        variables.insert("encoded_invoice", encoded_invoice.into());
         if let Some(amount_msats) = amount_msats {
             variables.insert("amount_msats", amount_msats.into());
         }
@@ -550,11 +598,8 @@ impl LightsparkClient {
         );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
-        variables.insert("node_id", node_id.clone().into());
-        variables.insert(
-            "destination_public_key",
-            destination_public_key.clone().into(),
-        );
+        variables.insert("node_id", node_id.into());
+        variables.insert("destination_public_key", destination_public_key.into());
         variables.insert("amount_msats", amount_msats.into());
         variables.insert("timeout_secs", timeout_secs.into());
         variables.insert("maximum_fees_msats", maximum_fees_msats.into());
@@ -582,7 +627,7 @@ impl LightsparkClient {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
             .requester
-            .execute_graphql(&operation, Some(value))
+            .execute_graphql(operation, Some(value))
             .await
             .map_err(Error::ClientError)?;
         Ok(json)
@@ -601,7 +646,7 @@ impl LightsparkClient {
         .to_string();
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
-        variables.insert("node_id", node_id.clone().into());
+        variables.insert("node_id", node_id.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
@@ -651,9 +696,9 @@ impl LightsparkClient {
         );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
-        variables.insert("node_id", node_id.clone().into());
+        variables.insert("node_id", node_id.into());
         variables.insert("amount_sats", amount_sats.into());
-        variables.insert("bitcoin_address", bitcoin_address.clone().into());
+        variables.insert("bitcoin_address", bitcoin_address.into());
         variables.insert("withdrawal_mode", withdrawal_mode.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
@@ -703,7 +748,7 @@ impl LightsparkClient {
 
         let json = self
             .requester
-            .execute_graphql(&mutation, Some(value))
+            .execute_graphql(mutation, Some(value))
             .await
             .map_err(Error::ClientError)?;
 
@@ -741,8 +786,8 @@ impl LightsparkClient {
         );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
-        variables.insert("node_id", node_id.clone().into());
-        variables.insert("encoded_invoice", encoded_invoice.clone().into());
+        variables.insert("node_id", node_id.into());
+        variables.insert("encoded_invoice", encoded_invoice.into());
         if let Some(amount_msats) = amount_msats {
             variables.insert("amount_msats", amount_msats.into());
         }

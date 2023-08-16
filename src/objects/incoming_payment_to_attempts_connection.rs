@@ -4,7 +4,7 @@ use serde::Deserialize;
 use std::vec::Vec;
 
 /// The connection from incoming payment to all attempts.
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct IncomingPaymentToAttemptsConnection {
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     #[serde(rename = "incoming_payment_to_attempts_connection_count")]

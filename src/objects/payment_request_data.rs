@@ -13,7 +13,13 @@ pub trait PaymentRequestData {
     fn type_name(&self) -> &'static str;
 }
 
-impl<'de> Deserialize<'de> for Box<dyn PaymentRequestData> {
+#[allow(clippy::large_enum_variant)]
+#[derive(Clone)]
+pub enum PaymentRequestDataEnum {
+    InvoiceData(InvoiceData),
+}
+
+impl<'de> Deserialize<'de> for PaymentRequestDataEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -25,7 +31,7 @@ impl<'de> Deserialize<'de> for Box<dyn PaymentRequestData> {
                     let obj = InvoiceData::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(PaymentRequestDataEnum::InvoiceData(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

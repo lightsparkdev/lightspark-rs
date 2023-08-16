@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum of the potential reasons that an attempted routed transaction through a Lightspark node may have failed.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum RoutingTransactionFailureReason {
     #[serde(rename = "INCOMING_LINK_FAILURE")]
@@ -15,9 +16,9 @@ pub enum RoutingTransactionFailureReason {
     ForwardingFailure,
 }
 
-impl Into<Value> for RoutingTransactionFailureReason {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<RoutingTransactionFailureReason> for Value {
+    fn from(val: RoutingTransactionFailureReason) -> Self {
+        Value::from(val.to_string())
     }
 }
 

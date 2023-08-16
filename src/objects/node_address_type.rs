@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
-/// An enum that enumerates all possible types of addresses of a node on the Lightning Network.
+/// This is an enum of the potential types of addresses that a node on the Lightning Network can have.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum NodeAddressType {
     #[serde(rename = "IPV4")]
@@ -16,9 +16,9 @@ pub enum NodeAddressType {
     Tor,
 }
 
-impl Into<Value> for NodeAddressType {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<NodeAddressType> for Value {
+    fn from(val: NodeAddressType) -> Self {
+        Value::from(val.to_string())
     }
 }
 

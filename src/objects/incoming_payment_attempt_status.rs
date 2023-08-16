@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
-/// Enum that enumerates all the possible status of an incoming payment attempt.
+/// This is an enum that enumerates all potential statuses for an incoming payment attempt.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum IncomingPaymentAttemptStatus {
     #[serde(rename = "ACCEPTED")]
@@ -19,9 +19,9 @@ pub enum IncomingPaymentAttemptStatus {
     Unknown,
 }
 
-impl Into<Value> for IncomingPaymentAttemptStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<IncomingPaymentAttemptStatus> for Value {
+    fn from(val: IncomingPaymentAttemptStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

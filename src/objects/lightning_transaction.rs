@@ -11,7 +11,15 @@ pub trait LightningTransaction: Transaction + Entity {
     fn type_name(&self) -> &'static str;
 }
 
-impl<'de> Deserialize<'de> for Box<dyn LightningTransaction> {
+#[allow(clippy::large_enum_variant)]
+#[derive(Clone)]
+pub enum LightningTransactionEnum {
+    IncomingPayment(IncomingPayment),
+    OutgoingPayment(OutgoingPayment),
+    RoutingTransaction(RoutingTransaction),
+}
+
+impl<'de> Deserialize<'de> for LightningTransactionEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -23,19 +31,19 @@ impl<'de> Deserialize<'de> for Box<dyn LightningTransaction> {
                     let obj = IncomingPayment::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(LightningTransactionEnum::IncomingPayment(obj))
                 }
                 "OutgoingPayment" => {
                     let obj = OutgoingPayment::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(LightningTransactionEnum::OutgoingPayment(obj))
                 }
                 "RoutingTransaction" => {
                     let obj = RoutingTransaction::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(LightningTransactionEnum::RoutingTransaction(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

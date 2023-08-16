@@ -4,7 +4,8 @@ use crate::objects::routing_transaction_failure_reason::RoutingTransactionFailur
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
-#[derive(Deserialize, Serialize)]
+/// This object represents payment failures associated with your Lightspark Node.
+#[derive(Clone, Deserialize, Serialize)]
 pub struct TransactionFailures {
     pub payment_failures: Option<Vec<PaymentFailureReason>>,
 

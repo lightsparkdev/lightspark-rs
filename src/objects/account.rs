@@ -10,11 +10,12 @@ use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
+use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
 use crate::objects::transaction_failures::TransactionFailures;
 use crate::objects::transaction_status::TransactionStatus;
 use crate::objects::transaction_type::TransactionType;
-use crate::requester::requester::Requester;
-use crate::types::custom_date_format::custom_date_format;
+use crate::request::requester::Requester;
+use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
@@ -22,7 +23,8 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
-#[derive(Deserialize)]
+/// This is an object representing the connected Lightspark account. You can retrieve this object to see your account information and objects tied to your account.
+#[derive(Clone, Deserialize)]
 pub struct Account {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "account_id")]
@@ -41,20 +43,26 @@ pub struct Account {
     pub name: Option<String>,
 }
 
+impl LightsparkNodeOwner for Account {
+    fn type_name(&self) -> &'static str {
+        "Account"
+    }
+}
+
 impl Entity for Account {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -64,7 +72,7 @@ impl Entity for Account {
 
 impl GetEntity for Account {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -76,7 +84,7 @@ impl GetEntity for Account {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 
@@ -95,12 +103,14 @@ impl Account {
         &self,
         requester: &Requester,
         first: Option<i64>,
+        after: Option<String>,
     ) -> Result<AccountToApiTokensConnection, Error> {
-        let query = "query FetchAccountToApiTokensConnection($entity_id: ID!, $first: Int) {
+        let query = "query FetchAccountToApiTokensConnection($entity_id: ID!, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on Account {
-            api_tokens(, first: $first) {
+            api_tokens(, first: $first, after: $after) {
                 __typename
+                account_to_api_tokens_connection_count: count
                 account_to_api_tokens_connection_page_info: page_info {
                     __typename
                     page_info_has_next_page: has_next_page
@@ -108,7 +118,6 @@ impl Account {
                     page_info_start_cursor: start_cursor
                     page_info_end_cursor: end_cursor
                 }
-                account_to_api_tokens_connection_count: count
                 account_to_api_tokens_connection_entities: entities {
                     __typename
                     api_token_id: id
@@ -125,14 +134,15 @@ impl Account {
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
+        variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["api_tokens"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
@@ -204,16 +214,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["blockchain_balance"].clone();
         let result = if json.is_null() {
             None
         } else {
-            Some(serde_json::from_value(json).map_err(|err| Error::JsonError(err))?)
+            Some(serde_json::from_value(json).map_err(Error::JsonError)?)
         };
         Ok(result)
     }
@@ -236,11 +246,11 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["conductivity"].clone();
         let result = json.as_i64();
         Ok(result)
@@ -271,16 +281,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["local_balance"].clone();
         let result = if json.is_null() {
             None
         } else {
-            Some(serde_json::from_value(json).map_err(|err| Error::JsonError(err))?)
+            Some(serde_json::from_value(json).map_err(Error::JsonError)?)
         };
         Ok(result)
     }
@@ -318,6 +328,9 @@ impl Account {
                     lightspark_node_display_name: display_name
                     lightspark_node_public_key: public_key
                     lightspark_node_account: account {
+                        id
+                    }
+                    lightspark_node_owner: owner {
                         id
                     }
                     lightspark_node_blockchain_balance: blockchain_balance {
@@ -421,13 +434,13 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["nodes"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
@@ -456,16 +469,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["remote_balance"].clone();
         let result = if json.is_null() {
             None
         } else {
-            Some(serde_json::from_value(json).map_err(|err| Error::JsonError(err))?)
+            Some(serde_json::from_value(json).map_err(Error::JsonError)?)
         };
         Ok(result)
     }
@@ -492,11 +505,11 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["uptime_percentage"].clone();
         let result = json.as_i64();
         Ok(result)
@@ -623,16 +636,17 @@ impl Account {
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("first", first.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["channels"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn get_transactions(
         &self,
         requester: &Requester,
@@ -651,6 +665,14 @@ impl Account {
         ... on Account {
             transactions(, first: $first, after: $after, types: $types, after_date: $after_date, before_date: $before_date, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id, statuses: $statuses, exclude_failures: $exclude_failures) {
                 __typename
+                account_to_transactions_connection_count: count
+                account_to_transactions_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
                 account_to_transactions_connection_profit_loss: profit_loss {
                     __typename
                     currency_amount_original_value: original_value
@@ -667,7 +689,6 @@ impl Account {
                     currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
                     currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
                 }
-                account_to_transactions_connection_count: count
                 account_to_transactions_connection_total_amount_transacted: total_amount_transacted {
                     __typename
                     currency_amount_original_value: original_value
@@ -876,6 +897,9 @@ impl Account {
                                         lightspark_node_account: account {
                                             id
                                         }
+                                        lightspark_node_owner: owner {
+                                            id
+                                        }
                                         lightspark_node_blockchain_balance: blockchain_balance {
                                             __typename
                                             blockchain_balance_total_balance: total_balance {
@@ -1045,13 +1069,6 @@ impl Account {
                         }
                     }
                 }
-                account_to_transactions_connection_page_info: page_info {
-                    __typename
-                    page_info_has_next_page: has_next_page
-                    page_info_has_previous_page: has_previous_page
-                    page_info_start_cursor: start_cursor
-                    page_info_end_cursor: end_cursor
-                }
             }
         }
     }
@@ -1068,19 +1085,20 @@ impl Account {
         variables.insert("statuses", statuses.into());
         variables.insert(
             "exclude_failures",
-            serde_json::to_value(&exclude_failures).map_err(|err| Error::ConversionError(err))?,
+            serde_json::to_value(&exclude_failures).map_err(Error::ConversionError)?,
         );
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["transactions"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn get_payment_requests(
         &self,
         requester: &Requester,
@@ -1097,6 +1115,13 @@ impl Account {
             payment_requests(, first: $first, after: $after, after_date: $after_date, before_date: $before_date, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id) {
                 __typename
                 account_to_payment_requests_connection_count: count
+                account_to_payment_requests_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
                 account_to_payment_requests_connection_entities: entities {
                     __typename
                     ... on Invoice {
@@ -1146,6 +1171,9 @@ impl Account {
                                     lightspark_node_display_name: display_name
                                     lightspark_node_public_key: public_key
                                     lightspark_node_account: account {
+                                        id
+                                    }
+                                    lightspark_node_owner: owner {
                                         id
                                     }
                                     lightspark_node_blockchain_balance: blockchain_balance {
@@ -1252,13 +1280,6 @@ impl Account {
                         }
                     }
                 }
-                account_to_payment_requests_connection_page_info: page_info {
-                    __typename
-                    page_info_has_next_page: has_next_page
-                    page_info_has_previous_page: has_previous_page
-                    page_info_start_cursor: start_cursor
-                    page_info_end_cursor: end_cursor
-                }
             }
         }
     }
@@ -1272,13 +1293,13 @@ impl Account {
         variables.insert("bitcoin_network", bitcoin_network.into());
         variables.insert("lightning_node_id", lightning_node_id.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["payment_requests"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
@@ -1334,6 +1355,7 @@ impl Account {
                         }
                     }
                     wallet_third_party_identifier: third_party_identifier
+                    wallet_status: status
                 }
             }
         }
@@ -1343,13 +1365,13 @@ impl Account {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["wallets"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

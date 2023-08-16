@@ -4,7 +4,7 @@ use serde::Deserialize;
 use std::vec::Vec;
 
 /// The connection from an outgoing payment attempt to the list of sequential hops that define the path from sender node to recipient node.
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct OutgoingPaymentAttemptToHopsConnection {
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     #[serde(rename = "outgoing_payment_attempt_to_hops_connection_count")]

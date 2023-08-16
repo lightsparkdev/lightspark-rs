@@ -2,7 +2,7 @@
 use crate::objects::api_token::ApiToken;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct CreateApiTokenOutput {
     /// The API Token that has been created.
     #[serde(rename = "create_api_token_output_api_token")]

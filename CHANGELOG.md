@@ -1,5 +1,10 @@
 # Changelog
 
+# v0.4.0
+- Add webhook handling.
+- Change the interface wrapper to enum.
+- Updated graphql schema.
+
 # v0.3.0
 - Add test mode operations: `create_test_mode_invoice` and `create_test_mode_payment`
 

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum of the potential modes that your Bitcoin withdrawal can take.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum WithdrawalMode {
     #[serde(rename = "WALLET_ONLY")]
@@ -12,9 +13,9 @@ pub enum WithdrawalMode {
     WalletThenChannels,
 }
 
-impl Into<Value> for WithdrawalMode {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<WithdrawalMode> for Value {
+    fn from(val: WithdrawalMode) -> Self {
+        Value::from(val.to_string())
     }
 }
 

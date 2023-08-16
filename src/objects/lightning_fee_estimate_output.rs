@@ -2,7 +2,7 @@
 use crate::objects::currency_amount::CurrencyAmount;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct LightningFeeEstimateOutput {
     /// The estimated fees for the payment.
     #[serde(rename = "lightning_fee_estimate_output_fee_estimate")]

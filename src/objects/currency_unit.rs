@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This enum identifies the unit of currency associated with a CurrencyAmount.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum CurrencyUnit {
     /// Bitcoin is the cryptocurrency native to the Bitcoin network. It is used as the native medium for value transfer for the Lightning Network.
@@ -35,9 +36,9 @@ pub enum CurrencyUnit {
     Millibitcoin,
 }
 
-impl Into<Value> for CurrencyUnit {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<CurrencyUnit> for Value {
+    fn from(val: CurrencyUnit) -> Self {
+        Value::from(val.to_string())
     }
 }
 

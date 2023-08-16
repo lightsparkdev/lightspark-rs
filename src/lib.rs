@@ -7,9 +7,12 @@
 //!
 //! After obtain an API token, a client can be initiate.
 //! ```
-//! let api_id = <your api token id>;
-//! let api_token = <your api token secret>;
-//! let auth_provider = AccountAuthProvider::new(api_id, api_token);
+//! use lightspark::request::auth_provider::AccountAuthProvider;
+//! use lightspark::client::LightsparkClient;
+//!
+//! let api_id = "<your api token id>";
+//! let api_token = "<your api token secret>";
+//! let auth_provider = AccountAuthProvider::new(api_id.to_string(), api_token.to_string());
 //! let client = match LightsparkClient::new(auth_provider) {
 //!    Ok(value) => value,
 //!    Err(err) => {
@@ -24,11 +27,12 @@
 //! See more examples in examples/example.rs
 //!
 /// The version of this library.
-pub const VERSION: &str = "0.1.0";
+pub const VERSION: &str = "0.4.0";
 
 pub mod client;
 pub mod crypto;
 pub mod error;
 pub mod objects;
-pub mod requester;
+pub mod request;
 pub mod types;
+pub mod webhooks;

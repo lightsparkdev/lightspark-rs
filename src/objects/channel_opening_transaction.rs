@@ -4,16 +4,16 @@ use crate::objects::entity::Entity;
 use crate::objects::on_chain_transaction::OnChainTransaction;
 use crate::objects::transaction::Transaction;
 use crate::objects::transaction_status::TransactionStatus;
-use crate::types::custom_date_format::custom_date_format;
-use crate::types::custom_date_format::custom_date_format_option;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use std::vec::Vec;
 
-/// The transaction on Bitcoin blockchain to open a channel on Lightning Network funded by the local Lightspark node.
-#[derive(Deserialize)]
+/// This is an object representing a transaction which opens a channel on the Lightning Network. This object occurs only for channels funded by the local Lightspark node.
+#[derive(Clone, Deserialize)]
 pub struct ChannelOpeningTransaction {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "channel_opening_transaction_id")]
@@ -80,27 +80,27 @@ pub struct ChannelOpeningTransaction {
 impl OnChainTransaction for ChannelOpeningTransaction {
     /// The fees that were paid by the wallet sending the transaction to commit it to the Bitcoin blockchain.
     fn get_fees(&self) -> Option<CurrencyAmount> {
-        return self.fees.clone();
+        self.fees.clone()
     }
 
     /// The hash of the block that included this transaction. This will be null for unconfirmed transactions.
     fn get_block_hash(&self) -> Option<String> {
-        return self.block_hash.clone();
+        self.block_hash.clone()
     }
 
     /// The height of the block that included this transaction. This will be zero for unconfirmed transactions.
     fn get_block_height(&self) -> i64 {
-        return self.block_height;
+        self.block_height
     }
 
     /// The Bitcoin blockchain addresses this transaction was sent to.
     fn get_destination_addresses(&self) -> Vec<String> {
-        return self.destination_addresses.clone();
+        self.destination_addresses.clone()
     }
 
     /// The number of blockchain confirmations for this transaction in real time.
     fn get_num_confirmations(&self) -> Option<i64> {
-        return self.num_confirmations;
+        self.num_confirmations
     }
 
     fn type_name(&self) -> &'static str {
@@ -111,22 +111,22 @@ impl OnChainTransaction for ChannelOpeningTransaction {
 impl Transaction for ChannelOpeningTransaction {
     /// The current status of this transaction.
     fn get_status(&self) -> TransactionStatus {
-        return self.status.clone();
+        self.status.clone()
     }
 
     /// The date and time when this transaction was completed or failed.
     fn get_resolved_at(&self) -> Option<DateTime<Utc>> {
-        return self.resolved_at;
+        self.resolved_at
     }
 
     /// The amount of money involved in this transaction.
     fn get_amount(&self) -> CurrencyAmount {
-        return self.amount.clone();
+        self.amount.clone()
     }
 
     /// The hash of this transaction, so it can be uniquely identified on the Lightning Network.
     fn get_transaction_hash(&self) -> Option<String> {
-        return self.transaction_hash.clone();
+        self.transaction_hash.clone()
     }
 
     fn type_name(&self) -> &'static str {
@@ -137,17 +137,17 @@ impl Transaction for ChannelOpeningTransaction {
 impl Entity for ChannelOpeningTransaction {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -157,7 +157,7 @@ impl Entity for ChannelOpeningTransaction {
 
 impl GetEntity for ChannelOpeningTransaction {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -169,7 +169,7 @@ impl GetEntity for ChannelOpeningTransaction {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 

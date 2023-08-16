@@ -2,7 +2,7 @@
 use crate::objects::invoice_type::InvoiceType;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct CreateTestModeInvoiceInput {
     pub local_node_id: String,
 

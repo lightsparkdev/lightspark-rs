@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum of the potential event types that can be associated with your Lightspark wallets.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum WebhookEventType {
     #[serde(rename = "PAYMENT_FINISHED")]
@@ -25,11 +26,14 @@ pub enum WebhookEventType {
 
     #[serde(rename = "WALLET_FUNDS_RECEIVED")]
     WalletFundsReceived,
+
+    #[serde(rename = "REMOTE_SIGNING")]
+    RemoteSigning,
 }
 
-impl Into<Value> for WebhookEventType {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<WebhookEventType> for Value {
+    fn from(val: WebhookEventType) -> Self {
+        Value::from(val.to_string())
     }
 }
 
@@ -43,6 +47,7 @@ impl fmt::Display for WebhookEventType {
             Self::WalletIncomingPaymentFinished => write!(f, "WALLET_INCOMING_PAYMENT_FINISHED"),
             Self::WalletWithdrawalFinished => write!(f, "WALLET_WITHDRAWAL_FINISHED"),
             Self::WalletFundsReceived => write!(f, "WALLET_FUNDS_RECEIVED"),
+            Self::RemoteSigning => write!(f, "REMOTE_SIGNING"),
         }
     }
 }

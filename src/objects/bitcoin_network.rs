@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum identifying a particular Bitcoin Network.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum BitcoinNetwork {
     /// The production version of the Bitcoin Blockchain.
@@ -17,15 +18,15 @@ pub enum BitcoinNetwork {
 
     #[serde(rename = "SIGNET")]
     Signet,
-    /// A test version of the Bitcoin Blockchain, publically available.
+    /// A test version of the Bitcoin Blockchain, publicly available.
 
     #[serde(rename = "TESTNET")]
     Testnet,
 }
 
-impl Into<Value> for BitcoinNetwork {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<BitcoinNetwork> for Value {
+    fn from(val: BitcoinNetwork) -> Self {
+        Value::from(val.to_string())
     }
 }
 

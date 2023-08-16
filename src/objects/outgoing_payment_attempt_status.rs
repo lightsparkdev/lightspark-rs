@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
-/// Enum that enumerates all the possible status of an outgoing payment attempt.
+/// This is an enum of all potential statuses of a payment attempt made from a Lightspark Node.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum OutgoingPaymentAttemptStatus {
     #[serde(rename = "IN_FLIGHT")]
@@ -16,9 +16,9 @@ pub enum OutgoingPaymentAttemptStatus {
     Failed,
 }
 
-impl Into<Value> for OutgoingPaymentAttemptStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<OutgoingPaymentAttemptStatus> for Value {
+    fn from(val: OutgoingPaymentAttemptStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

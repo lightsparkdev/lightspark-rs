@@ -29,7 +29,16 @@ pub trait OnChainTransaction: Transaction + Entity {
     fn type_name(&self) -> &'static str;
 }
 
-impl<'de> Deserialize<'de> for Box<dyn OnChainTransaction> {
+#[allow(clippy::large_enum_variant)]
+#[derive(Clone)]
+pub enum OnChainTransactionEnum {
+    ChannelClosingTransaction(ChannelClosingTransaction),
+    ChannelOpeningTransaction(ChannelOpeningTransaction),
+    Deposit(Deposit),
+    Withdrawal(Withdrawal),
+}
+
+impl<'de> Deserialize<'de> for OnChainTransactionEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -41,25 +50,25 @@ impl<'de> Deserialize<'de> for Box<dyn OnChainTransaction> {
                     let obj = ChannelClosingTransaction::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(OnChainTransactionEnum::ChannelClosingTransaction(obj))
                 }
                 "ChannelOpeningTransaction" => {
                     let obj = ChannelOpeningTransaction::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(OnChainTransactionEnum::ChannelOpeningTransaction(obj))
                 }
                 "Deposit" => {
                     let obj = Deposit::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(OnChainTransactionEnum::Deposit(obj))
                 }
                 "Withdrawal" => {
                     let obj = Withdrawal::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(OnChainTransactionEnum::Withdrawal(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

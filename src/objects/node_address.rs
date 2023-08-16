@@ -2,8 +2,8 @@
 use crate::objects::node_address_type::NodeAddressType;
 use serde::Deserialize;
 
-/// An object that represents the address of a node on the Lightning Network.
-#[derive(Deserialize)]
+/// This object represents the address of a node on the Lightning Network.
+#[derive(Clone, Deserialize)]
 pub struct NodeAddress {
     /// The string representation of the address.
     #[serde(rename = "node_address_address")]

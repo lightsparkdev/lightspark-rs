@@ -2,7 +2,8 @@
 use crate::objects::currency_amount::CurrencyAmount;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+/// This represents the fee policies set for a channel on the Lightning Network.
+#[derive(Clone, Deserialize)]
 pub struct ChannelFees {
     #[serde(rename = "channel_fees_base_fee")]
     pub base_fee: Option<CurrencyAmount>,

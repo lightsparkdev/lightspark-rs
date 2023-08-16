@@ -2,7 +2,7 @@
 use crate::types::entity_wrapper::EntityWrapper;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct CreateInvoiceOutput {
     #[serde(rename = "create_invoice_output_invoice")]
     pub invoice: EntityWrapper,

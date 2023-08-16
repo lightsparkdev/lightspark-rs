@@ -28,7 +28,14 @@ pub trait Node: Entity {
     fn type_name(&self) -> &'static str;
 }
 
-impl<'de> Deserialize<'de> for Box<dyn Node> {
+#[allow(clippy::large_enum_variant)]
+#[derive(Clone)]
+pub enum NodeEnum {
+    GraphNode(GraphNode),
+    LightsparkNode(LightsparkNode),
+}
+
+impl<'de> Deserialize<'de> for NodeEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -40,13 +47,13 @@ impl<'de> Deserialize<'de> for Box<dyn Node> {
                     let obj = GraphNode::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(NodeEnum::GraphNode(obj))
                 }
                 "LightsparkNode" => {
                     let obj = LightsparkNode::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(Box::new(obj))
+                    Ok(NodeEnum::LightsparkNode(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

@@ -2,7 +2,7 @@
 use crate::types::entity_wrapper::EntityWrapper;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct CreateNodeWalletAddressOutput {
     #[serde(rename = "create_node_wallet_address_output_node")]
     pub node: EntityWrapper,

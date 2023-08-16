@@ -12,8 +12,8 @@ use crate::objects::node::Node;
 use crate::objects::node_address_type::NodeAddressType;
 use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
 use crate::objects::secret::Secret;
-use crate::requester::requester::Requester;
-use crate::types::custom_date_format::custom_date_format;
+use crate::request::requester::Requester;
+use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
@@ -23,7 +23,7 @@ use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This is a node that is managed by Lightspark and is managed within the current connected account. It contains many details about the node configuration, state, and metadata.
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct LightsparkNode {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "lightspark_node_id")]
@@ -65,6 +65,10 @@ pub struct LightsparkNode {
     #[serde(rename = "lightspark_node_account")]
     pub account: EntityWrapper,
 
+    /// The owner of this LightsparkNode.
+    #[serde(rename = "lightspark_node_owner")]
+    pub owner: EntityWrapper,
+
     /// The details of the balance of this node on the Bitcoin Network.
     #[serde(rename = "lightspark_node_blockchain_balance")]
     pub blockchain_balance: Option<BlockchainBalance>,
@@ -101,32 +105,32 @@ pub struct LightsparkNode {
 impl Node for LightsparkNode {
     /// A name that identifies the node. It has no importance in terms of operating the node, it is just a way to identify and search for commercial services or popular nodes. This alias can be changed at any time by the node operator.
     fn get_alias(&self) -> Option<String> {
-        return self.alias.clone();
+        self.alias.clone()
     }
 
     /// The Bitcoin Network this node is deployed in.
     fn get_bitcoin_network(&self) -> BitcoinNetwork {
-        return self.bitcoin_network.clone();
+        self.bitcoin_network.clone()
     }
 
     /// A hexadecimal string that describes a color. For example "#000000" is black, "#FFFFFF" is white. It has no importance in terms of operating the node, it is just a way to visually differentiate nodes. That color can be changed at any time by the node operator.
     fn get_color(&self) -> Option<String> {
-        return self.color.clone();
+        self.color.clone()
     }
 
     /// A summary metric used to capture how well positioned a node is to send, receive, or route transactions efficiently. Maximizing a node's conductivity helps a node’s transactions to be capital efficient. The value is an integer ranging between 0 and 10 (bounds included).
     fn get_conductivity(&self) -> Option<i64> {
-        return self.conductivity;
+        self.conductivity
     }
 
     /// The name of this node in the network. It will be the most human-readable option possible, depending on the data available for this node.
     fn get_display_name(&self) -> String {
-        return self.display_name.clone();
+        self.display_name.clone()
     }
 
     /// The public key of this node. It acts as a unique identifier of this node in the Lightning Network.
     fn get_public_key(&self) -> Option<String> {
-        return self.public_key.clone();
+        self.public_key.clone()
     }
 
     fn type_name(&self) -> &'static str {
@@ -137,17 +141,17 @@ impl Node for LightsparkNode {
 impl Entity for LightsparkNode {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -157,7 +161,7 @@ impl Entity for LightsparkNode {
 
 impl GetEntity for LightsparkNode {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -169,7 +173,7 @@ impl GetEntity for LightsparkNode {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 
@@ -186,6 +190,9 @@ fragment LightsparkNodeFragment on LightsparkNode {
     lightspark_node_display_name: display_name
     lightspark_node_public_key: public_key
     lightspark_node_account: account {
+        id
+    }
+    lightspark_node_owner: owner {
         id
     }
     lightspark_node_blockchain_balance: blockchain_balance {
@@ -308,13 +315,13 @@ impl LightsparkNode {
         variables.insert("first", first.into());
         variables.insert("types", types.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["addresses"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
@@ -440,13 +447,13 @@ impl LightsparkNode {
         variables.insert("first", first.into());
         variables.insert("statuses", statuses.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["channels"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

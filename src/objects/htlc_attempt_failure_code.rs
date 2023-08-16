@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum representing a particular reason why an htlc sent over the Lightning Network may have failed.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum HtlcAttemptFailureCode {
     #[serde(rename = "INCORRECT_OR_UNKNOWN_PAYMENT_DETAILS")]
@@ -87,9 +88,9 @@ pub enum HtlcAttemptFailureCode {
     UnreadableFailure,
 }
 
-impl Into<Value> for HtlcAttemptFailureCode {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<HtlcAttemptFailureCode> for Value {
+    fn from(val: HtlcAttemptFailureCode) -> Self {
+        Value::from(val.to_string())
     }
 }
 

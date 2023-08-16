@@ -2,7 +2,7 @@
 use crate::objects::currency_unit::CurrencyUnit;
 use serde::Deserialize;
 
-/// Represents the value and unit for an amount of currency.
+/// This object represents the value and unit for an amount of currency.
 #[derive(Clone, Deserialize)]
 pub struct CurrencyAmount {
     /// The original numeric value for this CurrencyAmount.

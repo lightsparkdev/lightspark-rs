@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum representing the status of a channel on the Lightning Network.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum ChannelStatus {
     /// The channel is online and ready to send and receive funds.
@@ -35,9 +36,9 @@ pub enum ChannelStatus {
     Error,
 }
 
-impl Into<Value> for ChannelStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<ChannelStatus> for Value {
+    fn from(val: ChannelStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

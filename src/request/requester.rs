@@ -2,7 +2,7 @@
 
 use std::{env, fmt};
 
-use crate::{crypto::sign_payload, error::Error, requester::auth_provider::AuthProvider, VERSION};
+use crate::{crypto::sign_payload, error::Error, request::auth_provider::AuthProvider, VERSION};
 use chrono::{Duration, Utc};
 use os_version::detect;
 use rand::RngCore;

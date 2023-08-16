@@ -6,8 +6,8 @@ use crate::objects::channel_to_transactions_connection::ChannelToTransactionsCon
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::transaction_type::TransactionType;
-use crate::requester::requester::Requester;
-use crate::types::custom_date_format::custom_date_format;
+use crate::request::requester::Requester;
+use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
@@ -16,8 +16,8 @@ use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
-/// An object that represents a payment channel between two nodes in the Lightning Network.
-#[derive(Deserialize)]
+/// This is an object representing a channel on the Lightning Network. You can retrieve this object to get detailed information on a specific Lightning Network channel.
+#[derive(Clone, Deserialize)]
 pub struct Channel {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "channel_id")]
@@ -95,17 +95,17 @@ pub struct Channel {
 impl Entity for Channel {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -115,7 +115,7 @@ impl Entity for Channel {
 
 impl GetEntity for Channel {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -127,7 +127,7 @@ impl GetEntity for Channel {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 
@@ -247,11 +247,11 @@ impl Channel {
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["uptime_percentage"].clone();
         let result = json.as_i64();
         Ok(result)
@@ -304,13 +304,13 @@ impl Channel {
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester
-            .execute_graphql(&query, Some(value))
+            .execute_graphql(query, Some(value))
             .await
-            .map_err(|err| Error::ClientError(err))?;
+            .map_err(Error::ClientError)?;
         let json = result["entity"]["transactions"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

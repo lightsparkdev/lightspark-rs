@@ -4,7 +4,7 @@ use crate::objects::page_info::PageInfo;
 use serde::Deserialize;
 use std::vec::Vec;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct WithdrawalRequestToChannelOpeningTransactionsConnection {
     /// An object that holds pagination information about the objects in this connection.
     #[serde(rename = "withdrawal_request_to_channel_opening_transactions_connection_page_info")]

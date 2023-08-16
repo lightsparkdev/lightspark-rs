@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum of potential purposes set by a user for a Lightspark node.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum LightsparkNodePurpose {
     #[serde(rename = "SEND")]
@@ -15,9 +16,9 @@ pub enum LightsparkNodePurpose {
     Routing,
 }
 
-impl Into<Value> for LightsparkNodePurpose {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<LightsparkNodePurpose> for Value {
+    fn from(val: LightsparkNodePurpose) -> Self {
+        Value::from(val.to_string())
     }
 }
 

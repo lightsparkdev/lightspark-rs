@@ -1,13 +1,14 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::entity::Entity;
 use crate::objects::permission::Permission;
-use crate::types::custom_date_format::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use std::vec::Vec;
 
-#[derive(Deserialize)]
+/// This is an object representing a Lightspark API token, that can be used to authenticate this account when making API calls or using our SDKs. See the “Authentication” section of our API docs for more details on its usage.
+#[derive(Clone, Deserialize)]
 pub struct ApiToken {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "api_token_id")]
@@ -37,17 +38,17 @@ pub struct ApiToken {
 impl Entity for ApiToken {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
-        return self.id.clone();
+        self.id.clone()
     }
 
     /// The date and time when the entity was first created.
     fn get_created_at(&self) -> DateTime<Utc> {
-        return self.created_at;
+        self.created_at
     }
 
     /// The date and time when the entity was last updated.
     fn get_updated_at(&self) -> DateTime<Utc> {
-        return self.updated_at;
+        self.updated_at
     }
 
     fn type_name(&self) -> &'static str {
@@ -57,7 +58,7 @@ impl Entity for ApiToken {
 
 impl GetEntity for ApiToken {
     fn get_entity_query() -> String {
-        return format!(
+        format!(
             "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
@@ -69,7 +70,7 @@ impl GetEntity for ApiToken {
 
         {}",
             FRAGMENT
-        );
+        )
     }
 }
 

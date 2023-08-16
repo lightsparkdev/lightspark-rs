@@ -2,7 +2,7 @@
 use crate::types::entity_wrapper::EntityWrapper;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct RequestWithdrawalOutput {
     /// The request that is created for this withdrawal.
     #[serde(rename = "request_withdrawal_output_request")]

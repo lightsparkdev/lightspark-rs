@@ -2,7 +2,7 @@
 use crate::objects::currency_amount::CurrencyAmount;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct FundNodeOutput {
     #[serde(rename = "fund_node_output_amount")]
     pub amount: CurrencyAmount,

@@ -2,8 +2,8 @@
 use crate::objects::currency_amount::CurrencyAmount;
 use serde::Deserialize;
 
-/// This object provides a detailed breakdown of a `LightsparkNode`'s current balance on the Bitcoin Network.
-#[derive(Deserialize)]
+/// This is an object representing a detailed breakdown of the balance for a Lightspark Node.
+#[derive(Clone, Deserialize)]
 pub struct BlockchainBalance {
     /// The total wallet balance, including unconfirmed UTXOs.
     #[serde(rename = "blockchain_balance_total_balance")]

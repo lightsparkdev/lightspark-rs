@@ -1,14 +1,15 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::bitcoin_network::BitcoinNetwork;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::node::Node;
-use crate::objects::payment_request_data::PaymentRequestData;
-use crate::types::custom_date_format::custom_date_format;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-/// This object represents the BOLT #11 invoice protocol for Lightning Payments. See https://github.com/lightning/bolts/blob/master/11-payment-encoding.md.
-#[derive(Deserialize)]
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::objects::node::NodeEnum;
+use crate::objects::payment_request_data::PaymentRequestData;
+use crate::types::custom_date_formats::custom_date_format;
+
+/// This object represents the data associated with a BOLT #11 invoice. You can retrieve this object to receive the relevant data associated with a specific invoice.
+#[derive(Clone, Deserialize)]
 pub struct InvoiceData {
     #[serde(rename = "invoice_data_encoded_payment_request")]
     pub encoded_payment_request: String,
@@ -38,16 +39,16 @@ pub struct InvoiceData {
 
     /// The lightning node that will be paid when fulfilling this invoice.
     #[serde(rename = "invoice_data_destination")]
-    pub destination: Box<dyn Node>,
+    pub destination: NodeEnum,
 }
 
 impl PaymentRequestData for InvoiceData {
     fn get_encoded_payment_request(&self) -> String {
-        return self.encoded_payment_request.clone();
+        self.encoded_payment_request.clone()
     }
 
     fn get_bitcoin_network(&self) -> BitcoinNetwork {
-        return self.bitcoin_network.clone();
+        self.bitcoin_network.clone()
     }
 
     fn type_name(&self) -> &'static str {
@@ -98,6 +99,9 @@ fragment InvoiceDataFragment on InvoiceData {
             lightspark_node_display_name: display_name
             lightspark_node_public_key: public_key
             lightspark_node_account: account {
+                id
+            }
+            lightspark_node_owner: owner {
                 id
             }
             lightspark_node_blockchain_balance: blockchain_balance {

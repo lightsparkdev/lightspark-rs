@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum of the potential permissions that a Lightspark user can have in regards to account management.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum Permission {
     #[serde(rename = "ALL")]
@@ -48,9 +49,9 @@ pub enum Permission {
     AccountManage,
 }
 
-impl Into<Value> for Permission {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<Permission> for Value {
+    fn from(val: Permission) -> Self {
+        Value::from(val.to_string())
     }
 }
 

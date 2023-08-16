@@ -6,7 +6,7 @@ use serde::Deserialize;
 use std::vec::Vec;
 
 /// A connection between an account and the nodes it manages.
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct AccountToNodesConnection {
     /// An object that holds pagination information about the objects in this connection.
     #[serde(rename = "account_to_nodes_connection_page_info")]

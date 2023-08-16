@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+/// This is an enum for potential invoice types.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum InvoiceType {
     /// A standard Bolt 11 invoice.
@@ -15,9 +16,9 @@ pub enum InvoiceType {
     Amp,
 }
 
-impl Into<Value> for InvoiceType {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<InvoiceType> for Value {
+    fn from(val: InvoiceType) -> Self {
+        Value::from(val.to_string())
     }
 }
 
