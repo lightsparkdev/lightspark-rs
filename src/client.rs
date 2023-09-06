@@ -633,6 +633,19 @@ impl LightsparkClient {
         Ok(json)
     }
 
+    pub async fn execute_graphql_request_variable(
+        &self,
+        operation: &str,
+        variables: Value,
+    ) -> Result<Value, Error> {
+        let json = self
+            .requester
+            .execute_graphql(operation, Some(variables))
+            .await
+            .map_err(Error::ClientError)?;
+        Ok(json)
+    }
+
     pub async fn create_node_wallet_address(&self, node_id: &str) -> Result<String, Error> {
         let operation = "mutation CreateNodeWalletAddress(
                 $node_id: ID!

@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.5.0
+- Add UMA support.
+
 # v0.4.0
 - Add webhook handling.
 - Change the interface wrapper to enum.

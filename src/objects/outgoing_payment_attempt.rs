@@ -144,13 +144,21 @@ impl OutgoingPaymentAttempt {
         &self,
         requester: &Requester,
         first: Option<i64>,
+        after: Option<String>,
     ) -> Result<OutgoingPaymentAttemptToHopsConnection, Error> {
-        let query = "query FetchOutgoingPaymentAttemptToHopsConnection($entity_id: ID!, $first: Int) {
+        let query = "query FetchOutgoingPaymentAttemptToHopsConnection($entity_id: ID!, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on OutgoingPaymentAttempt {
-            hops(, first: $first) {
+            hops(, first: $first, after: $after) {
                 __typename
                 outgoing_payment_attempt_to_hops_connection_count: count
+                outgoing_payment_attempt_to_hops_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
                 outgoing_payment_attempt_to_hops_connection_entities: entities {
                     __typename
                     hop_id: id
@@ -186,6 +194,7 @@ impl OutgoingPaymentAttempt {
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
+        variables.insert("after", after.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester

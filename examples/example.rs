@@ -6,7 +6,8 @@ use lightspark::objects::bitcoin_network::BitcoinNetwork;
 use lightspark::objects::currency_amount::CurrencyAmount;
 use lightspark::objects::deposit::Deposit;
 
-use lightspark::objects::lightspark_node::LightsparkNode;
+use lightspark::objects::lightspark_node::{LightsparkNode, LightsparkNodeEnum};
+use lightspark::objects::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
 use lightspark::objects::transaction::Transaction;
 use lightspark::objects::withdrawal_mode::WithdrawalMode;
 use lightspark::{client::LightsparkClient, request::auth_provider::AccountAuthProvider};
@@ -154,6 +155,7 @@ async fn main() {
             Some(50),
             Some(vec![BitcoinNetwork::Regtest]),
             None,
+            None,
         )
         .await
     {
@@ -166,10 +168,14 @@ async fn main() {
     let mut node_name: Option<String> = None;
     println!("{}", node_connections.entities.len());
     for node in node_connections.entities {
+        let inner: Box<dyn LightsparkNode> = match node {
+            LightsparkNodeEnum::LightsparkNodeWithOSK(t) => Box::new(t),
+            LightsparkNodeEnum::LightsparkNodeWithRemoteSigning(t) => Box::new(t),
+        };
         println!("node info");
-        node_name = Some(node.display_name.clone());
-        node_id = Some(node.id.clone());
-        println!("{} {}", node.display_name, node.id);
+        node_name = Some(inner.get_display_name().clone());
+        node_id = Some(inner.get_id().clone());
+        println!("{} {}", inner.get_display_name(), inner.get_id());
     }
     println!();
 
@@ -536,14 +542,20 @@ async fn main() {
     }
 
     // Fetch the channels for the node
-    let node = match client.get_entity::<LightsparkNode>(node_id.as_str()).await {
+    let node = match client
+        .get_entity::<LightsparkNodeWithOSK>(node_id.as_str())
+        .await
+    {
         Ok(v) => v,
         Err(err) => {
             println!("{}", err);
             return;
         }
     };
-    if let Ok(channels_connection) = node.get_channels(&client.requester, Some(10), None).await {
+    if let Ok(channels_connection) = node
+        .get_channels(&client.requester, Some(10), None, None)
+        .await
+    {
         println!(
             "{} has {} channel(s):",
             node_name, channels_connection.count
@@ -551,7 +563,7 @@ async fn main() {
         for channel in channels_connection.entities {
             if let Some(node_entity) = channel.remote_node {
                 if let Ok(remote_node) = client
-                    .get_entity::<LightsparkNode>(node_entity.id.as_str())
+                    .get_entity::<LightsparkNodeWithOSK>(node_entity.id.as_str())
                     .await
                 {
                     let alias = remote_node.alias.unwrap_or("UNKNOWN".to_owned());

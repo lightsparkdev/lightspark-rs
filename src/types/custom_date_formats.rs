@@ -1,7 +1,7 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 
 pub mod custom_date_format {
-    use chrono::{DateTime, TimeZone, Utc};
+    use chrono::{DateTime, Utc};
     use serde::{self, Deserialize, Deserializer, Serializer};
 
     const FORMAT: &str = "%Y-%m-%dT%H:%M:%S%.f%z";
@@ -19,13 +19,14 @@ pub mod custom_date_format {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Utc.datetime_from_str(&s, FORMAT)
+        DateTime::parse_from_str(&s, FORMAT)
             .map_err(|e| serde::de::Error::custom(format!("invalid date format: {}", e)))
+            .map(|dt| dt.with_timezone(&Utc))
     }
 }
 
 pub mod custom_date_format_option {
-    use chrono::{DateTime, TimeZone, Utc};
+    use chrono::{DateTime, Utc};
     use serde::{self, Deserialize, Deserializer, Serializer};
 
     const FORMAT: &str = "%Y-%m-%dT%H:%M:%S%.f%z";
@@ -49,9 +50,9 @@ pub mod custom_date_format_option {
     {
         let s = Option::<String>::deserialize(deserializer)?;
         match s {
-            Some(s) => Utc
-                .datetime_from_str(&s, FORMAT)
+            Some(s) => DateTime::parse_from_str(&s, FORMAT)
                 .map_err(|e| serde::de::Error::custom(format!("invalid date format: {}", e)))
+                .map(|dt| dt.with_timezone(&Utc))
                 .map(Some),
             None => Ok(None),
         }

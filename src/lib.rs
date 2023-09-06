@@ -27,7 +27,7 @@
 //! See more examples in examples/example.rs
 //!
 /// The version of this library.
-pub const VERSION: &str = "0.4.0";
+pub const VERSION: &str = "0.5.0";
 
 pub mod client;
 pub mod crypto;
@@ -35,4 +35,5 @@ pub mod error;
 pub mod objects;
 pub mod request;
 pub mod types;
+pub mod uma;
 pub mod webhooks;

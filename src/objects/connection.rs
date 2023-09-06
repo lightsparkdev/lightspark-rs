@@ -1,8 +1,14 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 
 use super::account_to_api_tokens_connection::AccountToApiTokensConnection;
+use super::account_to_nodes_connection::AccountToNodesConnection;
 use super::account_to_payment_requests_connection::AccountToPaymentRequestsConnection;
 use super::account_to_transactions_connection::AccountToTransactionsConnection;
+use super::account_to_wallets_connection::AccountToWalletsConnection;
+use super::incoming_payment_to_attempts_connection::IncomingPaymentToAttemptsConnection;
+use super::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
+use super::outgoing_payment_attempt_to_hops_connection::OutgoingPaymentAttemptToHopsConnection;
+use super::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsConnection;
 use crate::objects::page_info::PageInfo;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
@@ -21,8 +27,14 @@ pub trait Connection {
 #[derive(Clone)]
 pub enum ConnectionEnum {
     AccountToApiTokensConnection(AccountToApiTokensConnection),
+    AccountToNodesConnection(AccountToNodesConnection),
     AccountToPaymentRequestsConnection(AccountToPaymentRequestsConnection),
     AccountToTransactionsConnection(AccountToTransactionsConnection),
+    AccountToWalletsConnection(AccountToWalletsConnection),
+    IncomingPaymentToAttemptsConnection(IncomingPaymentToAttemptsConnection),
+    LightsparkNodeToChannelsConnection(LightsparkNodeToChannelsConnection),
+    OutgoingPaymentAttemptToHopsConnection(OutgoingPaymentAttemptToHopsConnection),
+    OutgoingPaymentToAttemptsConnection(OutgoingPaymentToAttemptsConnection),
 }
 
 impl<'de> Deserialize<'de> for ConnectionEnum {
@@ -39,6 +51,12 @@ impl<'de> Deserialize<'de> for ConnectionEnum {
                     })?;
                     Ok(ConnectionEnum::AccountToApiTokensConnection(obj))
                 }
+                "AccountToNodesConnection" => {
+                    let obj = AccountToNodesConnection::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(ConnectionEnum::AccountToNodesConnection(obj))
+                }
                 "AccountToPaymentRequestsConnection" => {
                     let obj =
                         AccountToPaymentRequestsConnection::deserialize(value).map_err(|err| {
@@ -52,6 +70,39 @@ impl<'de> Deserialize<'de> for ConnectionEnum {
                             serde::de::Error::custom(format!("Serde JSON Error {}", err))
                         })?;
                     Ok(ConnectionEnum::AccountToTransactionsConnection(obj))
+                }
+                "AccountToWalletsConnection" => {
+                    let obj = AccountToWalletsConnection::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(ConnectionEnum::AccountToWalletsConnection(obj))
+                }
+                "IncomingPaymentToAttemptsConnection" => {
+                    let obj =
+                        IncomingPaymentToAttemptsConnection::deserialize(value).map_err(|err| {
+                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                        })?;
+                    Ok(ConnectionEnum::IncomingPaymentToAttemptsConnection(obj))
+                }
+                "LightsparkNodeToChannelsConnection" => {
+                    let obj =
+                        LightsparkNodeToChannelsConnection::deserialize(value).map_err(|err| {
+                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                        })?;
+                    Ok(ConnectionEnum::LightsparkNodeToChannelsConnection(obj))
+                }
+                "OutgoingPaymentAttemptToHopsConnection" => {
+                    let obj = OutgoingPaymentAttemptToHopsConnection::deserialize(value).map_err(
+                        |err| serde::de::Error::custom(format!("Serde JSON Error {}", err)),
+                    )?;
+                    Ok(ConnectionEnum::OutgoingPaymentAttemptToHopsConnection(obj))
+                }
+                "OutgoingPaymentToAttemptsConnection" => {
+                    let obj =
+                        OutgoingPaymentToAttemptsConnection::deserialize(value).map_err(|err| {
+                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                        })?;
+                    Ok(ConnectionEnum::OutgoingPaymentToAttemptsConnection(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

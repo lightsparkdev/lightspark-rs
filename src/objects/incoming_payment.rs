@@ -52,10 +52,6 @@ pub struct IncomingPayment {
     #[serde(rename = "incoming_payment_transaction_hash")]
     pub transaction_hash: Option<String>,
 
-    /// If known, the Lightspark node this payment originated from.
-    #[serde(rename = "incoming_payment_origin")]
-    pub origin: Option<EntityWrapper>,
-
     /// The recipient Lightspark node this payment was sent to.
     #[serde(rename = "incoming_payment_destination")]
     pub destination: EntityWrapper,
@@ -153,9 +149,6 @@ fragment IncomingPaymentFragment on IncomingPayment {
         currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
     }
     incoming_payment_transaction_hash: transaction_hash
-    incoming_payment_origin: origin {
-        id
-    }
     incoming_payment_destination: destination {
         id
     }
@@ -171,13 +164,21 @@ impl IncomingPayment {
         requester: &Requester,
         first: Option<i64>,
         statuses: Option<Vec<IncomingPaymentAttemptStatus>>,
+        after: Option<String>,
     ) -> Result<IncomingPaymentToAttemptsConnection, Error> {
-        let query = "query FetchIncomingPaymentToAttemptsConnection($entity_id: ID!, $first: Int, $statuses: [IncomingPaymentAttemptStatus!]) {
+        let query = "query FetchIncomingPaymentToAttemptsConnection($entity_id: ID!, $first: Int, $statuses: [IncomingPaymentAttemptStatus!], $after: String) {
     entity(id: $entity_id) {
         ... on IncomingPayment {
-            attempts(, first: $first, statuses: $statuses) {
+            attempts(, first: $first, statuses: $statuses, after: $after) {
                 __typename
                 incoming_payment_to_attempts_connection_count: count
+                incoming_payment_to_attempts_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
                 incoming_payment_to_attempts_connection_entities: entities {
                     __typename
                     incoming_payment_attempt_id: id
@@ -205,6 +206,7 @@ impl IncomingPayment {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
         variables.insert("statuses", statuses.into());
+        variables.insert("after", after.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester

@@ -14,4 +14,8 @@ pub struct CreateLnurlInvoiceInput {
 
     /// The expiry of the invoice in seconds. Default value is 86400 (1 day).
     pub expiry_secs: Option<i64>,
+
+    pub payment_hash: Option<String>,
+
+    pub preimage_nonce: Option<String>,
 }

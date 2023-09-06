@@ -68,13 +68,14 @@ core.workflow(
     ),
     destination = git.github_destination(
         url = "https://github.com/lightsparkdev/go-sdk.git",
-        push = "main",
+        # TODO: Move this back to main when we're ready to release.
+        push = "rc/remote-signing",
     ),
     # Switch to ITERATIVE mode to import each commit separately.
     mode = "SQUASH",
 
     origin_files = glob(
-	    ["go-sdk/**", "copy.bara.sky"],
+	    ["go-sdk/**"],
     ),
 
     authoring = authoring.pass_thru("Lightspark Eng <engineering@lightspark.com>"),

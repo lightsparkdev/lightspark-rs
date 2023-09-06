@@ -1,6 +1,7 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use super::graph_node::GraphNode;
-use super::lightspark_node::LightsparkNode;
+use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
 use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::entity::Entity;
 use serde::{Deserialize, Deserializer};
@@ -32,7 +33,8 @@ pub trait Node: Entity {
 #[derive(Clone)]
 pub enum NodeEnum {
     GraphNode(GraphNode),
-    LightsparkNode(LightsparkNode),
+    LightsparkNodeWithOSK(LightsparkNodeWithOSK),
+    LightsparkNodeWithRemoteSigning(LightsparkNodeWithRemoteSigning),
 }
 
 impl<'de> Deserialize<'de> for NodeEnum {
@@ -49,11 +51,18 @@ impl<'de> Deserialize<'de> for NodeEnum {
                     })?;
                     Ok(NodeEnum::GraphNode(obj))
                 }
-                "LightsparkNode" => {
-                    let obj = LightsparkNode::deserialize(value).map_err(|err| {
+                "LightsparkNodeWithOSK" => {
+                    let obj = LightsparkNodeWithOSK::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(NodeEnum::LightsparkNode(obj))
+                    Ok(NodeEnum::LightsparkNodeWithOSK(obj))
+                }
+                "LightsparkNodeWithRemoteSigning" => {
+                    let obj =
+                        LightsparkNodeWithRemoteSigning::deserialize(value).map_err(|err| {
+                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                        })?;
+                    Ok(NodeEnum::LightsparkNodeWithRemoteSigning(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

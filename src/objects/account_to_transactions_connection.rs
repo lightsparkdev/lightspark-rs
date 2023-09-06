@@ -1,10 +1,10 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::connection::Connection;
-use crate::objects::transaction::TransactionEnum;
+use crate::objects::page_info::PageInfo;
 use serde::Deserialize;
 
+use crate::objects::connection::Connection;
 use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::page_info::PageInfo;
+use crate::objects::transaction::TransactionEnum;
 use std::vec::Vec;
 
 #[derive(Clone, Deserialize)]

@@ -11,10 +11,13 @@ use super::hop::Hop;
 use super::incoming_payment::IncomingPayment;
 use super::incoming_payment_attempt::IncomingPaymentAttempt;
 use super::invoice::Invoice;
-use super::lightspark_node::LightsparkNode;
+use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
 use super::outgoing_payment::OutgoingPayment;
 use super::outgoing_payment_attempt::OutgoingPaymentAttempt;
 use super::routing_transaction::RoutingTransaction;
+use super::signable::Signable;
+use super::signable_payload::SignablePayload;
 use super::wallet::Wallet;
 use super::withdrawal::Withdrawal;
 use super::withdrawal_request::WithdrawalRequest;
@@ -49,10 +52,13 @@ pub enum EntityEnum {
     IncomingPayment(IncomingPayment),
     IncomingPaymentAttempt(IncomingPaymentAttempt),
     Invoice(Invoice),
-    LightsparkNode(LightsparkNode),
+    LightsparkNodeWithOSK(LightsparkNodeWithOSK),
+    LightsparkNodeWithRemoteSigning(LightsparkNodeWithRemoteSigning),
     OutgoingPayment(OutgoingPayment),
     OutgoingPaymentAttempt(OutgoingPaymentAttempt),
     RoutingTransaction(RoutingTransaction),
+    Signable(Signable),
+    SignablePayload(SignablePayload),
     Wallet(Wallet),
     Withdrawal(Withdrawal),
     WithdrawalRequest(WithdrawalRequest),
@@ -132,11 +138,18 @@ impl<'de> Deserialize<'de> for EntityEnum {
                     })?;
                     Ok(EntityEnum::Invoice(obj))
                 }
-                "LightsparkNode" => {
-                    let obj = LightsparkNode::deserialize(value).map_err(|err| {
+                "LightsparkNodeWithOSK" => {
+                    let obj = LightsparkNodeWithOSK::deserialize(value).map_err(|err| {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
-                    Ok(EntityEnum::LightsparkNode(obj))
+                    Ok(EntityEnum::LightsparkNodeWithOSK(obj))
+                }
+                "LightsparkNodeWithRemoteSigning" => {
+                    let obj =
+                        LightsparkNodeWithRemoteSigning::deserialize(value).map_err(|err| {
+                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                        })?;
+                    Ok(EntityEnum::LightsparkNodeWithRemoteSigning(obj))
                 }
                 "OutgoingPayment" => {
                     let obj = OutgoingPayment::deserialize(value).map_err(|err| {
@@ -155,6 +168,18 @@ impl<'de> Deserialize<'de> for EntityEnum {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
                     Ok(EntityEnum::RoutingTransaction(obj))
+                }
+                "Signable" => {
+                    let obj = Signable::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(EntityEnum::Signable(obj))
+                }
+                "SignablePayload" => {
+                    let obj = SignablePayload::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(EntityEnum::SignablePayload(obj))
                 }
                 "Wallet" => {
                     let obj = Wallet::deserialize(value).map_err(|err| {
