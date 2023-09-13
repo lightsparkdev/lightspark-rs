@@ -16,7 +16,7 @@ core.workflow(
     mode = "SQUASH",
 
     origin_files = glob(
-	    ["rust-sdk/lightspark/**", "copy.bara.sky"],
+	    ["rust-sdk/**", "copy.bara.sky"],
         exclude = ["rust-sdk/lightspark/examples/internal_example.rs"],
     ),
 
@@ -27,7 +27,7 @@ core.workflow(
         core.todo_replace(
           mode = 'SCRUB_NAMES'
         ),
-        core.move("rust-sdk/lightspark/", "")
+        core.move("rust-sdk/", "")
     ],
 )
 
@@ -68,8 +68,7 @@ core.workflow(
     ),
     destination = git.github_destination(
         url = "https://github.com/lightsparkdev/go-sdk.git",
-        # TODO: Move this back to main when we're ready to release.
-        push = "rc/remote-signing",
+        push = "main",
     ),
     # Switch to ITERATIVE mode to import each commit separately.
     mode = "SQUASH",

@@ -1,18 +1,11 @@
-# Lightspark Rust SDK - v0.5.0
-
+# Lightspark Rust SDK
 The Lightspark Rust SDK provides a convenient way to interact with the Lightspark services from applications written in the Rust language.
 
-***WARNING: This SDK is in version 0.4.0 (active development). It means that its APIs may not be fully stable. Please expect that changes to the APIs may happen until we move to v1.0.0.***
+## Project Structure
+The rust-sdk consists of multiple crates that can be picked at your convenience:
+- `lightspark`: The main crate that contains the SDK.
+- `uma`: The UMA protocol implementation.
+- `example`: Examples that shows you how to use the SDK.
 
-## Documentation
-
-The documentation for this SDK (installation, usage, etc.) is available at https://app.lightspark.com/docs/sdk
-
-## Sample code
-
-For your convenience, we included an example that shows you how to use the SDK.
-Open the file `example/example.rs` and make sure to update the variables at the top of the page with your information, then run it using cargo:
-
-```
-cargo run --example example
-```
+## License
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)

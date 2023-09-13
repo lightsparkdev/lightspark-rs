@@ -1,0 +1,6 @@
+version: 3
+
+project:
+  id: lightspark/rust-sdk
+  name: rust-sdk
+  url: https://github.com/lightsparkdev/webdev
