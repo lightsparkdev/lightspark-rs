@@ -848,7 +848,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             .await
             .map_err(Error::ClientError)?;
 
-        let result = serde_json::from_value(json["pay_invoice"]["payment"].clone())
+        let result = serde_json::from_value(json["create_test_mode_payment"]["payment"].clone())
             .map_err(Error::JsonError)?;
         Ok(result)
     }

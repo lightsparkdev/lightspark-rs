@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.6.1
+- Fix a minor bug in `create_test_mode_payment`.
+
 # v0.6.0
 - Make UMA protocol a sepearte crate. See https://crates.io/crates/uma
 - Upgrade to new graphql endpoint.

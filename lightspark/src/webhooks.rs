@@ -24,8 +24,8 @@ pub struct WebhookEvent {
 impl WebhookEvent {
     pub fn verify_and_parse(
         data: &[u8],
-        hexdigest: String,
-        webhook_secret: String,
+        hexdigest: &str,
+        webhook_secret: &str,
     ) -> Result<WebhookEvent, Error> {
         let mut hmac: Hmac<Sha256> =
             Hmac::new_from_slice(webhook_secret.as_bytes()).expect("HMAC can take key of any size");
@@ -56,12 +56,9 @@ mod tests {
         let hexdigest = "62a8829aeb48b4142533520b1f7f86cdb1ee7d718bf3ea15bc1c662d4c453b74";
         let webhook_secret = "3gZ5oQQUASYmqQNuEk0KambNMVkOADDItIJjzUlAWjX";
 
-        let result = super::WebhookEvent::verify_and_parse(
-            data.as_bytes(),
-            hexdigest.to_string(),
-            webhook_secret.to_string(),
-        )
-        .expect("Success case");
+        let result =
+            super::WebhookEvent::verify_and_parse(data.as_bytes(), hexdigest, webhook_secret)
+                .expect("Success case");
 
         assert_eq!(
             result.event_type.to_string(),
@@ -84,12 +81,9 @@ mod tests {
         let hexdigest = "17db38526ce47682f4052e3182766fe2f23810ac538e32d5f20bbe1deb2e3519";
         let webhook_secret = "3gZ5oQQUASYmqQNuEk0KambNMVkOADDItIJjzUlAWjX";
 
-        let result = super::WebhookEvent::verify_and_parse(
-            data.as_bytes(),
-            hexdigest.to_string(),
-            webhook_secret.to_string(),
-        )
-        .expect("Success case");
+        let result =
+            super::WebhookEvent::verify_and_parse(data.as_bytes(), hexdigest, webhook_secret)
+                .expect("Success case");
 
         assert_eq!(
             result.event_type.to_string(),

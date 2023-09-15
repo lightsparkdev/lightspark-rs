@@ -1,11 +1,19 @@
+// Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+
 use lightspark::objects::{
     decline_to_sign_messages_output, id_and_signature::IdAndSignature,
     release_channel_per_commitment_secret_output, release_payment_preimage_output,
-    sign_invoice_output, sign_messages_output, update_channel_per_commitment_point_output,
-    update_node_shared_secret_output,
+    set_invoice_payment_hash_output, sign_invoice_output, sign_messages_output,
+    update_channel_per_commitment_point_output, update_node_shared_secret_output,
 };
 use serde_json::{json, Value};
 
+/// This struct is used as a response for lightspark signing webhook requests.
+/// The response for a remote signing webhook needs to be issued as a graphql request through
+/// the lightspark client.
+///
+/// The response struct contains the graphql query and variables for the request.
+#[derive(Debug, Clone)]
 pub struct Response {
     pub query: String,
     pub variables: Value,
@@ -43,10 +51,12 @@ const RELEASE_CHANNEL_PER_COMMITMENT_SECRET_MUTATION: &str =
     "mutation ReleaseChannelPerCommitmentSecret(
   $channel_id: ID!
   $per_commitment_secret: Hash32!
+  $per_commitment_index: Long!
 ) {
     release_channel_per_commitment_secret(input: {
 		channel_id: $channel_id
 		per_commitment_secret: $per_commitment_secret
+        per_commitment_index: $per_commitment_index
 	}) {
         ...ReleaseChannelPerCommitmentSecretOutputFragment
     }
@@ -149,10 +159,12 @@ impl Response {
     pub fn release_channel_per_commitment_secret_response(
         channel_id: &str,
         per_commitment_secret: &str,
+        per_commitment_index: i64,
     ) -> Response {
         let variables = json!({
             "channel_id": channel_id,
             "per_commitment_secret": per_commitment_secret,
+            "per_commitment_index": per_commitment_index,
         });
         let query = format!(
             "{}\n{}",
@@ -226,7 +238,7 @@ impl Response {
         let query = format!(
             "{}\n{}",
             SET_INVOICE_PAYMENT_HASH,
-            sign_messages_output::FRAGMENT
+            set_invoice_payment_hash_output::FRAGMENT
         );
         Response { query, variables }
     }

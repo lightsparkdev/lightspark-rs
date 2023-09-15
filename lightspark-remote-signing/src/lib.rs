@@ -1,3 +1,12 @@
+// Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+//! Lightspark Remote Signing Library is a library to handle lightspark remote signing webhook
+//! events.
+//!
+//! For most cases, you will want to use the `handler::Handler` to handle the remote signing webhook
+//! event you get from lightspark. The handler will process the request, and form a response that
+//! you can send back to lightspark through Lightspark SDK.
+//!
+//! This crates also provides a `signer::LightsparkSigner` that can be used to sign transactions.
 use std::fmt;
 
 pub mod handler;

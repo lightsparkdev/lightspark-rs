@@ -1,85 +1,69 @@
-use std::{
-    io::{prelude::*, BufReader},
-    net::{TcpListener, TcpStream},
-};
-
+use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use futures_util::StreamExt as _;
 use lightspark::{
-    client::LightsparkClient,
-    key::{OperationSigningKey, Secp256k1SigningKey},
-    request::auth_provider::AccountAuthProvider,
-    webhooks::{self, WebhookEvent},
+    key::Secp256k1SigningKey, request::auth_provider::AccountAuthProvider, webhooks::WebhookEvent,
 };
 use lightspark_remote_signing::{
     handler::Handler,
-    signer::{self, LightsparkSigner, Seed},
-    validation::{PositiveValidator, Validation},
+    signer::{LightsparkSigner, Seed},
+    validation::PositiveValidator,
 };
 
-#[tokio::main]
-async fn main() {
-    let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
-    let seed = Seed::new("test".as_bytes().to_vec());
-    let signer = LightsparkSigner::new(&seed, signer::Network::Bitcoin).unwrap();
-    let validator = PositiveValidator;
-    let handler = Handler::new(signer, validator);
+pub mod config;
 
-    let auth = AccountAuthProvider::new("test".to_owned(), "test".to_owned());
-    let client = LightsparkClient::<Secp256k1SigningKey>::new(auth).expect("Assume success");
-
-    for stream in listener.incoming() {
-        let stream = stream.unwrap();
-        handle_connection(stream, &handler, &client).await;
-    }
+#[get("/ping")]
+async fn ping() -> impl Responder {
+    println!("ping");
+    HttpResponse::NoContent().finish()
 }
 
-async fn handle_connection<T: Validation, K: OperationSigningKey>(
-    stream: TcpStream,
-    handler: &Handler<T>,
-    client: &LightsparkClient<K>,
-) {
-    let mut reader = BufReader::new(stream.try_clone().unwrap());
-    let mut name = String::new();
-    loop {
-        let r = reader.read_line(&mut name).unwrap();
-        if r < 3 {
-            break;
-        }
+#[post("/ln/webhooks")]
+async fn webhook_handler(
+    req: HttpRequest,
+    mut body: web::Payload,
+    data: web::Data<config::Config>,
+) -> impl Responder {
+    let headers = req.headers();
+    let signature = headers.get(lightspark::webhooks::SIGNATURE_HEADER).unwrap();
+    let mut bytes = web::BytesMut::new();
+    while let Some(item) = body.next().await {
+        bytes.extend_from_slice(&item.unwrap());
     }
-    let mut size = 0;
-    let linesplit = name.split('\n');
-    let mut sig = "";
-    for l in linesplit {
-        if l.starts_with("Content-Length") {
-            let sizeplit = l.split(':');
-            for s in sizeplit {
-                if !(s.starts_with("Content-Length")) {
-                    size = s.trim().parse::<usize>().unwrap();
-                }
-            }
-        } else if l.starts_with(webhooks::SIGNATURE_HEADER) {
-            let sigsplit = l.split(':');
-            for s in sigsplit {
-                if !(s.starts_with(webhooks::SIGNATURE_HEADER)) {
-                    sig = s.trim();
-                }
-            }
-        }
-    }
-    let mut buffer = vec![0; size];
-    reader.read_exact(&mut buffer).unwrap();
-    let body = String::from_utf8(buffer.clone()).unwrap();
 
-    println!("Signature: {}", sig);
-    println!("Request: {}", body);
+    let auth = AccountAuthProvider::new(data.api_client_id.clone(), data.api_client_secret.clone());
+    let client = lightspark::client::LightsparkClient::<Secp256k1SigningKey>::new(auth).unwrap();
 
-    let event = WebhookEvent::verify_and_parse(
-        buffer.as_slice(),
-        sig.to_string(),
-        "webhook_secret".to_owned(),
-    )
-    .expect("Assume verified");
-    let response = handler.handle_remote_signing_webhook_msg(&event).expect("");
-    let _ = client
-        .execute_graphql_request_variable(&response.query, response.variables.clone())
+    let seed = Seed::new(hex::decode(data.master_seed_hex.clone()).unwrap());
+    let signer =
+        LightsparkSigner::new(&seed, lightspark_remote_signing::signer::Network::Regtest).unwrap();
+    let validation = PositiveValidator;
+    let handler = Handler::new(signer, validation);
+
+    let event =
+        WebhookEvent::verify_and_parse(&bytes, signature.to_str().unwrap(), &data.webhook_secret)
+            .unwrap();
+    let response = handler.handle_remote_signing_webhook_msg(&event).unwrap();
+
+    println!("Response {:?}", response);
+
+    let result = client
+        .execute_graphql_request_variable(&response.query, response.variables)
         .await;
+
+    println!("Graphql response {:?}", result);
+    HttpResponse::NoContent().finish()
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let config = config::Config::new_from_env();
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(config.clone()))
+            .service(ping)
+            .service(webhook_handler)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }

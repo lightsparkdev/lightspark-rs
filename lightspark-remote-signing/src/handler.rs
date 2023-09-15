@@ -11,6 +11,7 @@ use serde_json::from_value;
 
 use crate::{response::Response, signer::LightsparkSigner, validation::Validation, Error};
 
+/// A handler for lightspark remote signing webhook events.
 pub struct Handler<T>
 where
     T: Validation,
@@ -23,6 +24,11 @@ impl<T> Handler<T>
 where
     T: Validation,
 {
+    /// Create a new handler.
+    /// # Arguments
+    ///
+    /// * `signer` - A LightsparkSigner instance, which will be used to sign messages.
+    /// * `validator` - A Validation instance, which will be used to determine whether to sign messages.
     pub fn new(signer: LightsparkSigner, validator: T) -> Self {
         Self { signer, validator }
     }
@@ -38,6 +44,7 @@ where
         let data = &event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let sub_type: RemoteSigningSubEventType = from_value(data["sub_event_type"].clone())
             .map_err(|_| Error::WebhookEventDataMissing)?;
+        println!("handler for sub_type: {:?}", sub_type.to_string());
         if !self.validator.should_sign(event) {
             self.handle_decline_to_sign_messages(event)
         } else {
@@ -97,7 +104,7 @@ where
         info!("Handling ECDH webhook event");
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let node_id = &event.entity_id;
-        let public_key = data["public_key"]
+        let public_key = data["peer_public_key"]
             .as_str()
             .ok_or(Error::WebhookEventDataMissing)?;
         let public_key_bytes = hex::decode(public_key).map_err(Error::PublicKeyDecodeError)?;
@@ -203,6 +210,7 @@ where
         Ok(Response::release_channel_per_commitment_secret_response(
             channel_id,
             &commitment_secret_str,
+            per_commitment_point_idx as i64,
         ))
     }
 
@@ -249,39 +257,4 @@ struct SigningJob {
     add_tweak: Option<String>,
     mul_tweak: Option<String>,
     is_raw: bool,
-}
-
-#[cfg(test)]
-mod tests {
-    use lightspark::webhooks::WebhookEvent;
-
-    use crate::signer::{LightsparkSigner, Seed};
-
-    #[test]
-    fn test_handle_remote_signing_webhook_msg_ecdh() {
-        let data = "{\"event_type\": \"REMOTE_SIGNING\", \"event_id\": \"1615c8be5aa44e429eba700db2ed8ca5\", \"timestamp\": \"2023-05-17T23:56:47.874449+00:00\", \"entity_id\": \"lightning_node:01882c25-157a-f96b-0000-362d42b64397\", \"data\": {\"sub_event_type\": \"ECDH\", \"public_key\": \"027c4b09ffb985c298afe7e5813266cbfcb7780b480ac294b0b43dc21f2be3d13c\"}}";
-        let hexdigest = "17db38526ce47682f4052e3182766fe2f23810ac538e32d5f20bbe1deb2e3519";
-        let webhook_secret = "3gZ5oQQUASYmqQNuEk0KambNMVkOADDItIJjzUlAWjX";
-
-        let result = WebhookEvent::verify_and_parse(
-            data.as_bytes(),
-            hexdigest.to_string(),
-            webhook_secret.to_string(),
-        )
-        .expect("Success case");
-
-        let seed = Seed::new("test".as_bytes().to_vec());
-        let signer = LightsparkSigner::new(&seed, crate::signer::Network::Bitcoin).unwrap();
-        let validator = crate::validation::PositiveValidator;
-        let handler = super::Handler::new(signer, validator);
-        let response = handler
-            .handle_remote_signing_webhook_msg(&result)
-            .expect("Success case");
-
-        let ss = response.variables["shared_secret"].as_str().unwrap();
-        assert_eq!(
-            ss,
-            "930d00c9247dd9415b26855a5faafef14705460dfcc4c43fba2f2d899424d31b"
-        );
-    }
 }

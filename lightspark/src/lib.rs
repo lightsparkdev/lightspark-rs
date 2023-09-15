@@ -28,7 +28,7 @@
 //! See more examples in examples/example.rs
 //!
 /// The version of this library.
-pub const VERSION: &str = "0.6.0";
+pub const VERSION: &str = "0.6.1";
 
 pub mod client;
 pub mod crypto;
