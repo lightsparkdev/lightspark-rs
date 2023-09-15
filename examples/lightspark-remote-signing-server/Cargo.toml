@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-lightspark = { path = "../../lightspark" }
+lightspark = "0.6.1"
 lightspark-remote-signing = { path = "../../lightspark-remote-signing" }
 tokio = "1.32.0"
 actix-web = "4.4.0"
