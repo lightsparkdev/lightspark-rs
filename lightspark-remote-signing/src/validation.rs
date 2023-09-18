@@ -1,6 +1,6 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 
-pub trait Validation: {
+pub trait Validation: Send + Sync {
     /// This function should return true if the webhook should be signed.
     ///
     /// Arguments:
