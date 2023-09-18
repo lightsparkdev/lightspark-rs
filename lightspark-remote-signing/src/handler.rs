@@ -12,24 +12,18 @@ use serde_json::from_value;
 use crate::{response::Response, signer::LightsparkSigner, validation::Validation, Error};
 
 /// A handler for lightspark remote signing webhook events.
-pub struct Handler<T>
-where
-    T: Validation,
-{
+pub struct Handler {
     signer: LightsparkSigner,
-    validator: T,
+    validator: Box<dyn Validation>,
 }
 
-impl<T> Handler<T>
-where
-    T: Validation,
-{
+impl Handler {
     /// Create a new handler.
     /// # Arguments
     ///
     /// * `signer` - A LightsparkSigner instance, which will be used to sign messages.
     /// * `validator` - A Validation instance, which will be used to determine whether to sign messages.
-    pub fn new(signer: LightsparkSigner, validator: T) -> Self {
+    pub fn new(signer: LightsparkSigner, validator: Box<dyn Validation>) -> Self {
         Self { signer, validator }
     }
 

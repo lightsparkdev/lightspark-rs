@@ -37,7 +37,7 @@ async fn webhook_handler(
     let signer =
         LightsparkSigner::new(&seed, lightspark_remote_signing::signer::Network::Regtest).unwrap();
     let validation = PositiveValidator;
-    let handler = Handler::new(signer, validation);
+    let handler = Handler::new(signer, Box::new(validation));
 
     let event =
         WebhookEvent::verify_and_parse(&bytes, signature.to_str().unwrap(), &data.webhook_secret)
