@@ -45,7 +45,9 @@ where
         let sub_type: RemoteSigningSubEventType = from_value(data["sub_event_type"].clone())
             .map_err(|_| Error::WebhookEventDataMissing)?;
         println!("handler for sub_type: {:?}", sub_type.to_string());
-        if !self.validator.should_sign(event) {
+        let event_json =
+            serde_json::to_string(&event).expect("Serialize event to json should not fail");
+        if !self.validator.should_sign(&event_json) {
             self.handle_decline_to_sign_messages(event)
         } else {
             match sub_type {
