@@ -5,13 +5,13 @@ pub trait Validation: Send + Sync {
     ///
     /// Arguments:
     /// * `webhook` - The webhook event json serialized string to be validated.
-    fn should_sign(&self, webhook: &str) -> bool;
+    fn should_sign(&self, webhook: String) -> bool;
 }
 
 pub struct PositiveValidator;
 
 impl Validation for PositiveValidator {
-    fn should_sign(&self, _: &str) -> bool {
+    fn should_sign(&self, _: String) -> bool {
         true
     }
 }

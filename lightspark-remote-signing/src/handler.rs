@@ -41,7 +41,7 @@ impl Handler {
         println!("handler for sub_type: {:?}", sub_type.to_string());
         let event_json =
             serde_json::to_string(&event).expect("Serialize event to json should not fail");
-        if !self.validator.should_sign(&event_json) {
+        if !self.validator.should_sign(event_json) {
             self.handle_decline_to_sign_messages(event)
         } else {
             match sub_type {
