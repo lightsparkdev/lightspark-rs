@@ -1,4 +1,4 @@
-# Lightspark Rust SDK - v0.6.1
+# Lightspark Rust SDK - v0.6.2
 
 The Lightspark Rust SDK provides a convenient way to interact with the Lightspark services from applications written in the Rust language.
 

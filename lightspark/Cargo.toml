@@ -2,7 +2,7 @@
 name = "lightspark"
 description = "Lightspark Rust SDK"
 authors = ["Lightspark Group, Inc. <info@lightspark.com>"]
-version = "0.6.1"
+version = "0.6.2"
 edition = "2021"
 documentation = "https://app.lightspark.com/docs/sdk"
 homepage = "https://www.lightspark.com/"
@@ -21,7 +21,7 @@ serde_json = "1.0.94"
 serde = { version = "1.0.155", features = ["derive"] }
 regex = "1.7.1"
 chrono = "0.4.24"
-openssl = "0.10.48"
+openssl = { version = "0.10.48", features = ["vendored"] }
 aes-gcm = "0.10.1"
 rand = "0.8.5"
 block-modes = "0.9.1"
