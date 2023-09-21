@@ -2,7 +2,7 @@
 name = "lightspark-remote-signing"
 description = "Lightspark Remote Signing SDK for Rust"
 authors = ["Lightspark Group, Inc. <info@lightspark.com>"]
-version = "0.1.4"
+version = "0.1.5"
 edition = "2021"
 documentation = "https://app.lightspark.com/docs/"
 homepage = "https://www.lightspark.com/"
@@ -13,7 +13,7 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-lightspark = "0.6.3"
+lightspark = "0.6.4"
 bip39 = { "version" = "2.0.0", features = ["rand"]}
 bitcoin = "0.30.1"
 hex = "0.4.3"
