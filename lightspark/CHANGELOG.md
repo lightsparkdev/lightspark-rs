@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.6.4
+- Remove all openssl dependencies.
+
 # v0.6.3
 - Replace openssl with native rust crypto lib.
 
