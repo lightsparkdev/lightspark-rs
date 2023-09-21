@@ -5,8 +5,8 @@ use std::str::FromStr;
 
 use bitcoin::bip32::{DerivationPath, ExtendedPrivKey};
 use bitcoin::secp256k1::Secp256k1;
-use openssl::sha::sha256;
 use serde_json::Value;
+use sha2::{Digest, Sha256};
 
 use crate::crypto::{decrypt_private_key, CryptoError};
 use crate::error::Error;
@@ -386,7 +386,10 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             invoice::FRAGMENT
         );
 
-        let metadata_hash = hex::encode(sha256(metadata.as_bytes()));
+        let mut hasher = Sha256::new();
+        hasher.update(metadata.as_bytes());
+
+        let metadata_hash = hex::encode(hasher.finalize());
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("node_id", node_id.into());
@@ -501,7 +504,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
                 $node_id: ID!
             ) {
                 entity(id: $node_id) {
-                    ... on LightsparkNode {
+                    ... on LightsparkNodeWithOSK {
                         encrypted_signing_private_key {
                             encrypted_value
                             cipher

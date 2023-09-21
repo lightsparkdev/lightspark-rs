@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.6.3
+- Replace openssl with native rust crypto lib.
+
 # v0.6.1
 - Fix a minor bug in `create_test_mode_payment`.
 
