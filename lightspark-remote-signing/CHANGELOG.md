@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.4
+- Bump lightspark SDK version.
+
 ## v0.1.3
 - Change the validation interface to take a String instead of &str.
 
