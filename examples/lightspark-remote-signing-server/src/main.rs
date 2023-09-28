@@ -1,8 +1,8 @@
 use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use futures_util::StreamExt as _;
-use lightspark_remote_signing::lightspark::{
-    key::Secp256k1SigningKey, request::auth_provider::AccountAuthProvider, webhooks::WebhookEvent,
-};
+use lightspark::key::Secp256k1SigningKey;
+use lightspark::request::auth_provider::AccountAuthProvider;
+use lightspark_remote_signing::lightspark::webhooks::WebhookEvent;
 use lightspark_remote_signing::{
     handler::Handler,
     signer::{LightsparkSigner, Seed},
@@ -33,11 +33,9 @@ async fn webhook_handler(
     }
 
     let auth = AccountAuthProvider::new(data.api_client_id.clone(), data.api_client_secret.clone());
-    let client = lightspark_remote_signing::lightspark::client::LightsparkClient::<
-        Secp256k1SigningKey,
-    >::new(auth)
-    .unwrap();
-    // client.requester.set_base_url(data.api_endpoint.clone());
+    let mut client =
+        lightspark::client::LightsparkClient::<Secp256k1SigningKey>::new(auth).unwrap();
+    client.requester.set_base_url(data.api_endpoint.clone());
 
     let seed = Seed::new(hex::decode(data.master_seed_hex.clone()).unwrap());
     let signer =

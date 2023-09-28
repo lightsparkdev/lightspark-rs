@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.0
+- Remove unnecessary lightspark dependencies.
+- Expose lightspark crates.
+
 ## v0.1.4
 - Bump lightspark SDK version.
 
