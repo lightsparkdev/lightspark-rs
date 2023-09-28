@@ -1,14 +1,15 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 
-use std::{env, fmt};
+use std::env;
 
 use crate::{
-    crypto::CryptoError,
     error::Error,
     key::{OperationSigningKey, RSASigningKey},
     request::auth_provider::AuthProvider,
+    types::graphql_requester::GraphQLRequester,
     VERSION,
 };
+use async_trait::async_trait;
 use chrono::{Duration, Utc};
 use os_version::detect;
 use rand::RngCore;
@@ -20,36 +21,10 @@ use serde_json::{json, to_string, Value};
 
 const DEFAULT_BASE_URL: &str = "https://api.lightspark.com/graphql/server/2023-09-13";
 
-#[derive(Debug)]
-pub enum RequesterError {
-    ReqwestError(reqwest::Error),
-    GraphqlError(String),
-    SigningError(CryptoError),
-    InvalidHeaderValue,
-}
-
-impl fmt::Display for RequesterError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::ReqwestError(err) => write!(f, "Network error {}", err),
-            Self::GraphqlError(err) => write!(f, "Graphql error {}", err),
-            Self::SigningError(err) => write!(f, "Signing error {}", err),
-            Self::InvalidHeaderValue => write!(f, "Invalid header value"),
-        }
-    }
-}
-
-impl std::error::Error for RequesterError {}
-
-impl From<reqwest::Error> for RequesterError {
-    fn from(error: reqwest::Error) -> Self {
-        RequesterError::ReqwestError(error)
-    }
-}
-
 /// A Requester struct for graphql operations.
 pub struct Requester {
     client: reqwest::Client,
+    base_url: Option<String>,
 }
 
 fn user_agent() -> String {
@@ -68,6 +43,26 @@ fn user_agent() -> String {
         env::consts::OS,
         os_version
     )
+}
+
+#[async_trait]
+impl GraphQLRequester for Requester {
+    /// This executes a graphql operaion without signing.
+    ///
+    /// Returns the json result for the operation.
+    ///
+    /// # Arguments
+    ///
+    /// * `operation` - graphql query or mutation to be executed.
+    /// * `variables` - variable for the graphql.
+    async fn execute_graphql(
+        &self,
+        operation: &str,
+        variables: Option<Value>,
+    ) -> Result<Value, Error> {
+        self.execute_graphql_signing::<RSASigningKey>(operation, variables, None)
+            .await
+    }
 }
 
 impl Requester {
@@ -96,7 +91,10 @@ impl Requester {
         headers.insert("X-Lightspark-SDK", user_agent_header_value);
 
         match reqwest::Client::builder().default_headers(headers).build() {
-            Ok(client) => Ok(Requester { client }),
+            Ok(client) => Ok(Requester {
+                client,
+                base_url: None,
+            }),
             Err(err) => Err(Error::ClientCreationError(format!(
                 "reqwest client creation error: {}",
                 err
@@ -104,21 +102,8 @@ impl Requester {
         }
     }
 
-    /// This executes a graphql operaion without signing.
-    ///
-    /// Returns the json result for the operation.
-    ///
-    /// # Arguments
-    ///
-    /// * `operation` - graphql query or mutation to be executed.
-    /// * `variables` - variable for the graphql.
-    pub async fn execute_graphql(
-        &self,
-        operation: &str,
-        variables: Option<Value>,
-    ) -> Result<Value, RequesterError> {
-        self.execute_graphql_signing::<RSASigningKey>(operation, variables, None)
-            .await
+    pub fn set_base_url(&mut self, base_url: Option<String>) {
+        self.base_url = base_url;
     }
 
     /// This executes a graphql operaion. If the signing_key is provided, the operation will be
@@ -136,9 +121,9 @@ impl Requester {
         operation: &str,
         variables: Option<Value>,
         signing_key: Option<T>,
-    ) -> Result<Value, RequesterError> {
+    ) -> Result<Value, Error> {
         let re = regex::Regex::new(r"\s*(?:query|mutation)\s+(\w+)").map_err(|_| {
-            RequesterError::GraphqlError("The operation is not a query or a mutation".to_owned())
+            Error::GraphqlError("The operation is not a query or a mutation".to_owned())
         })?;
         let operation_name = re
             .captures(operation)
@@ -173,37 +158,43 @@ impl Requester {
         }
 
         if let Some(key) = signing_key {
-            let json_string = to_string(&body)
-                .map_err(|_| RequesterError::GraphqlError("Body malformat.".to_owned()))?;
+            let json_string =
+                to_string(&body).map_err(|_| Error::GraphqlError("Body malformat.".to_owned()))?;
             let payload: Vec<u8> = json_string.into_bytes();
-            let signing = key
-                .sign_payload(&payload)
-                .map_err(RequesterError::SigningError)?;
+            let signing = key.sign_payload(&payload).map_err(Error::CryptoError)?;
             headers.insert(
                 "X-Lightspark-Signing",
-                HeaderValue::from_str(signing.as_str())
-                    .map_err(|_| RequesterError::InvalidHeaderValue)?,
+                HeaderValue::from_str(signing.as_str()).map_err(|_| Error::InvalidHeaderValue)?,
             );
         }
 
+        let url = match &self.base_url {
+            Some(base_url) => base_url.clone(),
+            None => DEFAULT_BASE_URL.to_owned(),
+        };
+
         let response = self
             .client
-            .post(DEFAULT_BASE_URL)
+            .post(url)
             .headers(headers)
             .json(&body)
             .send()
-            .await?;
+            .await
+            .map_err(|e| Error::ReqwestError(e.to_string()))?;
 
-        let response_json: Value = response.json().await?;
+        let response_json: Value = response
+            .json()
+            .await
+            .map_err(|e| Error::ReqwestError(e.to_string()))?;
 
         if let Some(_errors) = response_json.get("errors") {
             // Check if there are any errors in the response
-            Err(RequesterError::GraphqlError(_errors.to_string()))
+            Err(Error::GraphqlError(_errors.to_string()))
         } else if let Some(data) = response_json.get("data") {
             // Return the data field of the response as json
             Ok(data.clone())
         } else {
-            Err(RequesterError::GraphqlError("missing data".to_owned()))
+            Err(Error::GraphqlError("missing data".to_owned()))
         }
     }
 }

@@ -9,11 +9,11 @@ use crate::objects::transaction_type::TransactionType;
 use crate::objects::wallet_status::WalletStatus;
 use crate::objects::wallet_to_payment_requests_connection::WalletToPaymentRequestsConnection;
 use crate::objects::wallet_to_transactions_connection::WalletToTransactionsConnection;
-use crate::request::requester::Requester;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde_json::Value;
@@ -147,7 +147,7 @@ impl Wallet {
     #[allow(clippy::too_many_arguments)]
     pub async fn get_transactions(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         after: Option<String>,
         created_after_date: Option<DateTime<Utc>>,
@@ -678,10 +678,7 @@ impl Wallet {
         variables.insert("types", types.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["transactions"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
@@ -689,7 +686,7 @@ impl Wallet {
 
     pub async fn get_payment_requests(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         after: Option<String>,
         created_after_date: Option<DateTime<Utc>>,
@@ -981,10 +978,7 @@ impl Wallet {
         );
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["payment_requests"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
@@ -992,7 +986,7 @@ impl Wallet {
 
     pub async fn get_total_amount_received(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         created_after_date: Option<DateTime<Utc>>,
         created_before_date: Option<DateTime<Utc>>,
     ) -> Result<CurrencyAmount, Error> {
@@ -1022,10 +1016,7 @@ impl Wallet {
         );
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["total_amount_received"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
@@ -1033,7 +1024,7 @@ impl Wallet {
 
     pub async fn get_total_amount_sent(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         created_after_date: Option<DateTime<Utc>>,
         created_before_date: Option<DateTime<Utc>>,
     ) -> Result<CurrencyAmount, Error> {
@@ -1063,10 +1054,7 @@ impl Wallet {
         );
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["total_amount_sent"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

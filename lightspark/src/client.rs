@@ -29,8 +29,9 @@ use crate::objects::{api_token, outgoing_payment};
 use crate::objects::{bitcoin_network, withdrawal_request};
 use crate::objects::{fee_estimate, lightning_fee_estimate_output};
 use crate::request::auth_provider::AuthProvider;
-use crate::request::requester::{Requester, RequesterError};
+use crate::request::requester::Requester;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 
 const SIGNING_KEY_PATH: &str = "m/5";
 
@@ -95,11 +96,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         variables.insert("bitcoin_network", bitcoin_network);
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let json = self
-            .requester
-            .execute_graphql(&query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let json = self.requester.execute_graphql(&query, Some(value)).await?;
         let result = serde_json::from_value(json["bitcoin_fee_estimate"].clone())
             .map_err(Error::JsonError)?;
         Ok(result)
@@ -138,11 +135,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         variables.insert("amount_msats", amount_msats.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let json = self
-            .requester
-            .execute_graphql(&query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let json = self.requester.execute_graphql(&query, Some(value)).await?;
         let result: LightningFeeEstimateOutput =
             serde_json::from_value(json["lightning_fee_estimate_for_node"].clone())
                 .map_err(Error::JsonError)?;
@@ -179,11 +172,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         variables.insert("amount_msats", amount_msats.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let json = self
-            .requester
-            .execute_graphql(&query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let json = self.requester.execute_graphql(&query, Some(value)).await?;
         let result: LightningFeeEstimateOutput =
             serde_json::from_value(json["lightning_fee_estimate_for_node"].clone())
                 .map_err(Error::JsonError)?;
@@ -203,11 +192,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             account::FRAGMENT
         );
 
-        let json = self
-            .requester
-            .execute_graphql(&query, None)
-            .await
-            .map_err(Error::ClientError)?;
+        let json = self.requester.execute_graphql(&query, None).await?;
         let result =
             serde_json::from_value(json["current_account"].clone()).map_err(Error::JsonError)?;
         Ok(result)
@@ -254,8 +239,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(&operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["create_api_token"]["api_token"].clone())
             .map_err(Error::JsonError)?;
@@ -286,8 +270,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         self.requester
             .execute_graphql(operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
         Ok(())
     }
 
@@ -302,8 +285,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(T::get_entity_query().as_str(), Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["entity"].clone()).map_err(Error::JsonError)?;
         Ok(result)
@@ -350,8 +332,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(&operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["create_invoice"]["invoice"].clone())
             .map_err(Error::JsonError)?;
@@ -400,8 +381,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(&operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["create_lnurl_invoice"]["invoice"].clone())
             .map_err(Error::JsonError)?;
@@ -438,8 +418,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(&operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["fund_node"]["amount"].clone())
             .map_err(Error::JsonError)?;
@@ -487,8 +466,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(&operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["decoded_payment_request"].clone())
             .map_err(Error::JsonError)?;
@@ -521,19 +499,14 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(&operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let encrypted_key = json["entity"]["encrypted_signing_private_key"]["encrypted_value"]
             .as_str()
-            .ok_or(Error::ClientError(RequesterError::GraphqlError(
-                "missing encrypted_value".to_owned(),
-            )))?;
+            .ok_or(Error::GraphqlError("missing encrypted_value".to_owned()))?;
         let cipher = json["entity"]["encrypted_signing_private_key"]["cipher"]
             .as_str()
-            .ok_or(Error::ClientError(RequesterError::GraphqlError(
-                "missing cipher".to_owned(),
-            )))?;
+            .ok_or(Error::GraphqlError("missing cipher".to_owned()))?;
 
         let decrypted_private_key = decrypt_private_key(cipher, encrypted_key, node_password)
             .map_err(Error::CryptoError)?;
@@ -592,8 +565,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql_signing(&operation, Some(value), Some(signing_key))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["pay_invoice"]["payment"].clone())
             .map_err(Error::JsonError)?;
@@ -648,8 +620,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql_signing(&operation, Some(value), Some(signing_key))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["send_payment"]["payment"].clone())
             .map_err(Error::JsonError)?;
@@ -665,8 +636,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
         Ok(json)
     }
 
@@ -678,8 +648,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(operation, Some(variables))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
         Ok(json)
     }
 
@@ -702,15 +671,12 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(&operation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         if let Some(result) = json["create_node_wallet_address"]["wallet_address"].as_str() {
             Ok(result.to_owned())
         } else {
-            Err(Error::ClientError(RequesterError::GraphqlError(
-                "missing wallet_address".to_owned(),
-            )))
+            Err(Error::GraphqlError("missing wallet_address".to_owned()))
         }
     }
 
@@ -756,8 +722,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql_signing(&operation, Some(value), Some(signing_key))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["request_withdrawal"]["request"].clone())
             .map_err(Error::JsonError)?;
@@ -799,8 +764,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql(mutation, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = json["create_test_mode_invoice"]["encoded_payment_request"].clone();
         Ok(result.to_string())
@@ -848,8 +812,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let json = self
             .requester
             .execute_graphql_signing(&mutation, Some(value), Some(signing_key))
-            .await
-            .map_err(Error::ClientError)?;
+            .await?;
 
         let result = serde_json::from_value(json["create_test_mode_payment"]["payment"].clone())
             .map_err(Error::JsonError)?;

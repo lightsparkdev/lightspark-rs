@@ -9,6 +9,7 @@
 //! This crates also provides a `signer::LightsparkSigner` that can be used to sign transactions.
 use std::fmt;
 
+pub extern crate lightspark;
 pub mod handler;
 pub mod response;
 pub mod signer;

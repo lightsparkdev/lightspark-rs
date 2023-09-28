@@ -6,11 +6,11 @@ use crate::objects::withdrawal_mode::WithdrawalMode;
 use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
 use crate::objects::withdrawal_request_to_channel_closing_transactions_connection::WithdrawalRequestToChannelClosingTransactionsConnection;
 use crate::objects::withdrawal_request_to_channel_opening_transactions_connection::WithdrawalRequestToChannelOpeningTransactionsConnection;
-use crate::request::requester::Requester;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde_json::Value;
@@ -137,7 +137,7 @@ fragment WithdrawalRequestFragment on WithdrawalRequest {
 impl WithdrawalRequest {
     pub async fn get_channel_closing_transactions(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
     ) -> Result<WithdrawalRequestToChannelClosingTransactionsConnection, Error> {
         let query = "query FetchWithdrawalRequestToChannelClosingTransactionsConnection($entity_id: ID!, $first: Int) {
@@ -194,10 +194,7 @@ impl WithdrawalRequest {
         variables.insert("first", first.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["channel_closing_transactions"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
@@ -205,7 +202,7 @@ impl WithdrawalRequest {
 
     pub async fn get_channel_opening_transactions(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
     ) -> Result<WithdrawalRequestToChannelOpeningTransactionsConnection, Error> {
         let query = "query FetchWithdrawalRequestToChannelOpeningTransactionsConnection($entity_id: ID!, $first: Int) {
@@ -262,10 +259,7 @@ impl WithdrawalRequest {
         variables.insert("first", first.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["channel_opening_transactions"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

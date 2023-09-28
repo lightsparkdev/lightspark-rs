@@ -5,11 +5,11 @@ use crate::objects::entity::Entity;
 use crate::objects::htlc_attempt_failure_code::HtlcAttemptFailureCode;
 use crate::objects::outgoing_payment_attempt_status::OutgoingPaymentAttemptStatus;
 use crate::objects::outgoing_payment_attempt_to_hops_connection::OutgoingPaymentAttemptToHopsConnection;
-use crate::request::requester::Requester;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde_json::Value;
@@ -142,7 +142,7 @@ fragment OutgoingPaymentAttemptFragment on OutgoingPaymentAttempt {
 impl OutgoingPaymentAttempt {
     pub async fn get_hops(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         after: Option<String>,
     ) -> Result<OutgoingPaymentAttemptToHopsConnection, Error> {
@@ -197,10 +197,7 @@ impl OutgoingPaymentAttempt {
         variables.insert("after", after.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["hops"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

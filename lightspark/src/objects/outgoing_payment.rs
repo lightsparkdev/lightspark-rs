@@ -1,5 +1,8 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::types::graphql_requester::GraphQLRequester;
 use serde::Deserialize;
+use serde_json::Value;
+use std::vec::Vec;
 
 use crate::error::Error;
 use crate::objects::currency_amount::CurrencyAmount;
@@ -12,15 +15,12 @@ use crate::objects::post_transaction_data::PostTransactionData;
 use crate::objects::rich_text::RichText;
 use crate::objects::transaction::Transaction;
 use crate::objects::transaction_status::TransactionStatus;
-use crate::request::requester::Requester;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde_json::Value;
 use std::collections::HashMap;
-use std::vec::Vec;
 
 /// This object represents a Lightning Network payment sent from a Lightspark Node. You can retrieve this object to receive payment related information about any payment sent from your Lightspark Node on the Lightning Network.
 #[derive(Clone, Deserialize)]
@@ -450,7 +450,7 @@ fragment OutgoingPaymentFragment on OutgoingPayment {
 impl OutgoingPayment {
     pub async fn get_attempts(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         after: Option<String>,
     ) -> Result<OutgoingPaymentToAttemptsConnection, Error> {
@@ -506,10 +506,7 @@ impl OutgoingPayment {
         variables.insert("after", after.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["attempts"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

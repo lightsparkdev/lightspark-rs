@@ -8,11 +8,11 @@ use crate::objects::lightning_transaction::LightningTransaction;
 use crate::objects::post_transaction_data::PostTransactionData;
 use crate::objects::transaction::Transaction;
 use crate::objects::transaction_status::TransactionStatus;
-use crate::request::requester::Requester;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde_json::Value;
@@ -178,7 +178,7 @@ fragment IncomingPaymentFragment on IncomingPayment {
 impl IncomingPayment {
     pub async fn get_attempts(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         statuses: Option<Vec<IncomingPaymentAttemptStatus>>,
         after: Option<String>,
@@ -226,10 +226,7 @@ impl IncomingPayment {
         variables.insert("after", after.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["attempts"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

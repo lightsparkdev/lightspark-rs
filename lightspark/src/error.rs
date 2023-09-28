@@ -2,13 +2,15 @@
 
 use std::fmt;
 
-use crate::{crypto::CryptoError, request::requester::RequesterError};
+use crate::crypto::CryptoError;
 
 #[derive(Debug)]
 pub enum Error {
+    ReqwestError(String),
+    GraphqlError(String),
+    InvalidHeaderValue,
     ClientCreationError(String),
     JsonError(serde_json::Error),
-    ClientError(RequesterError),
     ConversionError(serde_json::Error),
     CryptoError(CryptoError),
     WebhookSignatureError,
@@ -18,9 +20,11 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
+            Self::ReqwestError(err) => write!(f, "Reqwest error {}", err),
+            Self::GraphqlError(err) => write!(f, "Graphql error {}", err),
+            Self::InvalidHeaderValue => write!(f, "Invalid header value"),
             Self::ClientCreationError(err) => write!(f, "Client creation error {}", err),
             Self::JsonError(err) => write!(f, "JSON Parser error {}", err),
-            Self::ClientError(err) => write!(f, "Client error {}", err),
             Self::ConversionError(err) => write!(f, "Parameter conversion error {}", err),
             Self::CryptoError(err) => write!(f, "Crypto error {}", err),
             Self::WebhookSignatureError => {

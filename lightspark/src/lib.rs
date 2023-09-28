@@ -28,13 +28,21 @@
 //! See more examples in examples/example.rs
 //!
 /// The version of this library.
-pub const VERSION: &str = "0.6.4";
+pub const VERSION: &str = "0.7.0";
 
+#[cfg(feature = "client")]
 pub mod client;
+#[cfg(feature = "base")]
 pub mod crypto;
+#[cfg(feature = "base")]
 pub mod error;
+#[cfg(feature = "base")]
 pub mod key;
+#[cfg(feature = "objects")]
 pub mod objects;
+#[cfg(feature = "client")]
 pub mod request;
+#[cfg(feature = "base")]
 pub mod types;
+#[cfg(feature = "webhooks")]
 pub mod webhooks;

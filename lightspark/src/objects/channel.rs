@@ -6,10 +6,10 @@ use crate::objects::channel_to_transactions_connection::ChannelToTransactionsCon
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::transaction_type::TransactionType;
-use crate::request::requester::Requester;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde_json::Value;
@@ -231,7 +231,7 @@ fragment ChannelFragment on Channel {
 impl Channel {
     pub async fn get_uptime_percentage(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         after_date: Option<DateTime<Utc>>,
         before_date: Option<DateTime<Utc>>,
     ) -> Result<Option<i64>, Error> {
@@ -248,10 +248,7 @@ impl Channel {
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["uptime_percentage"].clone();
         let result = json.as_i64();
         Ok(result)
@@ -259,7 +256,7 @@ impl Channel {
 
     pub async fn get_transactions(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         types: Option<Vec<TransactionType>>,
         after_date: Option<DateTime<Utc>>,
         before_date: Option<DateTime<Utc>>,
@@ -305,10 +302,7 @@ impl Channel {
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["transactions"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

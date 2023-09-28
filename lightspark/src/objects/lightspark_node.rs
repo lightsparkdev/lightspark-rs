@@ -1,15 +1,15 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::objects::entity::Entity;
+use crate::objects::node::Node;
+
 use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
-use crate::objects::node::Node;
+use crate::types::entity_wrapper::EntityWrapper;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
-
-use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
-use crate::types::entity_wrapper::EntityWrapper;
 use std::vec::Vec;
 
 pub trait LightsparkNode: Node + Entity {

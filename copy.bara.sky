@@ -46,7 +46,7 @@ core.workflow(
 
     origin_files = glob(
 	    ["python-sdk/**", "copy.bara.sky"],
-        exclude = ["python-sdk/examples/internal_example.py"],
+        exclude = ["python-sdk/examples/internal_example.py", "python-sdk/RELEASE-internal.md"],
     ),
 
     authoring = authoring.pass_thru("Lightspark Eng <engineering@lightspark.com>"),

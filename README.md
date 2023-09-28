@@ -5,7 +5,6 @@ The Lightspark Rust SDK provides a convenient way to interact with the Lightspar
 The rust-sdk consists of multiple crates that can be picked at your convenience:
 - `lightspark`: The main crate that contains the SDK.
 - `lightspark-remote-signing`: The SDK for handling remote signing webhook handler.
-- `uma`: The UMA protocol implementation.
 - `example`: Examples that shows you how to use the SDK.
 
 ## License

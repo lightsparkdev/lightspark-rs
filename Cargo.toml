@@ -5,6 +5,5 @@ resolver = "2"
 members = [
     "lightspark",
     "lightspark-remote-signing",
-    "uma",
     "examples/*",
 ]

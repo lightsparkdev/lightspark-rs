@@ -1,5 +1,9 @@
 # Changelog
 
+# v0.7.0
+- Refine requester.
+- Separate crate into features.
+
 # v0.6.4
 - Remove all openssl dependencies.
 

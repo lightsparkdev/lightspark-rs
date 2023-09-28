@@ -2,7 +2,7 @@
 name = "lightspark"
 description = "Lightspark Rust SDK"
 authors = ["Lightspark Group, Inc. <info@lightspark.com>"]
-version = "0.6.4"
+version = "0.7.0"
 edition = "2021"
 documentation = "https://app.lightspark.com/docs/sdk"
 homepage = "https://www.lightspark.com/"
@@ -10,12 +10,18 @@ repository = "https://github.com/lightsparkdev/lightspark-rs"
 license = "Apache-2.0"
 readme = "README.md"
 
+[features]
+default = ["base", "objects", "client"]
+base = []
+objects = ["base"]
+webhooks = ["base", "objects"]
+client = ["base", "objects", "dep:reqwest"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "json"] }
+reqwest = { version = "0.11", features = ["blocking", "json"], optional = true }
 futures = "0.3" 
-tokio = { version = "1.12.0", features = ["full"] } 
 base64 = "0.21.0"
 serde_json = "1.0.94"
 serde = { version = "1.0.155", features = ["derive"] }
@@ -33,3 +39,7 @@ bitcoin = "0.30.1"
 pbkdf2 = "0.12.2"
 rsa = { version ="0.9.2", features = ["sha2"] }
 cbc = "0.1.2"
+async-trait = "0.1.73"
+
+[dev-dependencies]
+tokio = { version = "1.12.0", features = ["full"] } 

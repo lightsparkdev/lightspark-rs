@@ -5,9 +5,9 @@ use crate::objects::entity::Entity;
 use crate::objects::node::Node;
 use crate::objects::node_address_type::NodeAddressType;
 use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
-use crate::request::requester::Requester;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde_json::Value;
@@ -147,7 +147,7 @@ fragment GraphNodeFragment on GraphNode {
 impl GraphNode {
     pub async fn get_addresses(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         types: Option<Vec<NodeAddressType>>,
     ) -> Result<NodeToAddressesConnection, Error> {
@@ -172,10 +172,7 @@ impl GraphNode {
         variables.insert("types", types.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["addresses"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

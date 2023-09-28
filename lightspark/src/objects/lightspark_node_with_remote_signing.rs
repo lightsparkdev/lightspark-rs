@@ -1,26 +1,26 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::error::Error;
 use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
-use crate::objects::channel_status::ChannelStatus;
-use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::lightspark_node::LightsparkNode;
+use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
+use crate::objects::node::Node;
 use crate::objects::node_address_type::NodeAddressType;
+use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
+use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
-use crate::error::Error;
-use crate::objects::lightspark_node_status::LightsparkNodeStatus;
-use crate::objects::node::Node;
-use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
-use crate::request::requester::Requester;
+use crate::objects::channel_status::ChannelStatus;
+use crate::objects::currency_amount::CurrencyAmount;
 use crate::types::entity_wrapper::EntityWrapper;
-use serde_json::Value;
 
 /// This is a Lightspark node with remote signing.
 #[derive(Clone, Deserialize)]
@@ -327,7 +327,7 @@ fragment LightsparkNodeWithRemoteSigningFragment on LightsparkNodeWithRemoteSign
 impl LightsparkNodeWithRemoteSigning {
     pub async fn get_addresses(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         types: Option<Vec<NodeAddressType>>,
     ) -> Result<NodeToAddressesConnection, Error> {
@@ -352,10 +352,7 @@ impl LightsparkNodeWithRemoteSigning {
         variables.insert("types", types.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["addresses"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
@@ -363,7 +360,7 @@ impl LightsparkNodeWithRemoteSigning {
 
     pub async fn get_channels(
         &self,
-        requester: &Requester,
+        requester: &impl GraphQLRequester,
         first: Option<i64>,
         statuses: Option<Vec<ChannelStatus>>,
         after: Option<String>,
@@ -486,10 +483,7 @@ impl LightsparkNodeWithRemoteSigning {
         variables.insert("after", after.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester
-            .execute_graphql(query, Some(value))
-            .await
-            .map_err(Error::ClientError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["channels"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)

@@ -3,3 +3,4 @@
 pub mod custom_date_formats;
 pub mod entity_wrapper;
 pub mod get_entity;
+pub mod graphql_requester;
