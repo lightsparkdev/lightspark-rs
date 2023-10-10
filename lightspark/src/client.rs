@@ -15,6 +15,7 @@ use crate::objects::account::Account;
 use crate::objects::api_token::ApiToken;
 use crate::objects::currency_amount::{self, CurrencyAmount};
 use crate::objects::fee_estimate::FeeEstimate;
+use crate::objects::incoming_payment::IncomingPayment;
 use crate::objects::invoice;
 use crate::objects::invoice::Invoice;
 use crate::objects::invoice_data::InvoiceData;
@@ -25,7 +26,7 @@ use crate::objects::permission::Permission;
 use crate::objects::withdrawal_mode::WithdrawalMode;
 use crate::objects::withdrawal_request::WithdrawalRequest;
 use crate::objects::{account, invoice_data};
-use crate::objects::{api_token, outgoing_payment};
+use crate::objects::{api_token, incoming_payment, outgoing_payment};
 use crate::objects::{bitcoin_network, withdrawal_request};
 use crate::objects::{fee_estimate, lightning_fee_estimate_output};
 use crate::request::auth_provider::AuthProvider;
@@ -775,7 +776,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         node_id: &str,
         encoded_invoice: &str,
         amount_msats: Option<i64>,
-    ) -> Result<OutgoingPayment, Error> {
+    ) -> Result<IncomingPayment, Error> {
         let mutation = format!(
             "
             mutation CreateTestModePayment(
@@ -788,15 +789,15 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
                     encoded_invoice: $encoded_invoice
                     amount_msats: $amount_msats
                 }}) {{
-                    payment {{
-                        ...OutgoingPaymentFragment
+                    incoming_payment {{
+                        ...IncomingPaymentFragment
                     }}
                 }}
             }}
 
             {}          
             ",
-            outgoing_payment::FRAGMENT
+            incoming_payment::FRAGMENT
         );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
@@ -814,8 +815,9 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             .execute_graphql_signing(&mutation, Some(value), Some(signing_key))
             .await?;
 
-        let result = serde_json::from_value(json["create_test_mode_payment"]["payment"].clone())
-            .map_err(Error::JsonError)?;
+        let result =
+            serde_json::from_value(json["create_test_mode_payment"]["incoming_payment"].clone())
+                .map_err(Error::JsonError)?;
         Ok(result)
     }
 }

@@ -11,6 +11,7 @@ use std::fmt;
 
 pub extern crate lightspark;
 pub mod handler;
+pub mod invoice;
 pub mod response;
 pub mod signer;
 pub mod validation;
