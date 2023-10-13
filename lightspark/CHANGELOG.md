@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.7.1
+- Add UMA related operations in LightsparkClient.
+
 # v0.7.0
 - Refine requester.
 - Separate crate into features.

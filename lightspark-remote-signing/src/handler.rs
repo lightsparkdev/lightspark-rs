@@ -224,7 +224,6 @@ impl Handler {
                 .derive_key_and_sign(
                     hex::decode(signing_job.message).map_err(|_| Error::HexEncodingError)?,
                     signing_job.derivation_path,
-                    signing_job.is_raw,
                     signing_job
                         .add_tweak
                         .map(|tweak| hex::decode(tweak).map_err(|_| Error::HexEncodingError))
@@ -252,5 +251,4 @@ struct SigningJob {
     message: String,
     add_tweak: Option<String>,
     mul_tweak: Option<String>,
-    is_raw: bool,
 }

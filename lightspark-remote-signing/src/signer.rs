@@ -6,7 +6,6 @@ use std::str::FromStr;
 use bitcoin::bip32::{DerivationPath, ExtendedPrivKey, ExtendedPubKey};
 use bitcoin::hashes::{sha512, Hash, HashEngine, Hmac, HmacEngine};
 use bitcoin::secp256k1::ecdh::SharedSecret;
-use bitcoin::secp256k1::ecdsa::Signature;
 use bitcoin::secp256k1::hashes::sha256;
 use bitcoin::secp256k1::{Message, PublicKey, Scalar, Secp256k1, SecretKey};
 use rand_core::{OsRng, RngCore};
@@ -161,23 +160,13 @@ impl LightsparkSigner {
         &self,
         message: Vec<u8>,
         derivation_path: String,
-        is_raw: bool,
         add_tweak: Option<Vec<u8>>,
         mul_tweak: Option<Vec<u8>>,
     ) -> Result<Vec<u8>, Error> {
         let secp = Secp256k1::new();
         let signing_key = self.derive_and_tweak_key(derivation_path, add_tweak, mul_tweak)?;
-        let signature: Signature = match is_raw {
-            true => {
-                let msg = Message::from_slice(message.as_slice()).map_err(Error::Secp256k1Error)?;
-                secp.sign_ecdsa(&msg, &signing_key)
-            }
-            false => {
-                let msg = Message::from_hashed_data::<sha256::Hash>(message.as_slice());
-                secp.sign_ecdsa(&msg, &signing_key)
-            }
-        };
-
+        let msg = Message::from_slice(message.as_slice()).map_err(Error::Secp256k1Error)?;
+        let signature = secp.sign_ecdsa(&msg, &signing_key);
         Ok(signature.serialize_compact().to_vec())
     }
 
@@ -342,6 +331,7 @@ impl LightsparkSigner {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use bitcoin::secp256k1::ecdsa::Signature;
     use hex;
 
     #[test]
@@ -397,8 +387,9 @@ mod tests {
             .public_key;
 
         let message = b"Hello, world!";
+        let hash = sha256::Hash::hash(message);
         let signature_bytes = signer
-            .derive_key_and_sign(message.to_vec(), "m".to_owned(), false, None, None)
+            .derive_key_and_sign(hash.to_byte_array().to_vec(), "m".to_owned(), None, None)
             .unwrap();
         let signature = Signature::from_compact(signature_bytes.as_slice()).unwrap();
         let msg = Message::from_hashed_data::<sha256::Hash>(message);
@@ -525,7 +516,7 @@ mod tests {
         let signer = LightsparkSigner::new(&seed, Network::Bitcoin).unwrap();
 
         let signature_bytes = signer
-            .derive_key_and_sign(msg.clone(), "m/3/2106220917/0".to_owned(), true, None, None)
+            .derive_key_and_sign(msg.clone(), "m/3/2106220917/0".to_owned(), None, None)
             .unwrap();
         let pubkey = signer
             .derive_public_key("m/3/2106220917/0".to_owned())

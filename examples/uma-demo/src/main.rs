@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(VASP {
-                config: config::Config {},
+                config: config::Config::new_from_env(),
             }))
             .service(uma_lookup)
             .service(client_payreq)
@@ -57,7 +57,7 @@ async fn main() -> std::io::Result<()> {
             .service(lnurl_payreq)
             .service(uma_payreq)
     })
-    .bind(("127.0.0.1", port))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }

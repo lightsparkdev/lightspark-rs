@@ -66,7 +66,7 @@ async fn test_payment() {
     let invoice = client
         .create_test_mode_invoice(&node_id, 10000, Some("test"), None)
         .await;
-    let payment_request = invoice.unwrap().replace("\"", "");
+    let payment_request = invoice.unwrap().replace('\"', "");
     println!("Invoice created: {:?}", payment_request);
 
     let response = client

@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.1
+- Remove is_raw field for derive_key_and_sign.
+
 ## v0.2.0
 - Remove unnecessary lightspark dependencies.
 - Expose lightspark crates.

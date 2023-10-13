@@ -13,6 +13,7 @@ use crate::error::Error;
 use crate::key::OperationSigningKey;
 use crate::objects::account::Account;
 use crate::objects::api_token::ApiToken;
+use crate::objects::compliance_provider::ComplianceProvider;
 use crate::objects::currency_amount::{self, CurrencyAmount};
 use crate::objects::fee_estimate::FeeEstimate;
 use crate::objects::incoming_payment::IncomingPayment;
@@ -23,6 +24,7 @@ use crate::objects::invoice_type::InvoiceType;
 use crate::objects::lightning_fee_estimate_output::LightningFeeEstimateOutput;
 use crate::objects::outgoing_payment::OutgoingPayment;
 use crate::objects::permission::Permission;
+use crate::objects::risk_rating::RiskRating;
 use crate::objects::withdrawal_mode::WithdrawalMode;
 use crate::objects::withdrawal_request::WithdrawalRequest;
 use crate::objects::{account, invoice_data};
@@ -818,6 +820,149 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let result =
             serde_json::from_value(json["create_test_mode_payment"]["incoming_payment"].clone())
                 .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    pub async fn create_uma_invoice(
+        &self,
+        node_id: &str,
+        amount_msats: i64,
+        metadata: &str,
+        expiry_secs: Option<i32>,
+    ) -> Result<Invoice, Error> {
+        let mutation = format!(
+            "mutation CreateUmaInvoice(
+            $node_id: ID!
+            $amount_msats: Long!
+            $metadata_hash: String!
+            $expiry_secs: Int
+        ) {{
+            create_uma_invoice(input: {{
+                node_id: $node_id
+                amount_msats: $amount_msats
+                metadata_hash: $metadata_hash
+                expiry_secs: $expiry_secs
+            }}) {{
+                invoice {{
+                    ...InvoiceFragment
+                }}
+            }}
+        }}
+        
+        {}
+        ",
+            invoice::FRAGMENT
+        );
+
+        let mut hasher = Sha256::new();
+        hasher.update(metadata.as_bytes());
+
+        let metadata_hash = hex::encode(hasher.finalize());
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("node_id", node_id.into());
+        variables.insert("amount_msats", amount_msats.into());
+        variables.insert("metadata_hash", metadata_hash.into());
+        if let Some(expiry_secs) = expiry_secs {
+            variables.insert("expiry_secs", expiry_secs.into());
+        }
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(&mutation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(json["create_uma_invoice"]["invoice"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    pub async fn pay_uma_invoice(
+        &self,
+        node_id: &str,
+        encoded_invoice: &str,
+        timeout_secs: i32,
+        maximum_fees_msats: i64,
+        amount_msats: Option<i64>,
+    ) -> Result<OutgoingPayment, Error> {
+        let operation = format!(
+            "mutation PayUmaInvoice(
+            $node_id: ID!
+            $encoded_invoice: String!
+            $timeout_secs: Int!
+            $maximum_fees_msats: Long!
+            $amount_msats: Long
+        ) {{
+            pay_uma_invoice(input: {{
+                node_id: $node_id
+                encoded_invoice: $encoded_invoice
+                timeout_secs: $timeout_secs
+                maximum_fees_msats: $maximum_fees_msats
+                amount_msats: $amount_msats
+            }}) {{
+                payment {{
+                    ...OutgoingPaymentFragment
+                }}
+            }}
+        }}
+        
+        {}
+        ",
+            outgoing_payment::FRAGMENT
+        );
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("node_id", node_id.into());
+        variables.insert("encoded_invoice", encoded_invoice.into());
+        if let Some(amount_msats) = amount_msats {
+            variables.insert("amount_msats", amount_msats.into());
+        }
+        variables.insert("timeout_secs", timeout_secs.into());
+        variables.insert("maximum_fees_msats", maximum_fees_msats.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+
+        let signing_key = self.get_node_signing_key(node_id)?;
+        let json = self
+            .requester
+            .execute_graphql_signing(&operation, Some(value), Some(signing_key))
+            .await?;
+
+        let result = serde_json::from_value(json["pay_uma_invoice"]["payment"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    pub async fn screen_node(
+        &self,
+        provider: ComplianceProvider,
+        destination_node_public_key: &str,
+    ) -> Result<RiskRating, Error> {
+        let operation = "mutation ScreenNode(
+            $provider: ComplianceProvider!
+            $node_pubkey: String!
+        ) {
+            screen_node(input: {
+                provider: $provider
+                node_pubkey: $node_pubkey
+            }) {
+                rating
+            }
+        }";
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("provider", provider.into());
+        variables.insert("node_pubkey", destination_node_public_key.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(operation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(json["screen_node"]["rating"].clone())
+            .map_err(Error::JsonError)?;
         Ok(result)
     }
 }
