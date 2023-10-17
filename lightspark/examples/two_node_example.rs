@@ -1,0 +1,588 @@
+// Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+
+use chrono::{Duration, Utc};
+use lightspark::key::RSASigningKey;
+use lightspark::objects::bitcoin_network::BitcoinNetwork;
+
+use lightspark::objects::currency_amount::CurrencyAmount;
+use lightspark::objects::deposit::Deposit;
+
+use lightspark::objects::lightspark_node::{LightsparkNode, LightsparkNodeEnum};
+use lightspark::objects::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use lightspark::objects::transaction::Transaction;
+use lightspark::objects::withdrawal_mode::WithdrawalMode;
+use lightspark::{client::LightsparkClient, request::auth_provider::AccountAuthProvider};
+use serde_json::Value;
+
+use std::collections::HashMap;
+
+fn print_fees(fees: Option<CurrencyAmount>) {
+    if let Some(fee) = fees {
+        println!(
+            "        Paid {} {} in fees.",
+            fee.preferred_currency_value_approx, fee.preferred_currency_unit
+        );
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let api_id = std::env::var("LIGHTSPARK_API_TOKEN_CLIENT_ID").unwrap();
+    let api_token = std::env::var("LIGHTSPARK_API_TOKEN_CLIENT_SECRET").unwrap();
+
+    let node_1 = std::env::var("LIGHTSPARK_EXAMPLE_NODE_1_NAME").unwrap();
+    let node_2 = std::env::var("LIGHTSPARK_EXAMPLE_NODE_2_NAME").unwrap();
+    let node_2_password = std::env::var("LIGHTSPARK_EXAMPLE_NODE_2_PASSWORD").unwrap();
+
+    let auth_provider = AccountAuthProvider::new(api_id, api_token);
+    let mut client = match LightsparkClient::<RSASigningKey>::new(auth_provider) {
+        Ok(value) => value,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+
+    if let Ok(fee_estimate) = client
+        .get_bitcoin_fee_estimates(BitcoinNetwork::Regtest)
+        .await
+    {
+        println!(
+            "Fees for a fast transaction {} {}",
+            fee_estimate.fee_fast.preferred_currency_value_approx,
+            fee_estimate.fee_fast.preferred_currency_unit
+        );
+
+        println!(
+            "Fees for a cheap transaction {} {}",
+            fee_estimate.fee_min.preferred_currency_value_approx,
+            fee_estimate.fee_min.preferred_currency_unit
+        );
+    }
+    println!();
+
+    let account = match client.get_current_account().await {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+
+    if let Some(name) = account.name.clone() {
+        println!("You account name is {}", name);
+    }
+
+    let connection = match account.get_api_tokens(&client.requester, None, None).await {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!(
+        "You initially have {} active API token(s).",
+        connection.count
+    );
+    println!();
+
+    if let Ok(new_api_token) = client.create_api_token("Test token", true, true).await {
+        println!("Created API token {}.", new_api_token.0.id);
+
+        let connection = match account.get_api_tokens(&client.requester, None, None).await {
+            Ok(v) => v,
+            Err(err) => {
+                println!("{}", err);
+                return;
+            }
+        };
+        println!("You now have {} active API token(s).", connection.count);
+        println!();
+
+        match client.delete_api_token(new_api_token.0.id.as_str()).await {
+            Ok(()) => println!("Deleted API token {}", new_api_token.0.id),
+            Err(err) => {
+                println!("{}", err);
+                return;
+            }
+        };
+    } else {
+        println!("Creating API token error.");
+    }
+
+    let conductivity = account
+        .get_conductivity(&client.requester, Some(vec![BitcoinNetwork::Regtest]), None)
+        .await;
+    if let Ok(Some(conductivity)) = conductivity {
+        println!(
+            "Your account's conductivity on REGTEST is {}/10.",
+            conductivity
+        );
+        println!();
+    }
+
+    let local_balance = account
+        .get_local_balance(&client.requester, Some(vec![BitcoinNetwork::Regtest]), None)
+        .await;
+    if let Ok(Some(local_balance)) = local_balance {
+        println!(
+            "Your local balance is {} {}",
+            local_balance.preferred_currency_value_approx, local_balance.preferred_currency_unit
+        )
+    }
+
+    let remote_balance = account
+        .get_remote_balance(&client.requester, Some(vec![BitcoinNetwork::Regtest]), None)
+        .await;
+    if let Ok(Some(remote_balance)) = remote_balance {
+        println!(
+            "Your remote balance is {} {}",
+            remote_balance.preferred_currency_value_approx, remote_balance.preferred_currency_unit
+        )
+    }
+
+    println!();
+
+    let node_connections = match account
+        .get_nodes(
+            &client.requester,
+            Some(50),
+            Some(vec![BitcoinNetwork::Regtest]),
+            None,
+            None,
+        )
+        .await
+    {
+        Ok(v) => v,
+        Err(_) => panic!("Unable to fetch the nodes"),
+    };
+    println!("You have {} node(s).", node_connections.count);
+
+    let mut node_1_id: Option<String> = None;
+    let mut node_1_public_key: Option<String> = None;
+    let mut node_2_id: Option<String> = None;
+    for node in node_connections.entities {
+        let inner: Box<dyn LightsparkNode> = match node {
+            LightsparkNodeEnum::LightsparkNodeWithOSK(t) => Box::new(t),
+            LightsparkNodeEnum::LightsparkNodeWithRemoteSigning(t) => Box::new(t),
+        };
+        let name = inner.get_alias().unwrap_or("".to_owned());
+        println!("    - {} ({})", name, inner.get_status().unwrap());
+        println!("{} {}", node_2, name);
+        if name == node_1 {
+            node_1_id = Some(inner.get_id().clone());
+            node_1_public_key = Some(inner.get_public_key().unwrap());
+        } else if name == node_2 {
+            node_2_id = Some(inner.get_id().clone());
+        }
+    }
+    println!();
+
+    if node_1_id.is_none() || node_2_id.is_none() {
+        panic!("Couldn't find the nodes.");
+    }
+
+    let node_1_id = node_1_id.unwrap();
+    let node_2_id = node_2_id.unwrap();
+
+    match client.fund_node(node_1_id.as_str(), 10000).await {
+        Ok(amount) => {
+            println!(
+                "Found {} {} to {}",
+                amount.preferred_currency_value_approx, amount.preferred_currency_unit, node_1
+            );
+        }
+        Err(err) => {
+            println!("{}", err);
+        }
+    }
+
+    let transactions_connection = match account
+        .get_transactions(
+            &client.requester,
+            Some(30),
+            None,
+            None,
+            None,
+            None,
+            Some(BitcoinNetwork::Regtest),
+            None,
+            None,
+            None,
+        )
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!(
+        "There is a total of {} transaction(s) on this account:",
+        transactions_connection.count
+    );
+
+    let mut deposit_transaction_id: Option<String> = None;
+    for transaction in transactions_connection.entities {
+        let mut fee: Option<CurrencyAmount> = None;
+        let inner: Box<dyn Transaction> = match transaction {
+            lightspark::objects::transaction::TransactionEnum::Deposit(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::Withdrawal(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::OutgoingPayment(t) => Box::new(t),
+            lightspark::objects::transaction::TransactionEnum::IncomingPayment(t) => Box::new(t),
+            lightspark::objects::transaction::TransactionEnum::ChannelOpeningTransaction(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::ChannelClosingTransaction(t) => {
+                fee = t.fees.clone();
+                Box::new(t)
+            }
+            lightspark::objects::transaction::TransactionEnum::RoutingTransaction(t) => Box::new(t),
+        };
+        let type_name = Transaction::type_name(inner.as_ref());
+        println!(
+            "    - {} at {}: {} {} ({})",
+            type_name,
+            inner.get_created_at(),
+            inner.get_amount().preferred_currency_value_approx,
+            inner.get_amount().preferred_currency_unit,
+            inner.get_status()
+        );
+
+        if type_name == "Deposit" {
+            deposit_transaction_id = Some(inner.get_id().clone());
+        }
+
+        print_fees(fee);
+    }
+
+    println!();
+
+    let page_size = 10;
+    let mut iterations = 0;
+    let mut has_next = true;
+    let mut after: Option<String> = None;
+    while has_next && iterations < 30 {
+        iterations += 1;
+        let transactions_connection = match account
+            .get_transactions(
+                &client.requester,
+                Some(page_size),
+                after.clone(),
+                None,
+                None,
+                None,
+                Some(BitcoinNetwork::Regtest),
+                None,
+                None,
+                None,
+            )
+            .await
+        {
+            Ok(v) => v,
+            Err(err) => {
+                println!("{}", err);
+                return;
+            }
+        };
+
+        let num = transactions_connection.entities.len();
+        println!(
+            "We got {} transactions for the page (iteration #{})",
+            num, iterations
+        );
+
+        if transactions_connection.page_info.has_next_page.unwrap() {
+            has_next = true;
+            after = transactions_connection.page_info.end_cursor;
+            println!("  And we have another page!")
+        } else {
+            has_next = false;
+            println!("  And we're done!")
+        }
+    }
+    println!();
+
+    let time = Utc::now() - Duration::hours(24);
+    let transactions_connection = match account
+        .get_transactions(
+            &client.requester,
+            None,
+            None,
+            None,
+            Some(time),
+            None,
+            Some(BitcoinNetwork::Regtest),
+            None,
+            None,
+            None,
+        )
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!(
+        "We had {} transactions in the past 24 hours.",
+        transactions_connection.count
+    );
+
+    if let Some(deposit_transaction_id) = deposit_transaction_id {
+        let deposit: Deposit = match client
+            .get_entity::<Deposit>(deposit_transaction_id.as_str())
+            .await
+        {
+            Ok(v) => v,
+            Err(err) => {
+                println!("{}", err);
+                return;
+            }
+        };
+        println!("Details of deposit transaction");
+        println!("id: {}", deposit.id);
+        println!(
+            "amount: {} {}",
+            deposit.amount.preferred_currency_value_approx, deposit.amount.preferred_currency_unit
+        );
+        println!("created at: {}", deposit.created_at);
+        println!("updated at: {}", deposit.updated_at);
+        println!();
+    }
+
+    let invoice = match client
+        .create_invoice(&node_1_id, 42000, Some("Pizza"), None)
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!("Invoice created from {}:", node_1);
+    println!(
+        "Encoded invoice = {}",
+        invoice.data.encoded_payment_request.clone()
+    );
+    println!();
+
+    let decoded_request = match client
+        .get_decoded_payment_request(invoice.data.encoded_payment_request.as_str())
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!("Decoded payment request:");
+    println!(
+        "    amount = {} {}",
+        decoded_request.amount.preferred_currency_value_approx,
+        decoded_request.amount.preferred_currency_unit
+    );
+    if let Some(memo) = decoded_request.memo {
+        println!("    memo = {}", memo);
+    }
+    println!();
+
+    match client
+        .recover_node_signing_key(node_2_id.as_str(), node_2_password.as_str())
+        .await
+    {
+        Ok(v) => {
+            println!("{}'s signing key has been loaded.", node_2);
+            v
+        }
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+
+    match client
+        .get_lightning_fee_estimate_for_invoice(
+            node_2_id.as_str(),
+            invoice.data.encoded_payment_request.as_str(),
+            500000,
+        )
+        .await
+    {
+        Ok(amount) => {
+            println!(
+                "Estimate fee for paying this invoice is {} {}",
+                amount.preferred_currency_value_approx, amount.preferred_currency_unit
+            );
+        }
+        Err(err) => {
+            println!("{}", err);
+        }
+    };
+
+    let payment = match client
+        .pay_invoice(
+            node_2_id.as_str(),
+            invoice.data.encoded_payment_request.as_str(),
+            60,
+            None,
+            500000,
+        )
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!("Payment to the invoice done with ID = {}", payment.id);
+    println!();
+
+    let node_1_public_key = node_1_public_key.unwrap();
+
+    match client
+        .get_lightning_fee_estimate_for_node(node_2_id.as_str(), node_1_public_key.as_str(), 500000)
+        .await
+    {
+        Ok(amount) => {
+            println!(
+                "Estimate fee for paying this node is {} {}",
+                amount.preferred_currency_value_approx, amount.preferred_currency_unit
+            );
+        }
+        Err(err) => {
+            println!("{}", err);
+        }
+    };
+
+    let payment = match client
+        .send_payment(
+            node_2_id.as_str(),
+            node_1_public_key.as_str(),
+            60,
+            2000000,
+            500,
+        )
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!(
+        "Payment directly to node without invoice done with ID = {}",
+        payment.id
+    );
+    println!();
+
+    let address = match client.create_node_wallet_address(&node_1_id).await {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    println!("Got a bitcoin address for {}: {}", node_1, address);
+    println!();
+
+    if let Ok(withdrawal_request) = client
+        .request_withdrawal(
+            node_2_id.as_str(),
+            address.as_str(),
+            1000,
+            WithdrawalMode::WalletOnly,
+        )
+        .await
+    {
+        println!(
+            "Money was withdrawn with request ID = {}",
+            withdrawal_request.id
+        );
+        println!();
+    }
+
+    // Fetch the channels for Node 1
+    let node = match client
+        .get_entity::<LightsparkNodeWithOSK>(node_1_id.as_str())
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+    if let Ok(channels_connection) = node
+        .get_channels(&client.requester, Some(10), None, None)
+        .await
+    {
+        println!("{} has {} channel(s):", node_1, channels_connection.count);
+        for channel in channels_connection.entities {
+            if let Some(node_entity) = channel.remote_node {
+                if let Ok(remote_node) = client
+                    .get_entity::<LightsparkNodeWithOSK>(node_entity.id.as_str())
+                    .await
+                {
+                    let alias = remote_node.alias.unwrap_or("UNKNOWN".to_owned());
+                    if let Some(local_balance) = channel.local_balance {
+                        if let Some(remote_balance) = channel.remote_balance {
+                            println!(
+                                "    - With {}. Local/remote balance = {} {} {}",
+                                alias,
+                                local_balance.preferred_currency_value_approx,
+                                remote_balance.preferred_currency_value_approx,
+                                remote_balance.preferred_currency_unit
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    println!();
+
+    let mut variables: HashMap<&str, Value> = HashMap::new();
+    variables.insert("networks", BitcoinNetwork::Regtest.into());
+
+    let result = match client
+        .execute_graphql_request(
+            "query Test($networks: [BitcoinNetwork!]!) {
+            current_account {
+                name
+                nodes(bitcoin_networks: $networks) {
+                    count
+                }
+            }
+        }",
+            variables,
+        )
+        .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            println!("{}", err);
+            return;
+        }
+    };
+
+    let name = result["current_account"]["name"].clone();
+    let count = result["current_account"]["nodes"]["count"].clone();
+    println!(
+        "The account {} has {} nodes on the REGTEST network.",
+        name, count
+    );
+}

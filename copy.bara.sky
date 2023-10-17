@@ -17,7 +17,6 @@ core.workflow(
 
     origin_files = glob(
 	    ["rust-sdk/**", "copy.bara.sky"],
-        exclude = ["rust-sdk/lightspark/examples/internal_example.rs"],
     ),
 
     authoring = authoring.pass_thru("Lightspark Eng <engineering@lightspark.com>"),
@@ -28,35 +27,6 @@ core.workflow(
           mode = 'SCRUB_NAMES'
         ),
         core.move("rust-sdk/", "")
-    ],
-)
-
-core.workflow(
-    name = "python-sdk-push",
-    origin = git.github_origin(
-      url = "https://github.com/lightsparkdev/webdev.git",
-      ref = "main",
-    ),
-    destination = git.github_destination(
-        url = "https://github.com/lightsparkdev/python-sdk.git",
-        push = "main",
-    ),
-    # Switch to ITERATIVE mode to import each commit separately.
-    mode = "SQUASH",
-
-    origin_files = glob(
-	    ["python-sdk/**", "copy.bara.sky"],
-        exclude = ["python-sdk/examples/internal_example.py", "python-sdk/RELEASE-internal.md"],
-    ),
-
-    authoring = authoring.pass_thru("Lightspark Eng <engineering@lightspark.com>"),
-    transformations = [
-        metadata.restore_author("ORIGINAL_AUTHOR", search_all_changes = True),
-        metadata.expose_label("COPYBARA_INTEGRATE_REVIEW"),
-        core.todo_replace(
-          mode = 'SCRUB_NAMES'
-        ),
-        core.move("python-sdk/", "")
     ],
 )
 
