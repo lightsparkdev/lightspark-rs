@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.7.2
+- Add preimage to OutgoingPayment.
+
 # v0.7.1
 - Add UMA related operations in LightsparkClient.
 
