@@ -1,27 +1,27 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::error::Error;
+use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
+use serde::Deserialize;
+use std::collections::HashMap;
+
 use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
+use crate::objects::channel_status::ChannelStatus;
+use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::lightspark_node::LightsparkNode;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
-use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
 use crate::objects::node::Node;
 use crate::objects::node_address_type::NodeAddressType;
 use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
 use crate::objects::secret::Secret;
 use crate::types::custom_date_formats::custom_date_format;
+use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
 use serde_json::Value;
-use std::collections::HashMap;
 use std::vec::Vec;
-
-use crate::objects::channel_status::ChannelStatus;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::types::entity_wrapper::EntityWrapper;
 
 /// This is a Lightspark node with OSK.
 #[derive(Clone, Deserialize)]

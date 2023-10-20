@@ -9,6 +9,12 @@ pub enum WebhookEventType {
     #[serde(rename = "PAYMENT_FINISHED")]
     PaymentFinished,
 
+    #[serde(rename = "WITHDRAWAL_FINISHED")]
+    WithdrawalFinished,
+
+    #[serde(rename = "FUNDS_RECEIVED")]
+    FundsReceived,
+
     #[serde(rename = "NODE_STATUS")]
     NodeStatus,
 
@@ -29,6 +35,9 @@ pub enum WebhookEventType {
 
     #[serde(rename = "REMOTE_SIGNING")]
     RemoteSigning,
+
+    #[serde(rename = "LOW_BALANCE")]
+    LowBalance,
 }
 
 impl From<WebhookEventType> for Value {
@@ -41,6 +50,8 @@ impl fmt::Display for WebhookEventType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::PaymentFinished => write!(f, "PAYMENT_FINISHED"),
+            Self::WithdrawalFinished => write!(f, "WITHDRAWAL_FINISHED"),
+            Self::FundsReceived => write!(f, "FUNDS_RECEIVED"),
             Self::NodeStatus => write!(f, "NODE_STATUS"),
             Self::WalletStatus => write!(f, "WALLET_STATUS"),
             Self::WalletOutgoingPaymentFinished => write!(f, "WALLET_OUTGOING_PAYMENT_FINISHED"),
@@ -48,6 +59,7 @@ impl fmt::Display for WebhookEventType {
             Self::WalletWithdrawalFinished => write!(f, "WALLET_WITHDRAWAL_FINISHED"),
             Self::WalletFundsReceived => write!(f, "WALLET_FUNDS_RECEIVED"),
             Self::RemoteSigning => write!(f, "REMOTE_SIGNING"),
+            Self::LowBalance => write!(f, "LOW_BALANCE"),
         }
     }
 }

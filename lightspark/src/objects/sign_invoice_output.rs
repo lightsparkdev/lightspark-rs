@@ -4,6 +4,7 @@ use serde::Deserialize;
 
 #[derive(Clone, Deserialize)]
 pub struct SignInvoiceOutput {
+    ///  The signed invoice object.
     #[serde(rename = "sign_invoice_output_invoice")]
     pub invoice: EntityWrapper,
 }

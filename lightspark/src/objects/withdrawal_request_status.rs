@@ -6,6 +6,9 @@ use std::fmt;
 /// This is an enum of the potential statuses that a Withdrawal can take.
 #[derive(Clone, Deserialize, Serialize)]
 pub enum WithdrawalRequestStatus {
+    #[serde(rename = "CREATED")]
+    Created,
+
     #[serde(rename = "FAILED")]
     Failed,
 
@@ -25,6 +28,7 @@ impl From<WithdrawalRequestStatus> for Value {
 impl fmt::Display for WithdrawalRequestStatus {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
+            Self::Created => write!(f, "CREATED"),
             Self::Failed => write!(f, "FAILED"),
             Self::InProgress => write!(f, "IN_PROGRESS"),
             Self::Successful => write!(f, "SUCCESSFUL"),
