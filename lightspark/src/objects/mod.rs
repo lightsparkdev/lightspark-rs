@@ -15,6 +15,7 @@ pub mod channel;
 pub mod channel_closing_transaction;
 pub mod channel_fees;
 pub mod channel_opening_transaction;
+pub mod channel_snapshot;
 pub mod channel_status;
 pub mod channel_to_transactions_connection;
 pub mod compliance_provider;

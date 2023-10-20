@@ -5,6 +5,7 @@ use std::vec::Vec;
 
 #[derive(Clone, Deserialize)]
 pub struct SignMessagesOutput {
+    /// The list of signed payloads.
     #[serde(rename = "sign_messages_output_signed_payloads")]
     pub signed_payloads: Vec<SignablePayload>,
 }

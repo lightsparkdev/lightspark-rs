@@ -1,10 +1,9 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::connection::Connection;
+use crate::objects::lightspark_node::LightsparkNodeEnum;
 use crate::objects::page_info::PageInfo;
 use serde::Deserialize;
 use std::vec::Vec;
-
-use crate::objects::lightspark_node::LightsparkNodeEnum;
 
 /// A connection between an account and the nodes it manages.
 #[derive(Clone, Deserialize)]

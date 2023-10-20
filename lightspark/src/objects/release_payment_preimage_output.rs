@@ -4,6 +4,7 @@ use serde::Deserialize;
 
 #[derive(Clone, Deserialize)]
 pub struct ReleasePaymentPreimageOutput {
+    /// The invoice of the transaction.
     #[serde(rename = "release_payment_preimage_output_invoice")]
     pub invoice: EntityWrapper,
 }

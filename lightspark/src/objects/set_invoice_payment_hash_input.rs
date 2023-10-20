@@ -9,6 +9,6 @@ pub struct SetInvoicePaymentHashInput {
     /// The 32-byte hash of the payment preimage.
     pub payment_hash: String,
 
-    /// The 32-byte nonce used to generate the invoice preimage.
-    pub preimage_nonce: String,
+    /// The 32-byte nonce used to generate the invoice preimage if applicable. It will later be included in RELEASE_PAYMENT_PREIMAGE webhook to help recover the raw preimage.
+    pub preimage_nonce: Option<String>,
 }

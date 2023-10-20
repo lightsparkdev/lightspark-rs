@@ -4,6 +4,7 @@ use serde::Deserialize;
 
 #[derive(Clone, Deserialize)]
 pub struct ReleaseChannelPerCommitmentSecretOutput {
+    /// The channel object after the per-commitment secret release operation.
     #[serde(rename = "release_channel_per_commitment_secret_output_channel")]
     pub channel: EntityWrapper,
 }

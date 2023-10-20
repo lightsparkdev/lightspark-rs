@@ -26,6 +26,9 @@ pub enum RemoteSigningSubEventType {
 
     #[serde(rename = "REQUEST_INVOICE_PAYMENT_HASH")]
     RequestInvoicePaymentHash,
+
+    #[serde(rename = "REVEAL_COUNTERPARTY_PER_COMMITMENT_SECRET")]
+    RevealCounterpartyPerCommitmentSecret,
 }
 
 impl From<RemoteSigningSubEventType> for Value {
@@ -44,6 +47,9 @@ impl fmt::Display for RemoteSigningSubEventType {
             Self::DeriveKeyAndSign => write!(f, "DERIVE_KEY_AND_SIGN"),
             Self::ReleasePaymentPreimage => write!(f, "RELEASE_PAYMENT_PREIMAGE"),
             Self::RequestInvoicePaymentHash => write!(f, "REQUEST_INVOICE_PAYMENT_HASH"),
+            Self::RevealCounterpartyPerCommitmentSecret => {
+                write!(f, "REVEAL_COUNTERPARTY_PER_COMMITMENT_SECRET")
+            }
         }
     }
 }

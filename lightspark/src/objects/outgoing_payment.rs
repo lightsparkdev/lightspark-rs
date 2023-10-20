@@ -1,9 +1,4 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::types::graphql_requester::GraphQLRequester;
-use serde::Deserialize;
-use serde_json::Value;
-use std::vec::Vec;
-
 use crate::error::Error;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
@@ -12,15 +7,20 @@ use crate::objects::outgoing_payment_to_attempts_connection::OutgoingPaymentToAt
 use crate::objects::payment_failure_reason::PaymentFailureReason;
 use crate::objects::payment_request_data::PaymentRequestDataEnum;
 use crate::objects::post_transaction_data::PostTransactionData;
-use crate::objects::rich_text::RichText;
 use crate::objects::transaction::Transaction;
 use crate::objects::transaction_status::TransactionStatus;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
+use serde::Deserialize;
+use serde_json::Value;
 use std::collections::HashMap;
+use std::vec::Vec;
+
+use crate::objects::rich_text::RichText;
 
 /// This object represents a Lightning Network payment sent from a Lightspark Node. You can retrieve this object to receive payment related information about any payment sent from your Lightspark Node on the Lightning Network.
 #[derive(Clone, Deserialize)]
@@ -83,6 +83,10 @@ pub struct OutgoingPayment {
     /// The post transaction data which can be used in KYT payment registration.
     #[serde(rename = "outgoing_payment_uma_post_transaction_data")]
     pub uma_post_transaction_data: Option<Vec<PostTransactionData>>,
+
+    /// The preimage of the payment.
+    #[serde(rename = "outgoing_payment_payment_preimage")]
+    pub payment_preimage: Option<String>,
 }
 
 impl LightningTransaction for OutgoingPayment {
@@ -444,6 +448,7 @@ fragment OutgoingPaymentFragment on OutgoingPayment {
             currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
         }
     }
+    outgoing_payment_payment_preimage: payment_preimage
 }
 ";
 
@@ -494,6 +499,33 @@ impl OutgoingPayment {
                     }
                     outgoing_payment_attempt_outgoing_payment: outgoing_payment {
                         id
+                    }
+                    outgoing_payment_attempt_channel_snapshot: channel_snapshot {
+                        __typename
+                        channel_snapshot_local_balance: local_balance {
+                            __typename
+                            currency_amount_original_value: original_value
+                            currency_amount_original_unit: original_unit
+                            currency_amount_preferred_currency_unit: preferred_currency_unit
+                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                        }
+                        channel_snapshot_local_unsettled_balance: local_unsettled_balance {
+                            __typename
+                            currency_amount_original_value: original_value
+                            currency_amount_original_unit: original_unit
+                            currency_amount_preferred_currency_unit: preferred_currency_unit
+                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                        }
+                        channel_snapshot_local_channel_reserve: local_channel_reserve {
+                            __typename
+                            currency_amount_original_value: original_value
+                            currency_amount_original_unit: original_unit
+                            currency_amount_preferred_currency_unit: preferred_currency_unit
+                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                        }
                     }
                 }
             }

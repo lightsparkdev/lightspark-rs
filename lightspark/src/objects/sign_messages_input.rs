@@ -5,5 +5,6 @@ use std::vec::Vec;
 
 #[derive(Clone, Deserialize, Serialize)]
 pub struct SignMessagesInput {
+    /// The list of the message ids and signatures.
     pub signatures: Vec<IdAndSignature>,
 }

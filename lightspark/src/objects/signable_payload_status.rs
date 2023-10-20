@@ -13,6 +13,9 @@ pub enum SignablePayloadStatus {
 
     #[serde(rename = "VALIDATION_FAILED")]
     ValidationFailed,
+
+    #[serde(rename = "INVALID_SIGNATURE")]
+    InvalidSignature,
 }
 
 impl From<SignablePayloadStatus> for Value {
@@ -27,6 +30,7 @@ impl fmt::Display for SignablePayloadStatus {
             Self::Created => write!(f, "CREATED"),
             Self::Signed => write!(f, "SIGNED"),
             Self::ValidationFailed => write!(f, "VALIDATION_FAILED"),
+            Self::InvalidSignature => write!(f, "INVALID_SIGNATURE"),
         }
     }
 }
