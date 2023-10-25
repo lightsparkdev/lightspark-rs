@@ -30,7 +30,7 @@ impl Handler {
     pub fn handle_remote_signing_webhook_msg(
         &self,
         event: &WebhookEvent,
-    ) -> Result<Response, Error> {
+    ) -> Result<Option<Response>, Error> {
         if !matches!(event.event_type, WebhookEventType::RemoteSigning) {
             return Err(Error::WebhookEventNotRemoteSigning);
         }
@@ -42,31 +42,35 @@ impl Handler {
         let event_json =
             serde_json::to_string(&event).expect("Serialize event to json should not fail");
         if !self.validator.should_sign(event_json) {
-            self.handle_decline_to_sign_messages(event)
+            self.handle_decline_to_sign_messages(event).map(Some)
         } else {
             match sub_type {
-                RemoteSigningSubEventType::Ecdh => self.handle_ecdh(event),
-                RemoteSigningSubEventType::SignInvoice => self.handle_sign_invoice(event),
+                RemoteSigningSubEventType::Ecdh => self.handle_ecdh(event).map(Some),
+                RemoteSigningSubEventType::SignInvoice => self.handle_sign_invoice(event).map(Some),
                 RemoteSigningSubEventType::ReleasePaymentPreimage => {
-                    self.handle_release_payment_preimage(event)
+                    self.handle_release_payment_preimage(event).map(Some)
                 }
                 RemoteSigningSubEventType::GetPerCommitmentPoint => {
-                    self.handle_get_per_commitment_point(event)
+                    self.handle_get_per_commitment_point(event).map(Some)
                 }
                 RemoteSigningSubEventType::ReleasePerCommitmentSecret => {
-                    self.handle_release_per_commitment_secret(event)
+                    self.handle_release_per_commitment_secret(event).map(Some)
                 }
                 RemoteSigningSubEventType::DeriveKeyAndSign => {
-                    self.handle_derive_key_and_sign(event)
+                    self.handle_derive_key_and_sign(event).map(Some)
                 }
                 RemoteSigningSubEventType::RequestInvoicePaymentHash => {
-                    self.handle_request_invoice_payment_hash(event)
+                    self.handle_request_invoice_payment_hash(event).map(Some)
                 }
+                RemoteSigningSubEventType::RevealCounterpartyPerCommitmentSecret => Ok(None),
             }
         }
     }
 
-    fn handle_request_invoice_payment_hash(&self, event: &WebhookEvent) -> Result<Response, Error> {
+    pub fn handle_request_invoice_payment_hash(
+        &self,
+        event: &WebhookEvent,
+    ) -> Result<Response, Error> {
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let invoice_id = data["invoice_id"]
             .as_str()
@@ -86,7 +90,7 @@ impl Handler {
         ))
     }
 
-    fn handle_decline_to_sign_messages(&self, event: &WebhookEvent) -> Result<Response, Error> {
+    pub fn handle_decline_to_sign_messages(&self, event: &WebhookEvent) -> Result<Response, Error> {
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
 
         let signing_jobs: Vec<SigningJob> = serde_json::from_value(data["signing_jobs"].clone())
@@ -96,7 +100,7 @@ impl Handler {
         Ok(Response::decline_to_sign_message_response(&payload_ids))
     }
 
-    fn handle_ecdh(&self, event: &WebhookEvent) -> Result<Response, Error> {
+    pub fn handle_ecdh(&self, event: &WebhookEvent) -> Result<Response, Error> {
         info!("Handling ECDH webhook event");
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let node_id = &event.entity_id;
@@ -112,7 +116,7 @@ impl Handler {
         Ok(Response::ecdh_response(node_id, &ss_str))
     }
 
-    fn handle_sign_invoice(&self, event: &WebhookEvent) -> Result<Response, Error> {
+    pub fn handle_sign_invoice(&self, event: &WebhookEvent) -> Result<Response, Error> {
         info!("Handling sign invoice webhook event");
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let invoice_id = data["invoice_id"]
@@ -133,7 +137,7 @@ impl Handler {
         ))
     }
 
-    fn handle_release_payment_preimage(&self, event: &WebhookEvent) -> Result<Response, Error> {
+    pub fn handle_release_payment_preimage(&self, event: &WebhookEvent) -> Result<Response, Error> {
         info!("Handling release payment preimage webhook event");
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let nonce = data["preimage_nonce"]
@@ -155,7 +159,7 @@ impl Handler {
         ))
     }
 
-    fn handle_get_per_commitment_point(&self, event: &WebhookEvent) -> Result<Response, Error> {
+    pub fn handle_get_per_commitment_point(&self, event: &WebhookEvent) -> Result<Response, Error> {
         info!("Handling get per commitment point webhook event");
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let per_commitment_point_idx = data["per_commitment_point_idx"]
@@ -181,7 +185,7 @@ impl Handler {
         ))
     }
 
-    fn handle_release_per_commitment_secret(
+    pub fn handle_release_per_commitment_secret(
         &self,
         event: &WebhookEvent,
     ) -> Result<Response, Error> {
@@ -210,7 +214,7 @@ impl Handler {
         ))
     }
 
-    fn handle_derive_key_and_sign(&self, event: &WebhookEvent) -> Result<Response, Error> {
+    pub fn handle_derive_key_and_sign(&self, event: &WebhookEvent) -> Result<Response, Error> {
         info!("Handling derive key and sign webhook event");
         let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
 

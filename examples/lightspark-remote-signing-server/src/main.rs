@@ -46,7 +46,10 @@ async fn webhook_handler(
     let event =
         WebhookEvent::verify_and_parse(&bytes, signature.to_str().unwrap(), &data.webhook_secret)
             .unwrap();
-    let response = handler.handle_remote_signing_webhook_msg(&event).unwrap();
+    let response = handler
+        .handle_remote_signing_webhook_msg(&event)
+        .unwrap()
+        .unwrap();
 
     println!("Response {:?}", response);
 

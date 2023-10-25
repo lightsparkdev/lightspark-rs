@@ -13,7 +13,7 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-lightspark = { "version" = "0.7.0", default-features = false, features = ["objects", "webhooks"] }
+lightspark = { "version" = "0.7.2", default-features = false, features = ["objects", "webhooks"] }
 bip39 = { "version" = "2.0.0", features = ["rand"]}
 bitcoin = "0.30.1"
 hex = "0.4.3"
