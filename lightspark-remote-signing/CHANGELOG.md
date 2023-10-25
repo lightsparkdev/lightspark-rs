@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.3.0
+- Handle REVEAL_COUNTERPARTY_PER_COMMITMENT_SECRET webhook.
+
 ## v0.2.1
 - Remove is_raw field for derive_key_and_sign.
 
