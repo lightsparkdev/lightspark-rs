@@ -1,6 +1,24 @@
-use std::fmt::format;
+use std::fmt::{self, format};
+
+use actix_web::{HttpResponse, Responder};
+use chrono::{Duration, Utc};
+use serde_json::json;
+use uma::protocol::PubKeyResponse;
 
 use crate::config::Config;
+
+pub enum Error {
+    SigningKeyParseError,
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let msg = match self {
+            Error::SigningKeyParseError => "Error parsing signing key".to_string(),
+        };
+        write!(f, "{}", msg)
+    }
+}
 
 pub trait VASPSending {
     fn handle_client_uma_lookup(&self, receiver: &str) -> String;
@@ -24,8 +42,38 @@ impl VASP {
         VASP { config }
     }
 
-    pub fn handle_pubkey_request(&self) -> String {
-        format(format_args!("Hello {}!", "pubkey_request"))
+    pub fn handle_pubkey_request(&self) -> impl Responder {
+        let signing_pubkey_bytes = match hex::decode(&self.config.uma_signing_private_key_hex) {
+            Ok(bytes) => bytes,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error parsing signing key",
+                }))
+            }
+        };
+
+        let encryption_pubkey_bytes = match hex::decode(&self.config.uma_encryption_private_key_hex)
+        {
+            Ok(bytes) => bytes,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error parsing encryption key",
+                }))
+            }
+        };
+
+        let now = Utc::now();
+        let two_weeks_from_now = now + Duration::weeks(2);
+
+        let response = PubKeyResponse {
+            signing_pub_key: signing_pubkey_bytes,
+            encryption_pub_key: encryption_pubkey_bytes,
+            expiration_timestamp: Some(two_weeks_from_now.timestamp()),
+        };
+
+        HttpResponse::Ok().json(response)
     }
 }
 
