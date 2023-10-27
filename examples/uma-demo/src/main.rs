@@ -30,6 +30,7 @@ struct PayReqParam {
 }
 
 #[get("/api/umapayreq/{callback_uuid}")]
+#[warn(clippy::await_holding_lock)]
 async fn client_payreq(
     vasp: web::Data<Arc<Mutex<SendingVASP<InMemoryPublicKeyCache>>>>,
     callback_uuid: web::Path<String>,

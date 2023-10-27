@@ -306,7 +306,7 @@ impl<T: PublicKeyCache> SendingVASP<T> {
             &payer_info.identifier,
             payer_info.name.as_deref(),
             payer_info.email.as_deref(),
-            Some(&tr_info),
+            Some(tr_info),
             None,
             uma::kyc_status::KycStatus::KycStatusVerified,
             &sender_utxos,
