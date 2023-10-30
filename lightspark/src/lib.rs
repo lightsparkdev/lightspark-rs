@@ -44,5 +44,7 @@ pub mod objects;
 pub mod request;
 #[cfg(feature = "base")]
 pub mod types;
+#[cfg(feature = "objects")]
+pub mod utils;
 #[cfg(feature = "webhooks")]
 pub mod webhooks;

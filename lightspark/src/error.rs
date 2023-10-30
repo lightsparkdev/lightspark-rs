@@ -15,6 +15,7 @@ pub enum Error {
     CryptoError(CryptoError),
     WebhookSignatureError,
     SigningKeyNotFound,
+    InvalidCurrencyConversion,
 }
 
 impl fmt::Display for Error {
@@ -31,6 +32,7 @@ impl fmt::Display for Error {
                 write!(f, "Webhook message hash does not match signature")
             }
             Self::SigningKeyNotFound => write!(f, "Signing key not found"),
+            Self::InvalidCurrencyConversion => write!(f, "Invalid currency conversion"),
         }
     }
 }
