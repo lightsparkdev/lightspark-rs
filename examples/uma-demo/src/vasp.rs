@@ -304,7 +304,7 @@ impl<T: PublicKeyCache> SendingVASP<T> {
         // In practice, you'd probably use some real transaction ID here.
         let _tx_id = "1234";
 
-        let _pay_req = match get_pay_request(
+        let pay_req = match get_pay_request(
             &vasp2_encryption_pubkey,
             &uma_signing_private_key,
             currency_code,
@@ -328,7 +328,91 @@ impl<T: PublicKeyCache> SendingVASP<T> {
             }
         };
 
-        unimplemented!()
+        let pay_req_bytes = match serde_json::to_vec(&pay_req) {
+            Ok(bytes) => bytes,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error serializing pay request",
+                }))
+            }
+        };
+
+        let pay_req_result = match reqwest::blocking::Client::new()
+            .post(initial_request_data.lnurl_response.callback.clone())
+            .header("Content-Type", "application/json")
+            .body(pay_req_bytes)
+            .send()
+        {
+            Ok(result) => result,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error sending pay request",
+                }))
+            }
+        };
+
+        if pay_req_result.status() != reqwest::StatusCode::OK {
+            return HttpResponse::InternalServerError().json(json!({
+                "status": "ERROR",
+                "reason": format!("Failed response from receiver: {}", pay_req_result.status()),
+            }));
+        }
+
+        let pay_req_response = match pay_req_result.text() {
+            Ok(body) => body,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error reading response body",
+                }))
+            }
+        };
+
+        let pay_req_response = match serde_json::from_str::<uma::protocol::PayReqResponse>(
+            pay_req_response.as_str(),
+        ) {
+            Ok(response) => response,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error parsing pay request response",
+                }))
+            }
+        };
+
+        // TODO: Pre-screen the UTXOs from payreqResponse.Compliance.Utxos
+        println!("Received invoice: {}", pay_req_response.encoded_invoice);
+        let invoice = match self
+            .client
+            .get_decoded_payment_request(&pay_req_response.encoded_invoice)
+            .await
+        {
+            Ok(invoice) => invoice,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error decoding invoice",
+                }))
+            }
+        };
+
+        self.request_cache.save_pay_req_data(
+            callback_uuid,
+            &pay_req_response.encoded_invoice,
+            &pay_req_response.compliance.utxo_callback,
+            &invoice,
+        );
+
+        HttpResponse::Ok().json(json!({
+        "encodedInvoice": pay_req_response.encoded_invoice,
+        "callbackUuid":   callback_uuid,
+        "amount":         value_millisatoshi(&invoice.amount).unwrap(),
+        "conversionRate": pay_req_response.payment_info.multiplier,
+        "currencyCode":   pay_req_response.payment_info.currency_code,
+        "expiresAt":      invoice.expires_at.timestamp(),
+        }))
     }
 
     pub async fn handle_client_payment_confirm(&mut self, callback_uuid: &str) -> impl Responder {
