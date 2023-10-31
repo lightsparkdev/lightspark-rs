@@ -1,6 +1,6 @@
 use crate::{error::Error, objects::currency_amount::CurrencyAmount};
 
-pub fn value_millisatoshi(amount: CurrencyAmount) -> Result<i64, Error> {
+pub fn value_millisatoshi(amount: &CurrencyAmount) -> Result<i64, Error> {
     match amount.original_unit {
         crate::objects::currency_unit::CurrencyUnit::Bitcoin => {
             Ok(amount.original_value * 100_000_000_000)

@@ -8,13 +8,15 @@ use lightspark::{
     objects::{
         lightspark_node::LightsparkNode,
         lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning,
+        outgoing_payment::OutgoingPayment, transaction_status::TransactionStatus,
     },
+    utils::value_millisatoshi,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use uma::{
     payer_data::PayerDataOptions,
-    protocol::PubKeyResponse,
+    protocol::{PubKeyResponse, UtxoWithAmount},
     public_key_cache::PublicKeyCache,
     uma::{
         fetch_public_key_for_vasp, get_pay_request, get_signed_lnurlp_request_url,
@@ -27,12 +29,16 @@ use crate::{config::Config, vasp_request_cache::Vasp1PayReqCache};
 
 pub enum Error {
     SigningKeyParseError,
+    PaymentTimeOut,
+    LightsparkError(lightspark::error::Error),
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let msg = match self {
             Error::SigningKeyParseError => "Error parsing signing key".to_string(),
+            Error::PaymentTimeOut => "Payment timed out".to_string(),
+            Error::LightsparkError(e) => format!("Lightspark error: {}", e),
         };
         write!(f, "{}", msg)
     }
@@ -325,7 +331,7 @@ impl<T: PublicKeyCache> SendingVASP<T> {
         unimplemented!()
     }
 
-    pub fn handle_client_payment_confirm(&mut self, callback_uuid: &str) -> impl Responder {
+    pub async fn handle_client_payment_confirm(&mut self, callback_uuid: &str) -> impl Responder {
         let pay_req_data = match self.request_cache.get_pay_req_data(callback_uuid) {
             Some(data) => data,
             None => {
@@ -367,7 +373,105 @@ impl<T: PublicKeyCache> SendingVASP<T> {
             }
         };
 
-        unimplemented!()
+        let payment = match self
+            .client
+            .pay_uma_invoice(
+                &self.config.node_id,
+                &pay_req_data.encoded_invoice,
+                60,
+                1_000_000,
+                None,
+            )
+            .await
+        {
+            Ok(payment) => payment,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Failed to pay invoice",
+                }))
+            }
+        };
+
+        let payment = match self.wait_for_payment_completion(payment).await {
+            Ok(payment) => payment,
+            Err(e) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": format!("Failed to wait for payment completion: {}", e),
+                }))
+            }
+        };
+
+        println!(
+            "Payment {} completed: {:?}",
+            payment.id,
+            payment.status.to_string()
+        );
+
+        let mut utxos_with_amounts = Vec::<UtxoWithAmount>::new();
+        for utxo in payment.uma_post_transaction_data.iter().flatten() {
+            let millsatoshi_amount = match value_millisatoshi(&utxo.amount) {
+                Ok(amount) => amount,
+                Err(_) => {
+                    return HttpResponse::InternalServerError().json(json!({
+                        "status": "ERROR",
+                        "reason": "Error converting amount to millisatoshi",
+                    }))
+                }
+            };
+            utxos_with_amounts.push(UtxoWithAmount {
+                utxo: utxo.utxo.clone(),
+                amount: millsatoshi_amount,
+            });
+        }
+
+        let utxo_with_amounts_bytes = match serde_json::to_vec(&utxos_with_amounts) {
+            Ok(bytes) => bytes,
+            Err(_) => {
+                return HttpResponse::InternalServerError().json(json!({
+                    "status": "ERROR",
+                    "reason": "Error serializing utxos",
+                }))
+            }
+        };
+
+        println!(
+            "Sending UTXOs to {}: {}",
+            pay_req_data.utxo_callback,
+            String::from_utf8_lossy(&utxo_with_amounts_bytes)
+        );
+
+        HttpResponse::Ok().json(json!({
+            "didSucceed": payment.status.to_string() == TransactionStatus::Success.to_string(),
+            "paymentId": payment.id,
+        }))
+    }
+
+    async fn wait_for_payment_completion(
+        &self,
+        payment: OutgoingPayment,
+    ) -> Result<OutgoingPayment, Error> {
+        let mut attemp_limit = 200;
+        let mut payment = payment;
+        while payment.status.to_string() != TransactionStatus::Success.to_string()
+            && payment.status.to_string() != TransactionStatus::Failed.to_string()
+            && payment.status.to_string() != TransactionStatus::Cancelled.to_string()
+        {
+            if attemp_limit == 0 {
+                return Err(Error::PaymentTimeOut);
+            }
+
+            attemp_limit -= 1;
+            tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+
+            payment = match self.client.get_entity::<OutgoingPayment>(&payment.id).await {
+                Ok(p) => p,
+                Err(e) => return Err(Error::LightsparkError(e)),
+            };
+        }
+
+        Ok(payment)
     }
 
     pub fn handle_well_known_lnurlp(
