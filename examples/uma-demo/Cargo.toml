@@ -13,6 +13,7 @@ lightspark = { path = "../../lightspark" }
 reqwest = "0.11.22"
 serde = "1.0.190"
 serde_json = "1.0.107"
+tokio = "1.33.0"
 uma = "0.1.2"
 url = "2.4.1"
 uuid = { version = "1.5.0", features = ["v4"] }
