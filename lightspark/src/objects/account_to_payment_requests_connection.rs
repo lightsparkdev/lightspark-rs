@@ -1,9 +1,10 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::connection::Connection;
-use crate::objects::page_info::PageInfo;
-use crate::objects::payment_request::PaymentRequestEnum;
 use serde::Deserialize;
 use std::vec::Vec;
+
+use crate::objects::page_info::PageInfo;
+use crate::objects::payment_request::PaymentRequestEnum;
 
 #[derive(Clone, Deserialize)]
 pub struct AccountToPaymentRequestsConnection {

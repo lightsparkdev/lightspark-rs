@@ -1,10 +1,10 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::page_info::PageInfo;
+use crate::objects::transaction::TransactionEnum;
 use serde::Deserialize;
-use std::vec::Vec;
 
 use crate::objects::connection::Connection;
-use crate::objects::transaction::TransactionEnum;
+use crate::objects::page_info::PageInfo;
+use std::vec::Vec;
 
 #[derive(Clone, Deserialize)]
 pub struct WalletToTransactionsConnection {

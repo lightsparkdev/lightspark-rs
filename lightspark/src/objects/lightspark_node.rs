@@ -1,14 +1,16 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
-use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::node::Node;
-use crate::types::entity_wrapper::EntityWrapper;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
+
+use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
+use crate::objects::balances::Balances;
+use crate::types::entity_wrapper::EntityWrapper;
 use std::vec::Vec;
 
 pub trait LightsparkNode: Node + Entity {
@@ -35,6 +37,9 @@ pub trait LightsparkNode: Node + Entity {
 
     /// The utxos of the channels that are connected to this node. This is used in uma flow for pre-screening.
     fn get_uma_prescreening_utxos(&self) -> Vec<String>;
+
+    /// The balances that describe the funds in this node.
+    fn get_balances(&self) -> Option<Balances>;
 
     fn type_name(&self) -> &'static str;
 }

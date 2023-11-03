@@ -1,11 +1,11 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::page_info::PageInfo;
-use serde::Deserialize;
-use std::vec::Vec;
-
-use crate::objects::connection::Connection;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::transaction::TransactionEnum;
+use serde::Deserialize;
+
+use crate::objects::connection::Connection;
+use crate::objects::page_info::PageInfo;
+use std::vec::Vec;
 
 #[derive(Clone, Deserialize)]
 pub struct AccountToTransactionsConnection {
