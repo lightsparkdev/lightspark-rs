@@ -78,6 +78,9 @@ pub enum HtlcAttemptFailureCode {
     #[serde(rename = "INVALID_ONION_PAYLOAD")]
     InvalidOnionPayload,
 
+    #[serde(rename = "INVALID_ONION_BLINDING")]
+    InvalidOnionBlinding,
+
     #[serde(rename = "INTERNAL_FAILURE")]
     InternalFailure,
 
@@ -123,6 +126,7 @@ impl fmt::Display for HtlcAttemptFailureCode {
             Self::ExpiryTooFar => write!(f, "EXPIRY_TOO_FAR"),
             Self::MppTimeout => write!(f, "MPP_TIMEOUT"),
             Self::InvalidOnionPayload => write!(f, "INVALID_ONION_PAYLOAD"),
+            Self::InvalidOnionBlinding => write!(f, "INVALID_ONION_BLINDING"),
             Self::InternalFailure => write!(f, "INTERNAL_FAILURE"),
             Self::UnknownFailure => write!(f, "UNKNOWN_FAILURE"),
             Self::UnreadableFailure => write!(f, "UNREADABLE_FAILURE"),

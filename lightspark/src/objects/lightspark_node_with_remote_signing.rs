@@ -1,26 +1,27 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::error::Error;
-use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
-use serde::Deserialize;
-use std::collections::HashMap;
-
-use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
-use crate::objects::channel_status::ChannelStatus;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
 use crate::objects::lightspark_node::LightsparkNode;
-use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::node::Node;
 use crate::objects::node_address_type::NodeAddressType;
 use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
+use crate::types::graphql_requester::GraphQLRequester;
+use chrono::{DateTime, Utc};
+use serde::Deserialize;
+use std::vec::Vec;
+
+use crate::error::Error;
+use crate::objects::balances::Balances;
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::channel_status::ChannelStatus;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::objects::entity::Entity;
+use crate::objects::lightspark_node_status::LightsparkNodeStatus;
+use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
 use serde_json::Value;
-use std::vec::Vec;
+use std::collections::HashMap;
 
 /// This is a Lightspark node with remote signing.
 #[derive(Clone, Deserialize)]
@@ -98,6 +99,10 @@ pub struct LightsparkNodeWithRemoteSigning {
     /// The utxos of the channels that are connected to this node. This is used in uma flow for pre-screening.
     #[serde(rename = "lightspark_node_with_remote_signing_uma_prescreening_utxos")]
     pub uma_prescreening_utxos: Vec<String>,
+
+    /// The balances that describe the funds in this node.
+    #[serde(rename = "lightspark_node_with_remote_signing_balances")]
+    pub balances: Option<Balances>,
 }
 
 impl LightsparkNode for LightsparkNodeWithRemoteSigning {
@@ -139,6 +144,11 @@ impl LightsparkNode for LightsparkNodeWithRemoteSigning {
     /// The utxos of the channels that are connected to this node. This is used in uma flow for pre-screening.
     fn get_uma_prescreening_utxos(&self) -> Vec<String> {
         self.uma_prescreening_utxos.clone()
+    }
+
+    /// The balances that describe the funds in this node.
+    fn get_balances(&self) -> Option<Balances> {
+        self.balances.clone()
     }
 
     fn type_name(&self) -> &'static str {
@@ -321,6 +331,33 @@ fragment LightsparkNodeWithRemoteSigningFragment on LightsparkNodeWithRemoteSign
         }
     }
     lightspark_node_with_remote_signing_uma_prescreening_utxos: uma_prescreening_utxos
+    lightspark_node_with_remote_signing_balances: balances {
+        __typename
+        balances_owned_balance: owned_balance {
+            __typename
+            currency_amount_original_value: original_value
+            currency_amount_original_unit: original_unit
+            currency_amount_preferred_currency_unit: preferred_currency_unit
+            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+        }
+        balances_available_to_send_balance: available_to_send_balance {
+            __typename
+            currency_amount_original_value: original_value
+            currency_amount_original_unit: original_unit
+            currency_amount_preferred_currency_unit: preferred_currency_unit
+            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+        }
+        balances_available_to_withdraw_balance: available_to_withdraw_balance {
+            __typename
+            currency_amount_original_value: original_value
+            currency_amount_original_unit: original_unit
+            currency_amount_preferred_currency_unit: preferred_currency_unit
+            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+        }
+    }
 }
 ";
 
