@@ -1,12 +1,12 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::connection::Connection;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 use crate::objects::page_info::PageInfo;
 use crate::objects::payment_request::PaymentRequestEnum;
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct WalletToPaymentRequestsConnection {
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     #[serde(rename = "wallet_to_payment_requests_connection_count")]
@@ -19,6 +19,10 @@ pub struct WalletToPaymentRequestsConnection {
     /// The payment requests for the current page of this connection.
     #[serde(rename = "wallet_to_payment_requests_connection_entities")]
     pub entities: Vec<PaymentRequestEnum>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Connection for WalletToPaymentRequestsConnection {

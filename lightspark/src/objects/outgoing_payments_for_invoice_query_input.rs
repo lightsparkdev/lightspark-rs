@@ -3,7 +3,7 @@ use crate::objects::transaction_status::TransactionStatus;
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OutgoingPaymentsForInvoiceQueryInput {
     /// The encoded invoice that the outgoing payments paid to.
     pub encoded_invoice: String,

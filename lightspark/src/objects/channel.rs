@@ -11,13 +11,13 @@ use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This is an object representing a channel on the Lightning Network. You can retrieve this object to get detailed information on a specific Lightning Network channel.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Channel {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "channel_id")]
@@ -90,6 +90,10 @@ pub struct Channel {
     /// The unique identifier of the channel on Lightning Network, which is the location in the chain that the channel was confirmed. The format is <block-height>:<tx-index>:<tx-output>.
     #[serde(rename = "channel_short_channel_id")]
     pub short_channel_id: Option<String>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Entity for Channel {

@@ -3,9 +3,9 @@ use crate::objects::currency_amount::CurrencyAmount;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChannelSnapshot {
     #[serde(rename = "channel_snapshot_channel")]
     pub channel: EntityWrapper,

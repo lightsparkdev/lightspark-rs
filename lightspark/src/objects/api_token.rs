@@ -4,11 +4,11 @@ use crate::objects::permission::Permission;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 /// This is an object representing a Lightspark API token, that can be used to authenticate this account when making API calls or using our SDKs. See the “Authentication” section of our API docs for more details on its usage.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ApiToken {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "api_token_id")]
@@ -33,6 +33,10 @@ pub struct ApiToken {
     /// A list of permissions granted to the token.
     #[serde(rename = "api_token_permissions")]
     pub permissions: Vec<Permission>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Entity for ApiToken {

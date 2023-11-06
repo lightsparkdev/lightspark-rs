@@ -1,9 +1,9 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_amount::CurrencyAmount;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This is an object representing the balance associated with your Lightspark account. You can retrieve this object to see your balance, which can be broken down into several different categorizations.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Balances {
     /// This represents the balance that should be displayed when asked "how much do I own right now?".
     //

@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential statuses a transaction associated with your Lightspark Node can take.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum TransactionStatus {
     /// Transaction succeeded..
 

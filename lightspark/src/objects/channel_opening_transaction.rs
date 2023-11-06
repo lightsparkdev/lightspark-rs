@@ -9,11 +9,11 @@ use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 /// This is an object representing a transaction which opens a channel on the Lightning Network. This object occurs only for channels funded by the local Lightspark node.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChannelOpeningTransaction {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "channel_opening_transaction_id")]
@@ -75,6 +75,10 @@ pub struct ChannelOpeningTransaction {
     /// If known, the channel this transaction is opening.
     #[serde(rename = "channel_opening_transaction_channel")]
     pub channel: Option<EntityWrapper>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl OnChainTransaction for ChannelOpeningTransaction {

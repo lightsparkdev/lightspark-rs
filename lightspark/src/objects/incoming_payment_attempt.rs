@@ -7,10 +7,10 @@ use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This object represents any attempted payment sent to a Lightspark node on the Lightning Network. You can retrieve this object to receive payment related information about a specific incoming payment attempt.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct IncomingPaymentAttempt {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "incoming_payment_attempt_id")]
@@ -48,6 +48,10 @@ pub struct IncomingPaymentAttempt {
     /// The channel this attempt was made on.
     #[serde(rename = "incoming_payment_attempt_channel")]
     pub channel: EntityWrapper,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Entity for IncomingPaymentAttempt {

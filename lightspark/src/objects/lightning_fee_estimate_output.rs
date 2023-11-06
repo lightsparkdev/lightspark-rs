@@ -1,8 +1,8 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_amount::CurrencyAmount;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct LightningFeeEstimateOutput {
     /// The estimated fees for the payment.
     #[serde(rename = "lightning_fee_estimate_output_fee_estimate")]

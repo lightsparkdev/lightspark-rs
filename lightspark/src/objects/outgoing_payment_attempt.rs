@@ -12,12 +12,12 @@ use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 
 /// This object represents an attempted Lightning Network payment sent from a Lightspark Node. You can retrieve this object to receive payment related information about any payment attempt sent from your Lightspark Node on the Lightning Network, including any potential reasons the payment may have failed.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OutgoingPaymentAttempt {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "outgoing_payment_attempt_id")]
@@ -71,6 +71,10 @@ pub struct OutgoingPaymentAttempt {
     /// The channel snapshot at the time the outgoing payment attempt was made.
     #[serde(rename = "outgoing_payment_attempt_channel_snapshot")]
     pub channel_snapshot: Option<ChannelSnapshot>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Entity for OutgoingPaymentAttempt {

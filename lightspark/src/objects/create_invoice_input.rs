@@ -2,7 +2,7 @@
 use crate::objects::invoice_type::InvoiceType;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateInvoiceInput {
     /// The node from which to create the invoice.
     pub node_id: String,

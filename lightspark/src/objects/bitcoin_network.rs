@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum identifying a particular Bitcoin Network.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum BitcoinNetwork {
     /// The production version of the Bitcoin Blockchain.
 

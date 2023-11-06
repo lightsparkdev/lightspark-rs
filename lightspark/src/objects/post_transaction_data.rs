@@ -1,9 +1,9 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_amount::CurrencyAmount;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This object represents post-transaction data that could be used to register payment for KYT.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct PostTransactionData {
     /// The utxo of the channel over which the payment went through in the format of <transaction_hash>:<output_index>.
     #[serde(rename = "post_transaction_data_utxo")]

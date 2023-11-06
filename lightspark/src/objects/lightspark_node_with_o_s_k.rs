@@ -1,31 +1,31 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::blockchain_balance::BlockchainBalance;
-use crate::objects::lightspark_node::LightsparkNode;
-use crate::objects::node::Node;
-use crate::objects::node_address_type::NodeAddressType;
-use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
-use serde::Deserialize;
-use std::vec::Vec;
-
 use crate::error::Error;
 use crate::objects::balances::Balances;
 use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::channel_status::ChannelStatus;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
+use crate::objects::lightspark_node::LightsparkNode;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
+use crate::objects::node::Node;
+use crate::objects::node_address_type::NodeAddressType;
+use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
 use crate::objects::secret::Secret;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+use std::vec::Vec;
+
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::entity_wrapper::EntityWrapper;
 
 /// This is a Lightspark node with OSK.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct LightsparkNodeWithOSK {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "lightspark_node_with_o_s_k_id")]
@@ -108,6 +108,10 @@ pub struct LightsparkNodeWithOSK {
     /// The private key client is using to sign a GraphQL request which will be verified at server side.
     #[serde(rename = "lightspark_node_with_o_s_k_encrypted_signing_private_key")]
     pub encrypted_signing_private_key: Option<Secret>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl LightsparkNode for LightsparkNodeWithOSK {

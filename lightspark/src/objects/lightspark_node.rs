@@ -1,17 +1,17 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use crate::objects::balances::Balances;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::node::Node;
-use serde::{Deserialize, Deserializer};
 use serde_json::Value;
+use std::vec::Vec;
 
 use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
-use crate::objects::balances::Balances;
 use crate::types::entity_wrapper::EntityWrapper;
-use std::vec::Vec;
+use serde::{Deserialize, Deserializer, Serialize};
 
 pub trait LightsparkNode: Node + Entity {
     /// The owner of this LightsparkNode.
@@ -45,7 +45,7 @@ pub trait LightsparkNode: Node + Entity {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum LightsparkNodeEnum {
     LightsparkNodeWithOSK(LightsparkNodeWithOSK),
     LightsparkNodeWithRemoteSigning(LightsparkNodeWithRemoteSigning),

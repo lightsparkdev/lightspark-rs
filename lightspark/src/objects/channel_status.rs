@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum representing the status of a channel on the Lightning Network.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum ChannelStatus {
     /// The channel is online and ready to send and receive funds.
 

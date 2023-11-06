@@ -5,10 +5,10 @@ use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This object represents a specific node that existed on a particular payment route. You can retrieve this object to get information about a node on a particular payment path and all payment-relevant information for that node.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Hop {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "hop_id")]
@@ -45,6 +45,10 @@ pub struct Hop {
     /// The block height at which an unsettled HTLC is considered expired.
     #[serde(rename = "hop_expiry_block_height")]
     pub expiry_block_height: Option<i64>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Entity for Hop {

@@ -11,10 +11,10 @@ use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This object represents a transaction that was forwarded through a Lightspark node on the Lightning Network, i.e., a routed transaction. You can retrieve this object to receive information about any transaction routed through your Lightspark Node.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RoutingTransaction {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "routing_transaction_id")]
@@ -66,6 +66,10 @@ pub struct RoutingTransaction {
     /// If applicable, the reason why the routing failed.
     #[serde(rename = "routing_transaction_failure_reason")]
     pub failure_reason: Option<RoutingTransactionFailureReason>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl LightningTransaction for RoutingTransaction {

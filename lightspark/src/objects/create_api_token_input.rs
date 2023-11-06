@@ -3,7 +3,7 @@ use crate::objects::permission::Permission;
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateApiTokenInput {
     /// An arbitrary name that the user can choose to identify the API token in a list.
     pub name: String,

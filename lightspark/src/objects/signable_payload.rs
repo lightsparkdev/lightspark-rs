@@ -5,9 +5,9 @@ use crate::types::custom_date_formats::custom_date_format;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct SignablePayload {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "signable_payload_id")]
@@ -44,6 +44,10 @@ pub struct SignablePayload {
     /// The signable this payload belongs to.
     #[serde(rename = "signable_payload_signable")]
     pub signable: EntityWrapper,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Entity for SignablePayload {

@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential types of addresses that a node on the Lightning Network can have.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum NodeAddressType {
     #[serde(rename = "IPV4")]
     Ipv4,

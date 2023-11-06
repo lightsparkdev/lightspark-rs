@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential statuses that your Lightspark wallet can take.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum WalletStatus {
     /// The wallet has not been set up yet and is ready to be deployed. This is the default status after the first login.
 

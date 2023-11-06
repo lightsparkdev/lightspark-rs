@@ -14,13 +14,13 @@ use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This object represents any payment sent to a Lightspark node on the Lightning Network. You can retrieve this object to receive payment related information about a specific payment received by a Lightspark node.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct IncomingPayment {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "incoming_payment_id")]
@@ -64,6 +64,10 @@ pub struct IncomingPayment {
     /// The post transaction data which can be used in KYT payment registration.
     #[serde(rename = "incoming_payment_uma_post_transaction_data")]
     pub uma_post_transaction_data: Option<Vec<PostTransactionData>>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl LightningTransaction for IncomingPayment {

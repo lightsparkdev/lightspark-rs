@@ -1,9 +1,9 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_amount::CurrencyAmount;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This is an object representing a detailed breakdown of the balance for a Lightspark Node.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BlockchainBalance {
     /// The total wallet balance, including unconfirmed UTXOs.
     #[serde(rename = "blockchain_balance_total_balance")]

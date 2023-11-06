@@ -18,13 +18,13 @@ use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This is an object representing the connected Lightspark account. You can retrieve this object to see your account information and objects tied to your account.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Account {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "account_id")]
@@ -41,6 +41,10 @@ pub struct Account {
     /// The name of this account.
     #[serde(rename = "account_name")]
     pub name: Option<String>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl LightsparkNodeOwner for Account {

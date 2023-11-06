@@ -10,7 +10,7 @@ use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::transaction_status::TransactionStatus;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 pub trait Transaction: Entity {
@@ -30,7 +30,7 @@ pub trait Transaction: Entity {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum TransactionEnum {
     ChannelClosingTransaction(ChannelClosingTransaction),
     ChannelOpeningTransaction(ChannelOpeningTransaction),

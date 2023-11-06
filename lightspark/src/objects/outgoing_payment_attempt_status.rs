@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of all potential statuses of a payment attempt made from a Lightspark Node.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum OutgoingPaymentAttemptStatus {
     #[serde(rename = "IN_FLIGHT")]
     InFlight,

@@ -22,7 +22,7 @@ use super::wallet::Wallet;
 use super::withdrawal::Withdrawal;
 use super::withdrawal_request::WithdrawalRequest;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 pub trait Entity {
@@ -39,7 +39,7 @@ pub trait Entity {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum EntityEnum {
     Account(Account),
     ApiToken(ApiToken),

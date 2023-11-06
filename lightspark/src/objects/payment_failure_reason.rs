@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential reasons why an OutgoingPayment sent from a Lightspark Node may have failed.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum PaymentFailureReason {
     #[serde(rename = "NONE")]
     None,
