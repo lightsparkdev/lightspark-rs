@@ -1,8 +1,8 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::api_token::ApiToken;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateApiTokenOutput {
     /// The API Token that has been created.
     #[serde(rename = "create_api_token_output_api_token")]

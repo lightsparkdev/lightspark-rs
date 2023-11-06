@@ -2,10 +2,10 @@
 use crate::objects::channel::Channel;
 use crate::objects::connection::Connection;
 use crate::objects::page_info::PageInfo;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct LightsparkNodeToChannelsConnection {
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     #[serde(rename = "lightspark_node_to_channels_connection_count")]
@@ -18,6 +18,10 @@ pub struct LightsparkNodeToChannelsConnection {
     /// The channels for the current page of this connection.
     #[serde(rename = "lightspark_node_to_channels_connection_entities")]
     pub entities: Vec<Channel>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Connection for LightsparkNodeToChannelsConnection {

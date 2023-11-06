@@ -4,7 +4,7 @@ use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
 use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
 use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::entity::Entity;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 pub trait Node: Entity {
@@ -30,7 +30,7 @@ pub trait Node: Entity {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum NodeEnum {
     GraphNode(GraphNode),
     LightsparkNodeWithOSK(LightsparkNodeWithOSK),

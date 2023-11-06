@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DeclineToSignMessagesInput {
     /// List of payload ids to decline to sign because validation failed.
     pub payload_ids: Vec<String>,

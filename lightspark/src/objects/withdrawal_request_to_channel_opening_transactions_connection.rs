@@ -1,10 +1,10 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::channel_opening_transaction::ChannelOpeningTransaction;
 use crate::objects::page_info::PageInfo;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct WithdrawalRequestToChannelOpeningTransactionsConnection {
     /// An object that holds pagination information about the objects in this connection.
     #[serde(rename = "withdrawal_request_to_channel_opening_transactions_connection_page_info")]

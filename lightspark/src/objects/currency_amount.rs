@@ -1,9 +1,9 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_unit::CurrencyUnit;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This object represents the value and unit for an amount of currency.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CurrencyAmount {
     /// The original numeric value for this CurrencyAmount.
     #[serde(rename = "currency_amount_original_value")]

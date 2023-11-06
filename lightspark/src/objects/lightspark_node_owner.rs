@@ -2,7 +2,7 @@
 use super::account::Account;
 use super::wallet::Wallet;
 use crate::objects::entity::Entity;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 pub trait LightsparkNodeOwner: Entity {
@@ -10,7 +10,7 @@ pub trait LightsparkNodeOwner: Entity {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum LightsparkNodeOwnerEnum {
     Account(Account),
     Wallet(Wallet),

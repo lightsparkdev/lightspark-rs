@@ -3,7 +3,7 @@ use super::invoice::Invoice;
 use crate::objects::entity::Entity;
 use crate::objects::payment_request_data::PaymentRequestData;
 use crate::objects::payment_request_status::PaymentRequestStatus;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 pub trait PaymentRequest: Entity {
@@ -17,7 +17,7 @@ pub trait PaymentRequest: Entity {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum PaymentRequestEnum {
     Invoice(Invoice),
 }

@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential states that a payment request on the Lightning Network can take.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum PaymentRequestStatus {
     #[serde(rename = "OPEN")]
     Open,

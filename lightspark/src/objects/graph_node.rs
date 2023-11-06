@@ -9,13 +9,13 @@ use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This object represents a node that exists on the Lightning Network, including nodes not managed by Lightspark. You can retrieve this object to get publicly available information about any node on the Lightning Network.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GraphNode {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "graph_node_id")]
@@ -52,6 +52,10 @@ pub struct GraphNode {
     /// The public key of this node. It acts as a unique identifier of this node in the Lightning Network.
     #[serde(rename = "graph_node_public_key")]
     pub public_key: Option<String>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Node for GraphNode {

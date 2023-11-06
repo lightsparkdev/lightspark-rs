@@ -1,13 +1,12 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::transaction::TransactionEnum;
-use serde::Deserialize;
-
 use crate::objects::connection::Connection;
+use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::page_info::PageInfo;
+use crate::objects::transaction::TransactionEnum;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AccountToTransactionsConnection {
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     #[serde(rename = "account_to_transactions_connection_count")]
@@ -32,6 +31,10 @@ pub struct AccountToTransactionsConnection {
     /// The transactions for the current page of this connection.
     #[serde(rename = "account_to_transactions_connection_entities")]
     pub entities: Vec<TransactionEnum>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Connection for AccountToTransactionsConnection {

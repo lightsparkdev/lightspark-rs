@@ -9,11 +9,11 @@ use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 /// This object represents an L1 withdrawal from your Lightspark Node to any Bitcoin wallet. You can retrieve this object to receive detailed information about any L1 withdrawal associated with your Lightspark Node or account.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Withdrawal {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "withdrawal_id")]
@@ -66,6 +66,10 @@ pub struct Withdrawal {
     /// The Lightspark node this withdrawal originated from.
     #[serde(rename = "withdrawal_origin")]
     pub origin: EntityWrapper,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl OnChainTransaction for Withdrawal {

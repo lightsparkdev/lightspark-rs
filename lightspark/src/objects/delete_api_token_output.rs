@@ -1,8 +1,8 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::types::entity_wrapper::EntityWrapper;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DeleteApiTokenOutput {
     #[serde(rename = "delete_api_token_output_account")]
     pub account: EntityWrapper,

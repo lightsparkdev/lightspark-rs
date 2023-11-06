@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential types of transactions that can be associated with your Lightspark Node.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum TransactionType {
     /// Transactions initiated from a Lightspark node on Lightning Network.
 

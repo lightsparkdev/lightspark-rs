@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This enum identifies the unit of currency associated with a CurrencyAmount.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum CurrencyUnit {
     /// Bitcoin is the cryptocurrency native to the Bitcoin network. It is used as the native medium for value transfer for the Lightning Network.
 

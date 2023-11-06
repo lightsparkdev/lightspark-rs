@@ -12,7 +12,7 @@ use super::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsCon
 use super::wallet_to_payment_requests_connection::WalletToPaymentRequestsConnection;
 use super::wallet_to_transactions_connection::WalletToTransactionsConnection;
 use crate::objects::page_info::PageInfo;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 pub trait Connection {
@@ -26,7 +26,7 @@ pub trait Connection {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum ConnectionEnum {
     AccountToApiTokensConnection(AccountToApiTokensConnection),
     AccountToNodesConnection(AccountToNodesConnection),

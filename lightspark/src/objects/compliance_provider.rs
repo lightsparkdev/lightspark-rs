@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum identifying a type of compliance provider.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum ComplianceProvider {
     #[serde(rename = "CHAINALYSIS")]
     Chainalysis,

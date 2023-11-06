@@ -1,8 +1,8 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_amount::CurrencyAmount;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FundNodeOutput {
     #[serde(rename = "fund_node_output_amount")]
     pub amount: CurrencyAmount,

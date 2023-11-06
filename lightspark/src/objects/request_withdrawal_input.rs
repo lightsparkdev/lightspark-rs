@@ -2,7 +2,7 @@
 use crate::objects::withdrawal_mode::WithdrawalMode;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RequestWithdrawalInput {
     /// The node from which you'd like to make the withdrawal.
     pub node_id: String,

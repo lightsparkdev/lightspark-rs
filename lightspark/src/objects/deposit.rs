@@ -9,11 +9,11 @@ use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 /// This object represents a Deposit made to a Lightspark node wallet. This operation occurs for any L1 funding transaction to the wallet. You can retrieve this object to receive detailed information about the deposit.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Deposit {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "deposit_id")]
@@ -66,6 +66,10 @@ pub struct Deposit {
     /// The recipient Lightspark node this deposit was sent to.
     #[serde(rename = "deposit_destination")]
     pub destination: EntityWrapper,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl OnChainTransaction for Deposit {

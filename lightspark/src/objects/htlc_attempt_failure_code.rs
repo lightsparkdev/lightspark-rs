@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum representing a particular reason why an htlc sent over the Lightning Network may have failed.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum HtlcAttemptFailureCode {
     #[serde(rename = "INCORRECT_OR_UNKNOWN_PAYMENT_DETAILS")]
     IncorrectOrUnknownPaymentDetails,

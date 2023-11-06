@@ -2,11 +2,11 @@
 use crate::objects::connection::Connection;
 use crate::objects::lightspark_node::LightsparkNodeEnum;
 use crate::objects::page_info::PageInfo;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 /// A connection between an account and the nodes it manages.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AccountToNodesConnection {
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     #[serde(rename = "account_to_nodes_connection_count")]
@@ -19,6 +19,10 @@ pub struct AccountToNodesConnection {
     /// The nodes for the current page of this connection.
     #[serde(rename = "account_to_nodes_connection_entities")]
     pub entities: Vec<LightsparkNodeEnum>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Connection for AccountToNodesConnection {

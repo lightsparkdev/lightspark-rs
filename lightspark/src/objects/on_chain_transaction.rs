@@ -6,7 +6,7 @@ use super::withdrawal::Withdrawal;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::transaction::Transaction;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use std::vec::Vec;
 
@@ -30,7 +30,7 @@ pub trait OnChainTransaction: Transaction + Entity {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum OnChainTransactionEnum {
     ChannelClosingTransaction(ChannelClosingTransaction),
     ChannelOpeningTransaction(ChannelOpeningTransaction),

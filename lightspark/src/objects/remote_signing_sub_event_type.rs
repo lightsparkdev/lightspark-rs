@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential sub-event types for Remote Signing webook events.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum RemoteSigningSubEventType {
     #[serde(rename = "ECDH")]
     Ecdh,

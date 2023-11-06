@@ -2,11 +2,11 @@
 use crate::objects::connection::Connection;
 use crate::objects::outgoing_payment_attempt::OutgoingPaymentAttempt;
 use crate::objects::page_info::PageInfo;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 /// The connection from outgoing payment to all attempts.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OutgoingPaymentToAttemptsConnection {
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     #[serde(rename = "outgoing_payment_to_attempts_connection_count")]
@@ -19,6 +19,10 @@ pub struct OutgoingPaymentToAttemptsConnection {
     /// The attempts for the current page of this connection.
     #[serde(rename = "outgoing_payment_to_attempts_connection_entities")]
     pub entities: Vec<OutgoingPaymentAttempt>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Connection for OutgoingPaymentToAttemptsConnection {

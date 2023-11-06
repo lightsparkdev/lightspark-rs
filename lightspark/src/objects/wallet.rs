@@ -15,13 +15,13 @@ use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This object represents a Lightspark Wallet, tied to your Lightspark account. Wallets can be used to send or receive funds over the Lightning Network. You can retrieve this object to receive information about a specific wallet tied to your Lightspark account.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Wallet {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "wallet_id")]
@@ -54,6 +54,10 @@ pub struct Wallet {
     /// The status of this wallet.
     #[serde(rename = "wallet_status")]
     pub status: WalletStatus,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl LightsparkNodeOwner for Wallet {

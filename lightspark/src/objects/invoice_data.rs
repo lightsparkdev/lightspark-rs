@@ -1,15 +1,15 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::Deserialize;
-
-use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::node::NodeEnum;
-use crate::objects::payment_request_data::PaymentRequestData;
 use crate::types::custom_date_formats::custom_date_format;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::payment_request_data::PaymentRequestData;
 
 /// This object represents the data associated with a BOLT #11 invoice. You can retrieve this object to receive the relevant data associated with a specific invoice.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct InvoiceData {
     #[serde(rename = "invoice_data_encoded_payment_request")]
     pub encoded_payment_request: String,
@@ -40,6 +40,10 @@ pub struct InvoiceData {
     /// The lightning node that will be paid when fulfilling this invoice.
     #[serde(rename = "invoice_data_destination")]
     pub destination: NodeEnum,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl PaymentRequestData for InvoiceData {

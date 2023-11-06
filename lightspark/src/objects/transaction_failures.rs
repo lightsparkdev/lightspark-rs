@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::vec::Vec;
 
 /// This object represents payment failures associated with your Lightspark Node.
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct TransactionFailures {
     pub payment_failures: Option<Vec<PaymentFailureReason>>,
 

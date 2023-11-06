@@ -1,9 +1,9 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::currency_amount::CurrencyAmount;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// This object represents the estimated L1 transaction fees for the Bitcoin network. Fee estimates are separated by potential confirmation speeds for settlement.
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FeeEstimate {
     #[serde(rename = "fee_estimate_fee_fast")]
     pub fee_fast: CurrencyAmount,

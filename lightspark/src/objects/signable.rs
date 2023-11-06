@@ -3,9 +3,9 @@ use crate::objects::entity::Entity;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Signable {
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     #[serde(rename = "signable_id")]
@@ -18,6 +18,10 @@ pub struct Signable {
     /// The date and time when the entity was last updated.
     #[serde(with = "custom_date_format", rename = "signable_updated_at")]
     pub updated_at: DateTime<Utc>,
+
+    /// The typename of the object
+    #[serde(rename = "__typename")]
+    pub typename: String,
 }
 
 impl Entity for Signable {

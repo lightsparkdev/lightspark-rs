@@ -3,7 +3,7 @@ use crate::objects::compliance_provider::ComplianceProvider;
 use crate::objects::payment_direction::PaymentDirection;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RegisterPaymentInput {
     /// The compliance provider that is going to screen the node. You need to be a customer of the selected provider and store the API key on the Lightspark account setting page.
     pub provider: ComplianceProvider,
