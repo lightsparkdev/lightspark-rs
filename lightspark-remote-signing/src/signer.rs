@@ -8,6 +8,7 @@ use bitcoin::hashes::{sha512, Hash, HashEngine, Hmac, HmacEngine};
 use bitcoin::secp256k1::ecdh::SharedSecret;
 use bitcoin::secp256k1::hashes::sha256;
 use bitcoin::secp256k1::{Message, PublicKey, Scalar, Secp256k1, SecretKey};
+use log::debug;
 use rand_core::{OsRng, RngCore};
 
 const NODE_KEY_PATH: &str = "m/0";
@@ -164,9 +165,19 @@ impl LightsparkSigner {
         mul_tweak: Option<Vec<u8>>,
     ) -> Result<Vec<u8>, Error> {
         let secp = Secp256k1::new();
-        let signing_key = self.derive_and_tweak_key(derivation_path, add_tweak, mul_tweak)?;
+        let signing_key =
+            self.derive_and_tweak_key(derivation_path.clone(), add_tweak, mul_tweak)?;
         let msg = Message::from_slice(message.as_slice()).map_err(Error::Secp256k1Error)?;
         let signature = secp.sign_ecdsa(&msg, &signing_key);
+
+        debug!("Derivation: {}", derivation_path);
+        debug!("Signing Key: {}", hex::encode(signing_key.as_ref()));
+        debug!(
+            "Verification Key: {}",
+            signing_key.public_key(&secp).to_string()
+        );
+        debug!("Message: {}", hex::encode(message.as_slice()));
+
         Ok(signature.serialize_compact().to_vec())
     }
 

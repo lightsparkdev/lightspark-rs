@@ -38,7 +38,7 @@ impl Handler {
         let data = &event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
         let sub_type: RemoteSigningSubEventType = from_value(data["sub_event_type"].clone())
             .map_err(|_| Error::WebhookEventDataMissing)?;
-        println!("handler for sub_type: {:?}", sub_type.to_string());
+        info!("handler for sub_type: {:?}", sub_type.to_string());
         let event_json =
             serde_json::to_string(&event).expect("Serialize event to json should not fail");
         if !self.validator.should_sign(event_json) {

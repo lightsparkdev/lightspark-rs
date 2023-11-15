@@ -8,12 +8,14 @@ use lightspark_remote_signing::{
     signer::{LightsparkSigner, Seed},
     validation::PositiveValidator,
 };
+use tracing::{debug, info, Level};
+use tracing_subscriber::FmtSubscriber;
 
 pub mod config;
 
 #[get("/ping")]
 async fn ping() -> impl Responder {
-    println!("ping");
+    info!("ping");
     HttpResponse::NoContent().finish()
 }
 
@@ -51,26 +53,34 @@ async fn webhook_handler(
         .unwrap()
         .unwrap();
 
-    println!("Response {:?}", response);
+    debug!("Response {:?}", response);
 
     let result = client
         .execute_graphql_request_variable(&response.query, response.variables)
         .await;
 
-    println!("Graphql response {:?}", result);
+    debug!("Graphql response {:?}", result);
     HttpResponse::NoContent().finish()
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    let subscriber = FmtSubscriber::builder()
+        .with_max_level(Level::DEBUG)
+        .finish();
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+
     let config = config::Config::new_from_env();
+    let port = config.api_port;
+
+    info!(config = format!("{:?}", config), "Starting Remote Signer.");
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(config.clone()))
             .service(ping)
             .service(webhook_handler)
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }
