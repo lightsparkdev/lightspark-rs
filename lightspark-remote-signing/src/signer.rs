@@ -8,8 +8,8 @@ use bitcoin::hashes::{sha512, Hash, HashEngine, Hmac, HmacEngine};
 use bitcoin::secp256k1::ecdh::SharedSecret;
 use bitcoin::secp256k1::hashes::sha256;
 use bitcoin::secp256k1::{Message, PublicKey, Scalar, Secp256k1, SecretKey};
-use log::debug;
 use rand_core::{OsRng, RngCore};
+use tracing::debug;
 
 const NODE_KEY_PATH: &str = "m/0";
 

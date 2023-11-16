@@ -5,9 +5,9 @@ use lightspark::{
     },
     webhooks::WebhookEvent,
 };
-use log::info;
 use serde::Deserialize;
 use serde_json::from_value;
+use tracing::info;
 
 use crate::{response::Response, signer::LightsparkSigner, validation::Validation, Error};
 

@@ -19,5 +19,6 @@ bitcoin = "0.30.1"
 hex = "0.4.3"
 rand_core = { "version" = "0.6.4", features = ["getrandom"] }
 serde_json = "1.0.104"
-log = "0.4.20"
 serde = "1.0.183"
+tracing = { version = "0.1", features = ["log"], default-features = false }
+tracing-subscriber = "0.3"
