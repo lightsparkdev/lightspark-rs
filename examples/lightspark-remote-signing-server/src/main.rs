@@ -1,4 +1,6 @@
-use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{
+    get, middleware, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder,
+};
 use futures_util::StreamExt as _;
 use lightspark::key::Secp256k1SigningKey;
 use lightspark::request::auth_provider::AccountAuthProvider;
@@ -77,6 +79,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(config.clone()))
+            .wrap(middleware::NormalizePath::trim())
             .service(ping)
             .service(webhook_handler)
     })
