@@ -1035,7 +1035,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("inviter_uma", inviter_uma.into());
-        let inviter_phone_hash = self.hash_phone_number(inviter_phone_number_e164)?;
+        let inviter_phone_hash = Self::hash_phone_number(inviter_phone_number_e164)?;
         variables.insert("inviter_phone_hash", inviter_phone_hash.into());
         variables.insert("inviter_region", inviter_region.into());
 
@@ -1130,7 +1130,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("invitation_code", invitation_code.into());
         variables.insert("invitee_uma", invitee_uma.into());
-        let invitee_phone_hash = self.hash_phone_number(invitee_phone_number_e164)?;
+        let invitee_phone_hash = Self::hash_phone_number(invitee_phone_number_e164)?;
         variables.insert("invitee_phone_hash", invitee_phone_hash.into());
         variables.insert("invitee_region", invitee_region.into());
 
