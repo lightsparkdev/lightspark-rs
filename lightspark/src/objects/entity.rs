@@ -18,6 +18,7 @@ use super::outgoing_payment_attempt::OutgoingPaymentAttempt;
 use super::routing_transaction::RoutingTransaction;
 use super::signable::Signable;
 use super::signable_payload::SignablePayload;
+use super::uma_invitation::UmaInvitation;
 use super::wallet::Wallet;
 use super::withdrawal::Withdrawal;
 use super::withdrawal_request::WithdrawalRequest;
@@ -59,6 +60,7 @@ pub enum EntityEnum {
     RoutingTransaction(RoutingTransaction),
     Signable(Signable),
     SignablePayload(SignablePayload),
+    UmaInvitation(UmaInvitation),
     Wallet(Wallet),
     Withdrawal(Withdrawal),
     WithdrawalRequest(WithdrawalRequest),
@@ -180,6 +182,12 @@ impl<'de> Deserialize<'de> for EntityEnum {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
                     Ok(EntityEnum::SignablePayload(obj))
+                }
+                "UmaInvitation" => {
+                    let obj = UmaInvitation::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(EntityEnum::UmaInvitation(obj))
                 }
                 "Wallet" => {
                     let obj = Wallet::deserialize(value).map_err(|err| {

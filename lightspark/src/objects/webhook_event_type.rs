@@ -9,6 +9,9 @@ pub enum WebhookEventType {
     #[serde(rename = "PAYMENT_FINISHED")]
     PaymentFinished,
 
+    #[serde(rename = "FORCE_CLOSURE")]
+    ForceClosure,
+
     #[serde(rename = "WITHDRAWAL_FINISHED")]
     WithdrawalFinished,
 
@@ -17,6 +20,9 @@ pub enum WebhookEventType {
 
     #[serde(rename = "NODE_STATUS")]
     NodeStatus,
+
+    #[serde(rename = "UMA_INVITATION_CLAIMED")]
+    UmaInvitationClaimed,
 
     #[serde(rename = "WALLET_STATUS")]
     WalletStatus,
@@ -50,9 +56,11 @@ impl fmt::Display for WebhookEventType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::PaymentFinished => write!(f, "PAYMENT_FINISHED"),
+            Self::ForceClosure => write!(f, "FORCE_CLOSURE"),
             Self::WithdrawalFinished => write!(f, "WITHDRAWAL_FINISHED"),
             Self::FundsReceived => write!(f, "FUNDS_RECEIVED"),
             Self::NodeStatus => write!(f, "NODE_STATUS"),
+            Self::UmaInvitationClaimed => write!(f, "UMA_INVITATION_CLAIMED"),
             Self::WalletStatus => write!(f, "WALLET_STATUS"),
             Self::WalletOutgoingPaymentFinished => write!(f, "WALLET_OUTGOING_PAYMENT_FINISHED"),
             Self::WalletIncomingPaymentFinished => write!(f, "WALLET_INCOMING_PAYMENT_FINISHED"),

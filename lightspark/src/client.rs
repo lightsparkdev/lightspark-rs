@@ -24,10 +24,12 @@ use crate::objects::invoice_type::InvoiceType;
 use crate::objects::lightning_fee_estimate_output::LightningFeeEstimateOutput;
 use crate::objects::outgoing_payment::OutgoingPayment;
 use crate::objects::permission::Permission;
+use crate::objects::region_code::RegionCode;
 use crate::objects::risk_rating::RiskRating;
+use crate::objects::uma_invitation::UmaInvitation;
 use crate::objects::withdrawal_mode::WithdrawalMode;
 use crate::objects::withdrawal_request::WithdrawalRequest;
-use crate::objects::{account, invoice_data};
+use crate::objects::{account, invoice_data, uma_invitation};
 use crate::objects::{api_token, incoming_payment, outgoing_payment};
 use crate::objects::{bitcoin_network, withdrawal_request};
 use crate::objects::{fee_estimate, lightning_fee_estimate_output};
@@ -964,5 +966,207 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let result = serde_json::from_value(json["screen_node"]["rating"].clone())
             .map_err(Error::JsonError)?;
         Ok(result)
+    }
+
+    /// Creates an UMA invitation. If you are part of the incentive program, you should use
+    /// `create_uma_invitation_with_incentives`.
+    pub async fn create_uma_invitation(&self, inviter_uma: &str) -> Result<UmaInvitation, Error> {
+        let operation = "mutation CreateUmaInvitation(
+            $inviter_uma: String!
+        ) {
+            create_uma_invitation(input: {
+                inviter_uma: $inviter_uma
+            }) {
+                invitation {
+                    ...UmaInvitationFragment
+                }
+            }
+        }
+
+        " + uma_invitation::FRAGMENT;
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("inviter_uma", inviter_uma.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(operation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(json["create_uma_invitation"]["invitation"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    /// Creates an UMA invitation as part of the incentive program. If you are not part of the
+    /// incentive program, you should use `create_uma_invitation`.
+    pub async fn create_uma_invitation_with_incentives(
+        &self,
+        inviter_uma: &str,
+        inviter_phone_number_e164: &str,
+        inviter_region: RegionCode,
+    ) -> Result<UmaInvitation, Error> {
+        let operation = "mutation CreateUmaInvitationWithIncentives(
+            $inviter_uma: String!
+            $inviter_phone_hash: String!
+            $inviter_region: RegionCode!
+        ) {
+            create_uma_invitation_with_incentives(input: {
+                inviter_uma: $inviter_uma
+                inviter_phone_hash: $inviter_phone_hash
+                inviter_region: $inviter_region
+            }) {
+                invitation {
+                    ...UmaInvitationFragment
+                }
+            }
+        }
+
+        " + uma_invitation::FRAGMENT;
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("inviter_uma", inviter_uma.into());
+        let inviter_phone_hash = self.hash_phone_number(inviter_phone_number_e164)?;
+        variables.insert("inviter_phone_hash", inviter_phone_hash.into());
+        variables.insert("inviter_region", inviter_region.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(operation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(
+            json["create_uma_invitation_with_incentives"]["invitation"].clone(),
+        )
+        .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    /// Claims an UMA invitation. If you are part of the incentive program, you should use
+    /// `claim_uma_invitation_with_incentives`.
+    pub async fn claim_uma_invitation(
+        &self,
+        invitation_code: &str,
+        invitee_uma: &str,
+    ) -> Result<UmaInvitation, Error> {
+        let operation = "mutation ClaimUmaInvitation(
+            $invitation_code: String!
+            $invitee_uma: String!
+        ) {
+            claim_uma_invitation(input: {
+                invitation_code: $invitation_code
+                invitee_uma: $invitee_uma
+            }) {
+                invitation {
+                    ...UmaInvitationFragment
+                }
+            }
+        }
+
+        " + uma_invitation::FRAGMENT;
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("invitation_code", invitation_code.into());
+        variables.insert("invitee_uma", invitee_uma.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(operation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(json["claim_uma_invitation"]["invitation"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    /// Claims an UMA invitation as part of the incentive program. If you are not part of the
+    /// incentive program, you should use `claim_uma_invitation`.
+    pub async fn claim_uma_invitation_with_incentives(
+        &self,
+        invitation_code: &str,
+        invitee_uma: &str,
+        invitee_phone_number_e164: &str,
+        invitee_region: RegionCode,
+    ) -> Result<UmaInvitation, Error> {
+        let operation = "mutation ClaimUmaInvitation(
+            $invitation_code: String!
+            $invitee_uma: String!
+            $invitee_phone_hash: String!
+            $invitee_region: RegionCode!
+        ) {
+            claim_uma_invitation_with_incentives(input: {
+                invitation_code: $invitation_code
+                invitee_uma: $invitee_uma
+                invitee_phone_hash: $invitee_phone_hash
+                invitee_region: $invitee_region
+            }) {
+                invitation {
+                    ...UmaInvitationFragment
+                }
+            }
+        }
+
+        " + uma_invitation::FRAGMENT;
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("invitation_code", invitation_code.into());
+        variables.insert("invitee_uma", invitee_uma.into());
+        let invitee_phone_hash = self.hash_phone_number(invitee_phone_number_e164)?;
+        variables.insert("invitee_phone_hash", invitee_phone_hash.into());
+        variables.insert("invitee_region", invitee_region.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(operation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(
+            json["claim_uma_invitation_with_incentives"]["invitation"].clone(),
+        )
+        .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    /// Fetches a UMA invitation by its code.
+    pub async fn fetch_uma_invitation(
+        &self,
+        invitation_code: &str,
+    ) -> Result<UmaInvitation, Error> {
+        let operation = "query FetchUmaInvitation(
+            $invitation_code: String!
+        ) {
+            uma_invitation_by_code(code: $invitation_code) {
+                ...UmaInvitationFragment
+            }
+        }
+
+        " + uma_invitation::FRAGMENT;
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("invitation_code", invitation_code.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(operation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(json["uma_invitation_by_code"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    fn hash_phone_number(phone_number_e164: &str) -> Result<String, Error> {
+        let e164_regex = regex::Regex::new(r"^\+[1-9]\d{1,14}$").unwrap();
+        if !e164_regex.is_match(phone_number_e164) {
+            return Err(Error::InvalidPhoneNumber);
+        }
+        let mut hasher = Sha256::new();
+        hasher.update(phone_number_e164.as_bytes());
+        Ok(hex::encode(hasher.finalize()))
     }
 }

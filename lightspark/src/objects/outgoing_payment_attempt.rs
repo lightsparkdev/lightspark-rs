@@ -23,7 +23,7 @@ pub struct OutgoingPaymentAttempt {
     #[serde(rename = "outgoing_payment_attempt_id")]
     pub id: String,
 
-    /// The date and time when the attempt was initiated.
+    /// The date and time when the entity was first created.
     #[serde(
         with = "custom_date_format",
         rename = "outgoing_payment_attempt_created_at"
@@ -48,6 +48,13 @@ pub struct OutgoingPaymentAttempt {
     /// If the payment attempt failed, then this contains the index of the hop at which the problem occurred.
     #[serde(rename = "outgoing_payment_attempt_failure_source_index")]
     pub failure_source_index: Option<i64>,
+
+    /// The date and time when the attempt was initiated.
+    #[serde(
+        with = "custom_date_format",
+        rename = "outgoing_payment_attempt_attempted_at"
+    )]
+    pub attempted_at: DateTime<Utc>,
 
     /// The time the outgoing payment attempt failed or succeeded.
     #[serde(
@@ -125,6 +132,7 @@ fragment OutgoingPaymentAttemptFragment on OutgoingPaymentAttempt {
     outgoing_payment_attempt_status: status
     outgoing_payment_attempt_failure_code: failure_code
     outgoing_payment_attempt_failure_source_index: failure_source_index
+    outgoing_payment_attempt_attempted_at: attempted_at
     outgoing_payment_attempt_resolved_at: resolved_at
     outgoing_payment_attempt_amount: amount {
         __typename

@@ -16,6 +16,7 @@ pub enum Error {
     WebhookSignatureError,
     SigningKeyNotFound,
     InvalidCurrencyConversion,
+    InvalidPhoneNumber,
 }
 
 impl fmt::Display for Error {
@@ -33,6 +34,7 @@ impl fmt::Display for Error {
             }
             Self::SigningKeyNotFound => write!(f, "Signing key not found"),
             Self::InvalidCurrencyConversion => write!(f, "Invalid currency conversion"),
+            Self::InvalidPhoneNumber => write!(f, "Invalid phone number. Must be E.164 format."),
         }
     }
 }
