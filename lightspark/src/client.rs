@@ -971,19 +971,23 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
     /// Creates an UMA invitation. If you are part of the incentive program, you should use
     /// `create_uma_invitation_with_incentives`.
     pub async fn create_uma_invitation(&self, inviter_uma: &str) -> Result<UmaInvitation, Error> {
-        let operation = "mutation CreateUmaInvitation(
+        let operation = format!(
+            "mutation CreateUmaInvitation(
             $inviter_uma: String!
-        ) {
-            create_uma_invitation(input: {
+        ) {{
+            create_uma_invitation(input: {{
                 inviter_uma: $inviter_uma
-            }) {
-                invitation {
+            }}) {{
+                invitation {{
                     ...UmaInvitationFragment
-                }
-            }
-        }
+                }}
+            }}
+        }}
 
-        " + uma_invitation::FRAGMENT;
+        {}
+        ",
+            uma_invitation::FRAGMENT
+        );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("inviter_uma", inviter_uma.into());
@@ -991,7 +995,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
             .requester
-            .execute_graphql(operation, Some(value))
+            .execute_graphql(&operation, Some(value))
             .await?;
 
         let result = serde_json::from_value(json["create_uma_invitation"]["invitation"].clone())
@@ -1007,23 +1011,27 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         inviter_phone_number_e164: &str,
         inviter_region: RegionCode,
     ) -> Result<UmaInvitation, Error> {
-        let operation = "mutation CreateUmaInvitationWithIncentives(
+        let operation = format!(
+            "mutation CreateUmaInvitationWithIncentives(
             $inviter_uma: String!
             $inviter_phone_hash: String!
             $inviter_region: RegionCode!
-        ) {
-            create_uma_invitation_with_incentives(input: {
+        ) {{
+            create_uma_invitation_with_incentives(input: {{
                 inviter_uma: $inviter_uma
                 inviter_phone_hash: $inviter_phone_hash
                 inviter_region: $inviter_region
-            }) {
-                invitation {
+            }}) {{
+                invitation {{
                     ...UmaInvitationFragment
-                }
-            }
-        }
+                }}
+            }}
+        }}
 
-        " + uma_invitation::FRAGMENT;
+        {}
+        ",
+            uma_invitation::FRAGMENT
+        );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("inviter_uma", inviter_uma.into());
@@ -1034,7 +1042,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
             .requester
-            .execute_graphql(operation, Some(value))
+            .execute_graphql(&operation, Some(value))
             .await?;
 
         let result = serde_json::from_value(
@@ -1051,21 +1059,25 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         invitation_code: &str,
         invitee_uma: &str,
     ) -> Result<UmaInvitation, Error> {
-        let operation = "mutation ClaimUmaInvitation(
+        let operation = format!(
+            "mutation ClaimUmaInvitation(
             $invitation_code: String!
             $invitee_uma: String!
-        ) {
-            claim_uma_invitation(input: {
+        ) {{
+            claim_uma_invitation(input: {{
                 invitation_code: $invitation_code
                 invitee_uma: $invitee_uma
-            }) {
-                invitation {
+            }}) {{
+                invitation {{
                     ...UmaInvitationFragment
-                }
-            }
-        }
+                }}
+            }}
+        }}
 
-        " + uma_invitation::FRAGMENT;
+        {}
+        ",
+            uma_invitation::FRAGMENT
+        );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("invitation_code", invitation_code.into());
@@ -1074,7 +1086,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
             .requester
-            .execute_graphql(operation, Some(value))
+            .execute_graphql(&operation, Some(value))
             .await?;
 
         let result = serde_json::from_value(json["claim_uma_invitation"]["invitation"].clone())
@@ -1091,25 +1103,29 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         invitee_phone_number_e164: &str,
         invitee_region: RegionCode,
     ) -> Result<UmaInvitation, Error> {
-        let operation = "mutation ClaimUmaInvitation(
+        let operation = format!(
+            "mutation ClaimUmaInvitation(
             $invitation_code: String!
             $invitee_uma: String!
             $invitee_phone_hash: String!
             $invitee_region: RegionCode!
-        ) {
-            claim_uma_invitation_with_incentives(input: {
+        ) {{
+            claim_uma_invitation_with_incentives(input: {{
                 invitation_code: $invitation_code
                 invitee_uma: $invitee_uma
                 invitee_phone_hash: $invitee_phone_hash
                 invitee_region: $invitee_region
-            }) {
-                invitation {
+            }}) {{
+                invitation {{
                     ...UmaInvitationFragment
-                }
-            }
-        }
+                }}
+            }}
+        }}
 
-        " + uma_invitation::FRAGMENT;
+        {}
+        ",
+            uma_invitation::FRAGMENT
+        );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("invitation_code", invitation_code.into());
@@ -1121,7 +1137,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
             .requester
-            .execute_graphql(operation, Some(value))
+            .execute_graphql(&operation, Some(value))
             .await?;
 
         let result = serde_json::from_value(
@@ -1136,15 +1152,18 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         &self,
         invitation_code: &str,
     ) -> Result<UmaInvitation, Error> {
-        let operation = "query FetchUmaInvitation(
+        let operation = format!(
+            "query FetchUmaInvitation(
             $invitation_code: String!
-        ) {
-            uma_invitation_by_code(code: $invitation_code) {
+        ) {{
+            uma_invitation_by_code(code: $invitation_code) {{
                 ...UmaInvitationFragment
-            }
-        }
-
-        " + uma_invitation::FRAGMENT;
+            }}
+        }}
+        {}
+        ",
+            uma_invitation::FRAGMENT
+        );
 
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("invitation_code", invitation_code.into());
@@ -1152,7 +1171,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let json = self
             .requester
-            .execute_graphql(operation, Some(value))
+            .execute_graphql(&operation, Some(value))
             .await?;
 
         let result = serde_json::from_value(json["uma_invitation_by_code"].clone())
