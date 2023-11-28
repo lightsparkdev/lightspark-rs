@@ -11,6 +11,8 @@ pub mod api_token;
 pub mod balances;
 pub mod bitcoin_network;
 pub mod blockchain_balance;
+pub mod cancel_invoice_input;
+pub mod cancel_invoice_output;
 pub mod channel;
 pub mod channel_closing_transaction;
 pub mod channel_fees;
