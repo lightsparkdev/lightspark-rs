@@ -393,6 +393,40 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         Ok(result)
     }
 
+    /// Cancels an existing unpaid invoice and returns that invoice. Cancelled invoices cannot be paid.
+    pub async fn cancel_invoice(&self, invoice_id: &str) -> Result<Invoice, Error> {
+        let operation = format!(
+            "mutation CancelInvoice(
+                $invoice_id: ID!
+            ) {{
+                cancel_invoice(input: {{
+                    invoice_id: $invoice_id
+                }}) {{
+                    invoice {{
+                        ...InvoiceFragment
+                    }}
+                }}
+            }}
+
+            {}
+            ",
+            invoice::FRAGMENT
+        );
+
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("invoice_id", invoice_id.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let json = self
+            .requester
+            .execute_graphql(&operation, Some(value))
+            .await?;
+
+        let result = serde_json::from_value(json["cancel_invoice"]["invoice"].clone())
+            .map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
     pub async fn fund_node(
         &self,
         node_id: &str,
