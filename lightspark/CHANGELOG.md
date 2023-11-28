@@ -1,5 +1,10 @@
 # Changelog
 
+# v0.8.0
+
+- Add a function for cancelling unpaid invoices.
+- Add UMA invites support.
+
 # v0.7.2
 - Add preimage to OutgoingPayment.
 
