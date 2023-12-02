@@ -1,12 +1,9 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::connection::Connection;
-use crate::objects::transaction::TransactionEnum;
 use serde::{Deserialize, Serialize};
-<<<<<<< Updated upstream
 
 use crate::objects::page_info::PageInfo;
-=======
->>>>>>> Stashed changes
+use crate::objects::transaction::TransactionEnum;
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
