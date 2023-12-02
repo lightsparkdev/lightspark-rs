@@ -3,14 +3,21 @@ use crate::objects::entity::Entity;
 use crate::objects::node::Node;
 
 use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::objects::entity::Entity;
+use crate::objects::node::Node;
+use serde_json::Value;
+
 use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
 use crate::objects::balances::Balances;
 use crate::objects::blockchain_balance::BlockchainBalance;
+<<<<<<< Updated upstream
 use crate::objects::currency_amount::CurrencyAmount;
+=======
+>>>>>>> Stashed changes
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::types::entity_wrapper::EntityWrapper;
 use serde::{Deserialize, Deserializer, Serialize};
-use serde_json::Value;
 use std::vec::Vec;
 
 pub trait LightsparkNode: Node + Entity {

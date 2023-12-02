@@ -9,6 +9,8 @@ use crate::objects::transaction_type::TransactionType;
 use crate::objects::wallet_status::WalletStatus;
 use crate::objects::wallet_to_payment_requests_connection::WalletToPaymentRequestsConnection;
 use crate::objects::wallet_to_transactions_connection::WalletToTransactionsConnection;
+use crate::objects::wallet_to_withdrawal_requests_connection::WalletToWithdrawalRequestsConnection;
+use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::custom_date_formats::custom_date_format_option;
 use crate::types::entity_wrapper::EntityWrapper;
@@ -1131,6 +1133,98 @@ impl Wallet {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["total_amount_received"].clone();
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    pub async fn get_withdrawal_requests(
+        &self,
+        requester: &impl GraphQLRequester,
+        first: Option<i64>,
+        after: Option<String>,
+        statuses: Option<Vec<WithdrawalRequestStatus>>,
+        created_after_date: Option<DateTime<Utc>>,
+        created_before_date: Option<DateTime<Utc>>,
+    ) -> Result<WalletToWithdrawalRequestsConnection, Error> {
+        let query = "query FetchWalletToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: ID, $statuses: [WithdrawalRequestStatus!], $created_after_date: DateTime, $created_before_date: DateTime) {
+    entity(id: $entity_id) {
+        ... on Wallet {
+            withdrawal_requests(, first: $first, after: $after, statuses: $statuses, created_after_date: $created_after_date, created_before_date: $created_before_date) {
+                __typename
+                wallet_to_withdrawal_requests_connection_count: count
+                wallet_to_withdrawal_requests_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
+                wallet_to_withdrawal_requests_connection_entities: entities {
+                    __typename
+                    withdrawal_request_id: id
+                    withdrawal_request_created_at: created_at
+                    withdrawal_request_updated_at: updated_at
+                    withdrawal_request_requested_amount: requested_amount {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_amount: amount {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_estimated_amount: estimated_amount {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_amount_withdrawn: amount_withdrawn {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_bitcoin_address: bitcoin_address
+                    withdrawal_request_withdrawal_mode: withdrawal_mode
+                    withdrawal_request_status: status
+                    withdrawal_request_completed_at: completed_at
+                    withdrawal_request_withdrawal: withdrawal {
+                        id
+                    }
+                }
+            }
+        }
+    }
+}";
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("entity_id", self.id.clone().into());
+        variables.insert("first", first.into());
+        variables.insert("after", after.into());
+        variables.insert("statuses", statuses.into());
+        variables.insert(
+            "created_after_date",
+            created_after_date.map(|dt| dt.to_rfc3339()).into(),
+        );
+        variables.insert(
+            "created_before_date",
+            created_before_date.map(|dt| dt.to_rfc3339()).into(),
+        );
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
+        let json = result["entity"]["withdrawal_requests"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }

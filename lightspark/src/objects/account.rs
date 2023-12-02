@@ -6,6 +6,7 @@ use crate::objects::account_to_nodes_connection::AccountToNodesConnection;
 use crate::objects::account_to_payment_requests_connection::AccountToPaymentRequestsConnection;
 use crate::objects::account_to_transactions_connection::AccountToTransactionsConnection;
 use crate::objects::account_to_wallets_connection::AccountToWalletsConnection;
+use crate::objects::account_to_withdrawal_requests_connection::AccountToWithdrawalRequestsConnection;
 use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
@@ -14,6 +15,7 @@ use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
 use crate::objects::transaction_failures::TransactionFailures;
 use crate::objects::transaction_status::TransactionStatus;
 use crate::objects::transaction_type::TransactionType;
+use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
 use crate::types::custom_date_formats::custom_date_format;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
@@ -1752,6 +1754,97 @@ impl Account {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["payment_requests"].clone();
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub async fn get_withdrawal_requests(
+        &self,
+        requester: &impl GraphQLRequester,
+        first: Option<i64>,
+        after: Option<String>,
+        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
+        statuses: Option<Vec<WithdrawalRequestStatus>>,
+        node_ids: Option<Vec<String>>,
+        after_date: Option<DateTime<Utc>>,
+        before_date: Option<DateTime<Utc>>,
+    ) -> Result<AccountToWithdrawalRequestsConnection, Error> {
+        let query = "query FetchAccountToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: String, $bitcoin_networks: [BitcoinNetwork!], $statuses: [WithdrawalRequestStatus!], $node_ids: [ID!], $after_date: DateTime, $before_date: DateTime) {
+    entity(id: $entity_id) {
+        ... on Account {
+            withdrawal_requests(, first: $first, after: $after, bitcoin_networks: $bitcoin_networks, statuses: $statuses, node_ids: $node_ids, after_date: $after_date, before_date: $before_date) {
+                __typename
+                account_to_withdrawal_requests_connection_count: count
+                account_to_withdrawal_requests_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
+                account_to_withdrawal_requests_connection_entities: entities {
+                    __typename
+                    withdrawal_request_id: id
+                    withdrawal_request_created_at: created_at
+                    withdrawal_request_updated_at: updated_at
+                    withdrawal_request_requested_amount: requested_amount {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_amount: amount {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_estimated_amount: estimated_amount {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_amount_withdrawn: amount_withdrawn {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                    withdrawal_request_bitcoin_address: bitcoin_address
+                    withdrawal_request_withdrawal_mode: withdrawal_mode
+                    withdrawal_request_status: status
+                    withdrawal_request_completed_at: completed_at
+                    withdrawal_request_withdrawal: withdrawal {
+                        id
+                    }
+                }
+            }
+        }
+    }
+}";
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("entity_id", self.id.clone().into());
+        variables.insert("first", first.into());
+        variables.insert("after", after.into());
+        variables.insert("bitcoin_networks", bitcoin_networks.into());
+        variables.insert("statuses", statuses.into());
+        variables.insert("node_ids", node_ids.into());
+        variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
+        let json = result["entity"]["withdrawal_requests"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }

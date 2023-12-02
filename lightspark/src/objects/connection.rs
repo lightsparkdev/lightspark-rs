@@ -5,12 +5,14 @@ use super::account_to_nodes_connection::AccountToNodesConnection;
 use super::account_to_payment_requests_connection::AccountToPaymentRequestsConnection;
 use super::account_to_transactions_connection::AccountToTransactionsConnection;
 use super::account_to_wallets_connection::AccountToWalletsConnection;
+use super::account_to_withdrawal_requests_connection::AccountToWithdrawalRequestsConnection;
 use super::incoming_payment_to_attempts_connection::IncomingPaymentToAttemptsConnection;
 use super::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
 use super::outgoing_payment_attempt_to_hops_connection::OutgoingPaymentAttemptToHopsConnection;
 use super::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsConnection;
 use super::wallet_to_payment_requests_connection::WalletToPaymentRequestsConnection;
 use super::wallet_to_transactions_connection::WalletToTransactionsConnection;
+use super::wallet_to_withdrawal_requests_connection::WalletToWithdrawalRequestsConnection;
 use crate::objects::page_info::PageInfo;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
@@ -33,12 +35,14 @@ pub enum ConnectionEnum {
     AccountToPaymentRequestsConnection(AccountToPaymentRequestsConnection),
     AccountToTransactionsConnection(AccountToTransactionsConnection),
     AccountToWalletsConnection(AccountToWalletsConnection),
+    AccountToWithdrawalRequestsConnection(AccountToWithdrawalRequestsConnection),
     IncomingPaymentToAttemptsConnection(IncomingPaymentToAttemptsConnection),
     LightsparkNodeToChannelsConnection(LightsparkNodeToChannelsConnection),
     OutgoingPaymentAttemptToHopsConnection(OutgoingPaymentAttemptToHopsConnection),
     OutgoingPaymentToAttemptsConnection(OutgoingPaymentToAttemptsConnection),
     WalletToPaymentRequestsConnection(WalletToPaymentRequestsConnection),
     WalletToTransactionsConnection(WalletToTransactionsConnection),
+    WalletToWithdrawalRequestsConnection(WalletToWithdrawalRequestsConnection),
 }
 
 impl<'de> Deserialize<'de> for ConnectionEnum {
@@ -81,6 +85,12 @@ impl<'de> Deserialize<'de> for ConnectionEnum {
                     })?;
                     Ok(ConnectionEnum::AccountToWalletsConnection(obj))
                 }
+                "AccountToWithdrawalRequestsConnection" => {
+                    let obj = AccountToWithdrawalRequestsConnection::deserialize(value).map_err(
+                        |err| serde::de::Error::custom(format!("Serde JSON Error {}", err)),
+                    )?;
+                    Ok(ConnectionEnum::AccountToWithdrawalRequestsConnection(obj))
+                }
                 "IncomingPaymentToAttemptsConnection" => {
                     let obj =
                         IncomingPaymentToAttemptsConnection::deserialize(value).map_err(|err| {
@@ -121,6 +131,12 @@ impl<'de> Deserialize<'de> for ConnectionEnum {
                             serde::de::Error::custom(format!("Serde JSON Error {}", err))
                         })?;
                     Ok(ConnectionEnum::WalletToTransactionsConnection(obj))
+                }
+                "WalletToWithdrawalRequestsConnection" => {
+                    let obj = WalletToWithdrawalRequestsConnection::deserialize(value).map_err(
+                        |err| serde::de::Error::custom(format!("Serde JSON Error {}", err)),
+                    )?;
+                    Ok(ConnectionEnum::WalletToWithdrawalRequestsConnection(obj))
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),
