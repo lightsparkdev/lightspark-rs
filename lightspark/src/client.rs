@@ -40,6 +40,7 @@ use crate::types::graphql_requester::GraphQLRequester;
 
 const SIGNING_KEY_PATH: &str = "m/5";
 
+#[derive(Clone)]
 pub struct LightsparkClient<T: OperationSigningKey> {
     pub requester: Requester,
     signing_keys: HashMap<String, T>,
