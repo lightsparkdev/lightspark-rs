@@ -1,6 +1,7 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 
 use super::account_to_api_tokens_connection::AccountToApiTokensConnection;
+use super::account_to_channels_connection::AccountToChannelsConnection;
 use super::account_to_nodes_connection::AccountToNodesConnection;
 use super::account_to_payment_requests_connection::AccountToPaymentRequestsConnection;
 use super::account_to_transactions_connection::AccountToTransactionsConnection;
@@ -31,6 +32,7 @@ pub trait Connection {
 #[derive(Debug, Clone, Serialize)]
 pub enum ConnectionEnum {
     AccountToApiTokensConnection(AccountToApiTokensConnection),
+    AccountToChannelsConnection(AccountToChannelsConnection),
     AccountToNodesConnection(AccountToNodesConnection),
     AccountToPaymentRequestsConnection(AccountToPaymentRequestsConnection),
     AccountToTransactionsConnection(AccountToTransactionsConnection),
@@ -58,6 +60,12 @@ impl<'de> Deserialize<'de> for ConnectionEnum {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
                     Ok(ConnectionEnum::AccountToApiTokensConnection(obj))
+                }
+                "AccountToChannelsConnection" => {
+                    let obj = AccountToChannelsConnection::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(ConnectionEnum::AccountToChannelsConnection(obj))
                 }
                 "AccountToNodesConnection" => {
                     let obj = AccountToNodesConnection::deserialize(value).map_err(|err| {

@@ -1,26 +1,29 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
-use crate::objects::lightspark_node::LightsparkNode;
-use crate::objects::node_address_type::NodeAddressType;
-use crate::types::entity_wrapper::EntityWrapper;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-
 use crate::error::Error;
-use crate::objects::balances::Balances;
-use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::channel_status::ChannelStatus;
-use crate::objects::lightspark_node_status::LightsparkNodeStatus;
-use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
+use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::node::Node;
-use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
-use crate::objects::secret::Secret;
 use crate::types::custom_date_formats::custom_date_format;
+use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+
+use crate::objects::balances::Balances;
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::entity::Entity;
+use crate::objects::lightning_payment_direction::LightningPaymentDirection;
+use crate::objects::lightspark_node::LightsparkNode;
+use crate::objects::lightspark_node_status::LightsparkNodeStatus;
+use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
+use crate::objects::lightspark_node_to_daily_liquidity_forecasts_connection::LightsparkNodeToDailyLiquidityForecastsConnection;
+use crate::objects::node_address_type::NodeAddressType;
+use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
+use crate::objects::secret::Secret;
+use chrono::NaiveDate;
 use serde_json::Value;
 use std::vec::Vec;
 
@@ -536,6 +539,51 @@ impl LightsparkNodeWithOSK {
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["channels"].clone();
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        Ok(result)
+    }
+
+    pub async fn get_daily_liquidity_forecasts(
+        &self,
+        requester: &impl GraphQLRequester,
+        from_date: NaiveDate,
+        to_date: NaiveDate,
+        direction: LightningPaymentDirection,
+    ) -> Result<LightsparkNodeToDailyLiquidityForecastsConnection, Error> {
+        let query = "query FetchLightsparkNodeToDailyLiquidityForecastsConnection($entity_id: ID!, $from_date: Date!, $to_date: Date!, $direction: LightningPaymentDirection!) {
+    entity(id: $entity_id) {
+        ... on LightsparkNodeWithOSK {
+            daily_liquidity_forecasts(, from_date: $from_date, to_date: $to_date, direction: $direction) {
+                __typename
+                lightspark_node_to_daily_liquidity_forecasts_connection_from_date: from_date
+                lightspark_node_to_daily_liquidity_forecasts_connection_to_date: to_date
+                lightspark_node_to_daily_liquidity_forecasts_connection_direction: direction
+                lightspark_node_to_daily_liquidity_forecasts_connection_entities: entities {
+                    __typename
+                    daily_liquidity_forecast_date: date
+                    daily_liquidity_forecast_direction: direction
+                    daily_liquidity_forecast_amount: amount {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
+                }
+            }
+        }
+    }
+}";
+        let mut variables: HashMap<&str, Value> = HashMap::new();
+        variables.insert("entity_id", self.id.clone().into());
+        variables.insert("from_date", from_date.format("%Y-%m-%d").to_string().into());
+        variables.insert("to_date", to_date.format("%Y-%m-%d").to_string().into());
+        variables.insert("direction", direction.into());
+
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
+        let json = result["entity"]["daily_liquidity_forecasts"].clone();
         let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
