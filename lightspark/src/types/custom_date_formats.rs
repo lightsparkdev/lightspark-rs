@@ -58,3 +58,60 @@ pub mod custom_date_format_option {
         }
     }
 }
+
+pub mod custom_date_only_format {
+    use chrono::NaiveDate;
+    use serde::{self, Deserialize, Deserializer, Serializer};
+
+    const FORMAT: &str = "%Y-%m-%d";
+
+    pub fn serialize<S>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = date.format(FORMAT).to_string();
+        serializer.serialize_str(&s)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<NaiveDate, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        NaiveDate::parse_from_str(&s, FORMAT)
+            .map_err(|e| serde::de::Error::custom(format!("invalid date format: {}", e)))
+    }
+}
+
+pub mod custom_date_only_format_option {
+    use chrono::NaiveDate;
+    use serde::{self, Deserialize, Deserializer, Serializer};
+
+    const FORMAT: &str = "%Y-%m-%d";
+
+    pub fn serialize<S>(date: &Option<NaiveDate>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match date {
+            Some(date) => {
+                let s = date.format(FORMAT).to_string();
+                serializer.serialize_str(&s)
+            }
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<NaiveDate>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = Option::<String>::deserialize(deserializer)?;
+        match s {
+            Some(s) => NaiveDate::parse_from_str(&s, FORMAT)
+                .map_err(|e| serde::de::Error::custom(format!("invalid date format: {}", e)))
+                .map(Some),
+            None => Ok(None),
+        }
+    }
+}
