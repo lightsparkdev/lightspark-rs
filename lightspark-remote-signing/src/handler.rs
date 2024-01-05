@@ -5,11 +5,13 @@ use lightspark::{
     },
     webhooks::WebhookEvent,
 };
-use serde::Deserialize;
 use serde_json::from_value;
 use tracing::info;
 
-use crate::{response::Response, signer::LightsparkSigner, validation::Validation, Error};
+use crate::{
+    response::Response, signer::LightsparkSigner, signing_requests::SigningJob,
+    validation::Validation, Error,
+};
 
 /// A handler for lightspark remote signing webhook events.
 pub struct Handler {
@@ -246,13 +248,4 @@ impl Handler {
         }
         Ok(Response::sign_messages_response(signatures))
     }
-}
-
-#[derive(Clone, Deserialize, Debug)]
-struct SigningJob {
-    id: String,
-    derivation_path: String,
-    message: String,
-    add_tweak: Option<String>,
-    mul_tweak: Option<String>,
 }

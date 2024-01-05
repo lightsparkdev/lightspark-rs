@@ -14,6 +14,8 @@ pub mod handler;
 pub mod invoice;
 pub mod response;
 pub mod signer;
+pub mod signing_requests;
+pub mod signing_responses;
 pub mod validation;
 
 #[derive(Debug)]
