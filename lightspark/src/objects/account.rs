@@ -655,6 +655,7 @@ impl Account {
         Ok(result)
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn get_channels(
         &self,
         requester: &impl GraphQLRequester,
@@ -663,13 +664,21 @@ impl Account {
         after_date: Option<DateTime<Utc>>,
         before_date: Option<DateTime<Utc>>,
         first: Option<i64>,
+        after: Option<String>,
     ) -> Result<AccountToChannelsConnection, Error> {
-        let query = "query FetchAccountToChannelsConnection($entity_id: ID!, $bitcoin_network: BitcoinNetwork!, $lightning_node_id: ID, $after_date: DateTime, $before_date: DateTime, $first: Int) {
+        let query = "query FetchAccountToChannelsConnection($entity_id: ID!, $bitcoin_network: BitcoinNetwork!, $lightning_node_id: ID, $after_date: DateTime, $before_date: DateTime, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on Account {
-            channels(, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id, after_date: $after_date, before_date: $before_date, first: $first) {
+            channels(, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id, after_date: $after_date, before_date: $before_date, first: $first, after: $after) {
                 __typename
                 account_to_channels_connection_count: count
+                account_to_channels_connection_page_info: page_info {
+                    __typename
+                    page_info_has_next_page: has_next_page
+                    page_info_has_previous_page: has_previous_page
+                    page_info_start_cursor: start_cursor
+                    page_info_end_cursor: end_cursor
+                }
                 account_to_channels_connection_entities: entities {
                     __typename
                     channel_id: id
@@ -775,6 +784,7 @@ impl Account {
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("first", first.into());
+        variables.insert("after", after.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;
