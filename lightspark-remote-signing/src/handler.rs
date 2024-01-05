@@ -88,7 +88,7 @@ impl Handler {
         Ok(Response::set_invoice_payment_hash_response(
             invoice_id,
             &payment_hash_str,
-            &nonce_str,
+            Some(&nonce_str),
         ))
     }
 
