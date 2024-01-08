@@ -159,7 +159,7 @@ impl Response {
     pub fn release_channel_per_commitment_secret_response(
         channel_id: &str,
         per_commitment_secret: &str,
-        per_commitment_index: i64,
+        per_commitment_index: u64,
     ) -> Response {
         let variables = json!({
             "channel_id": channel_id,

@@ -54,7 +54,7 @@ pub struct GetPerCommitmentPointResponse {
 pub struct ReleasePerCommitmentSecretResponse {
     pub channel_id: String,
     pub per_commitment_secret: String,
-    pub per_commitment_point_idx: i64,
+    pub per_commitment_point_idx: u64,
 }
 
 #[derive(Clone)]
