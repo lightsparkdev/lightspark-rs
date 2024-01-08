@@ -228,7 +228,7 @@ impl Response {
     pub fn set_invoice_payment_hash_response(
         invoice_id: &str,
         payment_hash: &str,
-        pre_image_nonce: &str,
+        pre_image_nonce: Option<&str>,
     ) -> Response {
         let variables = json!({
             "invoice_id": invoice_id,

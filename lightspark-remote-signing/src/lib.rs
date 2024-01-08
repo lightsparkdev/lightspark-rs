@@ -14,6 +14,8 @@ pub mod handler;
 pub mod invoice;
 pub mod response;
 pub mod signer;
+pub mod signing_requests;
+pub mod signing_responses;
 pub mod validation;
 
 #[derive(Debug)]
@@ -24,6 +26,7 @@ pub enum Error {
     PublicKeyDecodeError(hex::FromHexError),
     HexEncodingError,
     SignerError(signer::Error),
+    WebhookEventTypeNotSupported,
 }
 
 impl fmt::Display for Error {
@@ -37,6 +40,9 @@ impl fmt::Display for Error {
             Error::PublicKeyDecodeError(e) => format!("Error decoding public key: {}", e),
             Error::HexEncodingError => "Error encoding hex".to_string(),
             Error::SignerError(e) => format!("Error signing: {}", e),
+            Error::WebhookEventTypeNotSupported => {
+                "Remote signing event type not supported".to_string()
+            }
         };
         write!(f, "{}", msg)
     }
