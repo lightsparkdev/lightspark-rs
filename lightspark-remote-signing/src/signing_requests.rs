@@ -103,13 +103,7 @@ impl GetPerCommitmentPointRequest {
             .ok_or(Error::WebhookEventDataMissing)?
             .as_u64()
             .ok_or(Error::WebhookEventDataMissing)?;
-        let bitcoin_network_str = data
-            .get("bitcoin_network")
-            .ok_or(Error::WebhookEventDataMissing)?
-            .as_str()
-            .ok_or(Error::WebhookEventDataMissing)?;
-        let bitcoin_network = serde_json::from_str(bitcoin_network_str)
-            .map_err(|_| Error::WebhookEventDataMissing)?;
+        let bitcoin_network = bitcoin_network_from_webhook_event(webhook_event)?;
         Ok(Self {
             channel_id,
             derivation_path,
@@ -127,7 +121,7 @@ impl GetPerCommitmentPointRequest {
 pub struct ReleasePerCommitmentSecretRequest {
     pub channel_id: String,
     pub derivation_path: String,
-    pub per_commitmnet_point_idx: u64,
+    pub per_commitment_point_idx: u64,
     pub bitcoin_network: BitcoinNetwork,
 }
 
@@ -148,22 +142,16 @@ impl ReleasePerCommitmentSecretRequest {
             .as_str()
             .ok_or(Error::WebhookEventDataMissing)?
             .to_string();
-        let per_commitmnet_point_idx = data
+        let per_commitment_point_idx = data
             .get("per_commitment_point_idx")
             .ok_or(Error::WebhookEventDataMissing)?
             .as_u64()
             .ok_or(Error::WebhookEventDataMissing)?;
-        let bitcoin_network_str = data
-            .get("bitcoin_network")
-            .ok_or(Error::WebhookEventDataMissing)?
-            .as_str()
-            .ok_or(Error::WebhookEventDataMissing)?;
-        let bitcoin_network = serde_json::from_str(bitcoin_network_str)
-            .map_err(|_| Error::WebhookEventDataMissing)?;
+        let bitcoin_network = bitcoin_network_from_webhook_event(webhook_event)?;
         Ok(Self {
             channel_id,
             derivation_path,
-            per_commitmnet_point_idx,
+            per_commitment_point_idx,
             bitcoin_network,
         })
     }
@@ -194,13 +182,7 @@ impl DeriveKeyAndSignRequest {
             .iter()
             .map(|v| serde_json::from_value(v.clone()).map_err(|_| Error::WebhookEventDataMissing))
             .collect::<Result<Vec<SigningJob>, Error>>()?;
-        let bitcoin_network_str = data
-            .get("bitcoin_network")
-            .ok_or(Error::WebhookEventDataMissing)?
-            .as_str()
-            .ok_or(Error::WebhookEventDataMissing)?;
-        let bitcoin_network = serde_json::from_str(bitcoin_network_str)
-            .map_err(|_| Error::WebhookEventDataMissing)?;
+        let bitcoin_network = bitcoin_network_from_webhook_event(webhook_event)?;
         Ok(Self {
             signing_jobs,
             bitcoin_network,
@@ -233,13 +215,7 @@ impl InvoicePaymentHashRequest {
             .as_str()
             .ok_or(Error::WebhookEventDataMissing)?
             .to_string();
-        let bitcoin_network_str = data
-            .get("bitcoin_network")
-            .ok_or(Error::WebhookEventDataMissing)?
-            .as_str()
-            .ok_or(Error::WebhookEventDataMissing)?;
-        let bitcoin_network = serde_json::from_str(bitcoin_network_str)
-            .map_err(|_| Error::WebhookEventDataMissing)?;
+        let bitcoin_network = bitcoin_network_from_webhook_event(webhook_event)?;
         Ok(Self {
             invoice_id,
             bitcoin_network,
@@ -276,13 +252,7 @@ impl ReleasePaymentPreimageRequest {
             .ok_or(Error::WebhookEventDataMissing)?
             .as_str()
             .map(|s| s.to_string());
-        let bitcoin_network_str = data
-            .get("bitcoin_network")
-            .ok_or(Error::WebhookEventDataMissing)?
-            .as_str()
-            .ok_or(Error::WebhookEventDataMissing)?;
-        let bitcoin_network = serde_json::from_str(bitcoin_network_str)
-            .map_err(|_| Error::WebhookEventDataMissing)?;
+        let bitcoin_network = bitcoin_network_from_webhook_event(webhook_event)?;
         Ok(Self {
             invoice_id,
             nonce,
@@ -336,4 +306,23 @@ pub struct SigningJob {
     pub message: String,
     pub add_tweak: Option<String>,
     pub mul_tweak: Option<String>,
+}
+
+fn bitcoin_network_from_webhook_event(event: &WebhookEvent) -> Result<BitcoinNetwork, Error> {
+    let data = event.data.as_ref().ok_or(Error::WebhookEventDataMissing)?;
+    let data = data
+        .as_object()
+        .ok_or(Error::WebhookEventDataMissing)?
+        .clone();
+    let bitcoin_network_str = data
+        .get("bitcoin_network")
+        .ok_or(Error::WebhookEventDataMissing)?
+        .as_str()
+        .ok_or(Error::WebhookEventDataMissing)?;
+    match bitcoin_network_str {
+        "MAINNET" => Ok(BitcoinNetwork::Mainnet),
+        "TESTNET" => Ok(BitcoinNetwork::Testnet),
+        "REGTEST" => Ok(BitcoinNetwork::Regtest),
+        _ => Err(Error::WebhookEventDataMissing),
+    }
 }
