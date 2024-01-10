@@ -1,11 +1,19 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 
+
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateTestModeInvoiceOutput {
-    #[serde(rename = "create_test_mode_invoice_output_encoded_payment_request")]
+
+    
+    #[serde (rename = "create_test_mode_invoice_output_encoded_payment_request")]
     pub encoded_payment_request: String,
+
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment CreateTestModeInvoiceOutputFragment on CreateTestModeInvoiceOutput {
@@ -13,3 +21,6 @@ fragment CreateTestModeInvoiceOutputFragment on CreateTestModeInvoiceOutput {
     create_test_mode_invoice_output_encoded_payment_request: encoded_payment_request
 }
 ";
+
+
+

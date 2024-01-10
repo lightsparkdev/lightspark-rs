@@ -1,44 +1,48 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum LightsparkNodeStatus {
-    #[serde(rename = "CREATED")]
+
+    #[serde(rename="CREATED")]
     Created,
 
-    #[serde(rename = "DEPLOYED")]
+    #[serde(rename="DEPLOYED")]
     Deployed,
 
-    #[serde(rename = "STARTED")]
+    #[serde(rename="STARTED")]
     Started,
 
-    #[serde(rename = "SYNCING")]
+    #[serde(rename="SYNCING")]
     Syncing,
 
-    #[serde(rename = "READY")]
+    #[serde(rename="READY")]
     Ready,
 
-    #[serde(rename = "STOPPED")]
+    #[serde(rename="STOPPED")]
     Stopped,
 
-    #[serde(rename = "TERMINATED")]
+    #[serde(rename="TERMINATED")]
     Terminated,
 
-    #[serde(rename = "TERMINATING")]
+    #[serde(rename="TERMINATING")]
     Terminating,
 
-    #[serde(rename = "WALLET_LOCKED")]
+    #[serde(rename="WALLET_LOCKED")]
     WalletLocked,
 
-    #[serde(rename = "FAILED_TO_DEPLOY")]
+    #[serde(rename="FAILED_TO_DEPLOY")]
     FailedToDeploy,
+
 }
 
-impl From<LightsparkNodeStatus> for Value {
-    fn from(val: LightsparkNodeStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for LightsparkNodeStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -55,6 +59,8 @@ impl fmt::Display for LightsparkNodeStatus {
             Self::Terminating => write!(f, "TERMINATING"),
             Self::WalletLocked => write!(f, "WALLET_LOCKED"),
             Self::FailedToDeploy => write!(f, "FAILED_TO_DEPLOY"),
+
         }
     }
 }
+

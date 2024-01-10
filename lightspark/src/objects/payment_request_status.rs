@@ -1,3 +1,4 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -6,16 +7,18 @@ use std::fmt;
 /// This is an enum of the potential states that a payment request on the Lightning Network can take.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum PaymentRequestStatus {
-    #[serde(rename = "OPEN")]
+
+    #[serde(rename="OPEN")]
     Open,
 
-    #[serde(rename = "CLOSED")]
+    #[serde(rename="CLOSED")]
     Closed,
+
 }
 
-impl From<PaymentRequestStatus> for Value {
-    fn from(val: PaymentRequestStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for PaymentRequestStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -24,6 +27,8 @@ impl fmt::Display for PaymentRequestStatus {
         match self {
             Self::Open => write!(f, "OPEN"),
             Self::Closed => write!(f, "CLOSED"),
+
         }
     }
 }
+

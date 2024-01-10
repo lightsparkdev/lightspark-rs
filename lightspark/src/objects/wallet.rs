@@ -1,32 +1,34 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::error::Error;
-use crate::objects::balances::Balances;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
+use serde::{Deserialize, Serialize};
+use crate::objects::wallet_to_withdrawal_requests_connection::WalletToWithdrawalRequestsConnection;
 use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
-use crate::objects::transaction_status::TransactionStatus;
+use std::collections::HashMap;
+use crate::types::entity_wrapper::EntityWrapper;
 use crate::objects::transaction_type::TransactionType;
+use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
+use chrono::{DateTime, Utc};
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::objects::entity::Entity;
 use crate::objects::wallet_status::WalletStatus;
 use crate::objects::wallet_to_payment_requests_connection::WalletToPaymentRequestsConnection;
+use crate::objects::transaction_status::TransactionStatus;
 use crate::objects::wallet_to_transactions_connection::WalletToTransactionsConnection;
-use crate::objects::wallet_to_withdrawal_requests_connection::WalletToWithdrawalRequestsConnection;
-use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::custom_date_formats::custom_date_format_option;
-use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::objects::balances::Balances;
+use crate::types::custom_date_formats::custom_date_format;
 use serde_json::Value;
-use std::collections::HashMap;
+use crate::error::Error;
+use crate::types::graphql_requester::GraphQLRequester;
 use std::vec::Vec;
+use crate::objects::currency_amount::CurrencyAmount;
 
 /// This object represents a Lightspark Wallet, tied to your Lightspark account. Wallets can be used to send or receive funds over the Lightning Network. You can retrieve this object to receive information about a specific wallet tied to your Lightspark account.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Wallet {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "wallet_id")]
+    #[serde (rename = "wallet_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
@@ -42,11 +44,11 @@ pub struct Wallet {
     pub last_login_at: Option<DateTime<Utc>>,
 
     /// The balances that describe the funds in this wallet.
-    #[serde(rename = "wallet_balances")]
+    #[serde (rename = "wallet_balances")]
     pub balances: Option<Balances>,
 
     /// The unique identifier of this wallet, as provided by the Lightspark Customer during login.
-    #[serde(rename = "wallet_third_party_identifier")]
+    #[serde (rename = "wallet_third_party_identifier")]
     pub third_party_identifier: String,
 
     /// The account this wallet belongs to.
@@ -54,21 +56,28 @@ pub struct Wallet {
     pub account: Option<EntityWrapper>,
 
     /// The status of this wallet.
-    #[serde(rename = "wallet_status")]
+    #[serde (rename = "wallet_status")]
     pub status: WalletStatus,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl LightsparkNodeOwner for Wallet {
+
+
     fn type_name(&self) -> &'static str {
         "Wallet"
     }
 }
 
+
+
 impl Entity for Wallet {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -84,15 +93,16 @@ impl Entity for Wallet {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "Wallet"
     }
 }
 
+
 impl GetEntity for Wallet {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on Wallet {{
@@ -101,11 +111,11 @@ impl GetEntity for Wallet {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment WalletFragment on Wallet {
@@ -149,18 +159,11 @@ fragment WalletFragment on Wallet {
 }
 ";
 
+
 impl Wallet {
+
     #[allow(clippy::too_many_arguments)]
-    pub async fn get_transactions(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-        created_after_date: Option<DateTime<Utc>>,
-        created_before_date: Option<DateTime<Utc>>,
-        statuses: Option<Vec<TransactionStatus>>,
-        types: Option<Vec<TransactionType>>,
-    ) -> Result<WalletToTransactionsConnection, Error> {
+    pub async fn get_transactions(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>, created_after_date: Option<DateTime<Utc>>, created_before_date: Option<DateTime<Utc>>, statuses: Option<Vec<TransactionStatus>>, types: Option<Vec<TransactionType>>) -> Result<WalletToTransactionsConnection, Error> {
         let query = "query FetchWalletToTransactionsConnection($entity_id: ID!, $first: Int, $after: ID, $created_after_date: DateTime, $created_before_date: DateTime, $statuses: [TransactionStatus!], $types: [TransactionType!]) {
     entity(id: $entity_id) {
         ... on Wallet {
@@ -727,32 +730,21 @@ impl Wallet {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
         variables.insert("after", after.into());
-        variables.insert(
-            "created_after_date",
-            created_after_date.map(|dt| dt.to_rfc3339()).into(),
-        );
-        variables.insert(
-            "created_before_date",
-            created_before_date.map(|dt| dt.to_rfc3339()).into(),
-        );
+        variables.insert("created_after_date", created_after_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("created_before_date", created_before_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("statuses", statuses.into());
         variables.insert("types", types.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["transactions"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_payment_requests(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-        created_after_date: Option<DateTime<Utc>>,
-        created_before_date: Option<DateTime<Utc>>,
-    ) -> Result<WalletToPaymentRequestsConnection, Error> {
+    
+    pub async fn get_payment_requests(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>, created_after_date: Option<DateTime<Utc>>, created_before_date: Option<DateTime<Utc>>) -> Result<WalletToPaymentRequestsConnection, Error> {
         let query = "query FetchWalletToPaymentRequestsConnection($entity_id: ID!, $first: Int, $after: ID, $created_after_date: DateTime, $created_before_date: DateTime) {
     entity(id: $entity_id) {
         ... on Wallet {
@@ -1083,28 +1075,19 @@ impl Wallet {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
         variables.insert("after", after.into());
-        variables.insert(
-            "created_after_date",
-            created_after_date.map(|dt| dt.to_rfc3339()).into(),
-        );
-        variables.insert(
-            "created_before_date",
-            created_before_date.map(|dt| dt.to_rfc3339()).into(),
-        );
+        variables.insert("created_after_date", created_after_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("created_before_date", created_before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["payment_requests"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_total_amount_received(
-        &self,
-        requester: &impl GraphQLRequester,
-        created_after_date: Option<DateTime<Utc>>,
-        created_before_date: Option<DateTime<Utc>>,
-    ) -> Result<CurrencyAmount, Error> {
+    
+    pub async fn get_total_amount_received(&self, requester:&impl GraphQLRequester, created_after_date: Option<DateTime<Utc>>, created_before_date: Option<DateTime<Utc>>) -> Result<CurrencyAmount, Error> {
         let query = "query FetchWalletTotalAmountReceived($entity_id: ID!, $created_after_date: DateTime, $created_before_date: DateTime) {
     entity(id: $entity_id) {
         ... on Wallet {
@@ -1121,31 +1104,19 @@ impl Wallet {
 }";
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("entity_id", self.id.clone().into());
-        variables.insert(
-            "created_after_date",
-            created_after_date.map(|dt| dt.to_rfc3339()).into(),
-        );
-        variables.insert(
-            "created_before_date",
-            created_before_date.map(|dt| dt.to_rfc3339()).into(),
-        );
+        variables.insert("created_after_date", created_after_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("created_before_date", created_before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["total_amount_received"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_withdrawal_requests(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-        statuses: Option<Vec<WithdrawalRequestStatus>>,
-        created_after_date: Option<DateTime<Utc>>,
-        created_before_date: Option<DateTime<Utc>>,
-    ) -> Result<WalletToWithdrawalRequestsConnection, Error> {
+    
+    pub async fn get_withdrawal_requests(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>, statuses: Option<Vec<WithdrawalRequestStatus>>, created_after_date: Option<DateTime<Utc>>, created_before_date: Option<DateTime<Utc>>) -> Result<WalletToWithdrawalRequestsConnection, Error> {
         let query = "query FetchWalletToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: ID, $statuses: [WithdrawalRequestStatus!], $created_after_date: DateTime, $created_before_date: DateTime) {
     entity(id: $entity_id) {
         ... on Wallet {
@@ -1213,28 +1184,19 @@ impl Wallet {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
         variables.insert("statuses", statuses.into());
-        variables.insert(
-            "created_after_date",
-            created_after_date.map(|dt| dt.to_rfc3339()).into(),
-        );
-        variables.insert(
-            "created_before_date",
-            created_before_date.map(|dt| dt.to_rfc3339()).into(),
-        );
+        variables.insert("created_after_date", created_after_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("created_before_date", created_before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["withdrawal_requests"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_total_amount_sent(
-        &self,
-        requester: &impl GraphQLRequester,
-        created_after_date: Option<DateTime<Utc>>,
-        created_before_date: Option<DateTime<Utc>>,
-    ) -> Result<CurrencyAmount, Error> {
+    
+    pub async fn get_total_amount_sent(&self, requester:&impl GraphQLRequester, created_after_date: Option<DateTime<Utc>>, created_before_date: Option<DateTime<Utc>>) -> Result<CurrencyAmount, Error> {
         let query = "query FetchWalletTotalAmountSent($entity_id: ID!, $created_after_date: DateTime, $created_before_date: DateTime) {
     entity(id: $entity_id) {
         ... on Wallet {
@@ -1251,19 +1213,15 @@ impl Wallet {
 }";
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("entity_id", self.id.clone().into());
-        variables.insert(
-            "created_after_date",
-            created_after_date.map(|dt| dt.to_rfc3339()).into(),
-        );
-        variables.insert(
-            "created_before_date",
-            created_before_date.map(|dt| dt.to_rfc3339()).into(),
-        );
+        variables.insert("created_after_date", created_after_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("created_before_date", created_before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["total_amount_sent"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
+
 }

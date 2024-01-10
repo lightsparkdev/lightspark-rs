@@ -1,14 +1,17 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::entity::Entity;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::get_entity::GetEntity;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use crate::types::custom_date_formats::custom_date_format;
+use chrono::{DateTime, Utc};
+use crate::types::get_entity::GetEntity;
+use crate::objects::entity::Entity;
+
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Signable {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "signable_id")]
+    #[serde (rename = "signable_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
@@ -22,9 +25,12 @@ pub struct Signable {
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl Entity for Signable {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -40,15 +46,16 @@ impl Entity for Signable {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "Signable"
     }
 }
 
+
 impl GetEntity for Signable {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on Signable {{
@@ -57,11 +64,11 @@ impl GetEntity for Signable {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment SignableFragment on Signable {
@@ -71,3 +78,6 @@ fragment SignableFragment on Signable {
     signable_updated_at: updated_at
 }
 ";
+
+
+

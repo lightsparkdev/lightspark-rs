@@ -1,23 +1,29 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::channel_opening_transaction::ChannelOpeningTransaction;
-use crate::objects::page_info::PageInfo;
 use serde::{Deserialize, Serialize};
+use crate::objects::page_info::PageInfo;
+use crate::objects::channel_opening_transaction::ChannelOpeningTransaction;
 use std::vec::Vec;
+
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct WithdrawalRequestToChannelOpeningTransactionsConnection {
+
     /// An object that holds pagination information about the objects in this connection.
-    #[serde(rename = "withdrawal_request_to_channel_opening_transactions_connection_page_info")]
+    #[serde (rename = "withdrawal_request_to_channel_opening_transactions_connection_page_info")]
     pub page_info: PageInfo,
 
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
-    #[serde(rename = "withdrawal_request_to_channel_opening_transactions_connection_count")]
+    #[serde (rename = "withdrawal_request_to_channel_opening_transactions_connection_count")]
     pub count: i64,
 
     /// The channel opening transactions for the current page of this connection.
-    #[serde(rename = "withdrawal_request_to_channel_opening_transactions_connection_entities")]
+    #[serde (rename = "withdrawal_request_to_channel_opening_transactions_connection_entities")]
     pub entities: Vec<ChannelOpeningTransaction>,
+
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment WithdrawalRequestToChannelOpeningTransactionsConnectionFragment on WithdrawalRequestToChannelOpeningTransactionsConnection {
@@ -35,3 +41,6 @@ fragment WithdrawalRequestToChannelOpeningTransactionsConnectionFragment on With
     }
 }
 ";
+
+
+

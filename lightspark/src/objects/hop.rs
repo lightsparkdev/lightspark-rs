@@ -1,17 +1,19 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
+use serde::{Deserialize, Serialize};
 use crate::types::custom_date_formats::custom_date_format;
-use crate::types::entity_wrapper::EntityWrapper;
 use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::objects::entity::Entity;
+use crate::objects::currency_amount::CurrencyAmount;
 
 /// This object represents a specific node that existed on a particular payment route. You can retrieve this object to get information about a node on a particular payment path and all payment-relevant information for that node.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Hop {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "hop_id")]
+    #[serde (rename = "hop_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
@@ -27,31 +29,34 @@ pub struct Hop {
     pub destination: Option<EntityWrapper>,
 
     /// The zero-based index position of this hop in the path
-    #[serde(rename = "hop_index")]
+    #[serde (rename = "hop_index")]
     pub index: i64,
 
     /// The public key of the node to which the hop is bound.
-    #[serde(rename = "hop_public_key")]
+    #[serde (rename = "hop_public_key")]
     pub public_key: Option<String>,
 
     /// The amount that is to be forwarded to the destination node.
-    #[serde(rename = "hop_amount_to_forward")]
+    #[serde (rename = "hop_amount_to_forward")]
     pub amount_to_forward: Option<CurrencyAmount>,
 
     /// The fees to be collected by the source node for forwarding the payment over the hop.
-    #[serde(rename = "hop_fee")]
+    #[serde (rename = "hop_fee")]
     pub fee: Option<CurrencyAmount>,
 
     /// The block height at which an unsettled HTLC is considered expired.
-    #[serde(rename = "hop_expiry_block_height")]
+    #[serde (rename = "hop_expiry_block_height")]
     pub expiry_block_height: Option<i64>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl Entity for Hop {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -67,15 +72,16 @@ impl Entity for Hop {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "Hop"
     }
 }
 
+
 impl GetEntity for Hop {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on Hop {{
@@ -84,11 +90,11 @@ impl GetEntity for Hop {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment HopFragment on Hop {
@@ -120,3 +126,6 @@ fragment HopFragment on Hop {
     hop_expiry_block_height: expiry_block_height
 }
 ";
+
+
+

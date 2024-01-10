@@ -1,3 +1,4 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -8,25 +9,26 @@ use std::fmt;
 pub enum BitcoinNetwork {
     /// The production version of the Bitcoin Blockchain.
 
-    #[serde(rename = "MAINNET")]
+    #[serde(rename="MAINNET")]
     Mainnet,
     /// A test version of the Bitcoin Blockchain, maintained by Lightspark.
 
-    #[serde(rename = "REGTEST")]
+    #[serde(rename="REGTEST")]
     Regtest,
     /// A test version of the Bitcoin Blockchain, maintained by a centralized organization. Not in use at Lightspark.
 
-    #[serde(rename = "SIGNET")]
+    #[serde(rename="SIGNET")]
     Signet,
     /// A test version of the Bitcoin Blockchain, publicly available.
 
-    #[serde(rename = "TESTNET")]
+    #[serde(rename="TESTNET")]
     Testnet,
+
 }
 
-impl From<BitcoinNetwork> for Value {
-    fn from(val: BitcoinNetwork) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for BitcoinNetwork {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -37,6 +39,8 @@ impl fmt::Display for BitcoinNetwork {
             Self::Regtest => write!(f, "REGTEST"),
             Self::Signet => write!(f, "SIGNET"),
             Self::Testnet => write!(f, "TESTNET"),
+
         }
     }
 }
+
