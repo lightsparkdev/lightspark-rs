@@ -1,19 +1,21 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
-use crate::objects::entity::Entity;
 use crate::objects::node::Node;
-use serde::{Deserialize, Deserializer, Serialize};
-use std::vec::Vec;
-
-use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
-use crate::objects::balances::Balances;
-use crate::objects::blockchain_balance::BlockchainBalance;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::lightspark_node_status::LightsparkNodeStatus;
+use crate::objects::entity::Entity;
 use crate::types::entity_wrapper::EntityWrapper;
+use std::vec::Vec;
+use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use crate::objects::lightspark_node_status::LightsparkNodeStatus;
+use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
+use serde::{Deserialize, Deserializer, Serialize};
+use crate::objects::blockchain_balance::BlockchainBalance;
+use crate::objects::balances::Balances;
+use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
 use serde_json::Value;
+use crate::objects::currency_amount::CurrencyAmount;
 
-pub trait LightsparkNode: Node + Entity {
+pub trait LightsparkNode : Node + Entity {
+
     /// The owner of this LightsparkNode.
     fn get_owner_id(&self) -> EntityWrapper;
 
@@ -41,15 +43,20 @@ pub trait LightsparkNode: Node + Entity {
     /// The balances that describe the funds in this node.
     fn get_balances(&self) -> Option<Balances>;
 
-    fn type_name(&self) -> &'static str;
+
+fn type_name(&self) -> &'static str;
 }
+
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 pub enum LightsparkNodeEnum {
     LightsparkNodeWithOSK(LightsparkNodeWithOSK),
     LightsparkNodeWithRemoteSigning(LightsparkNodeWithRemoteSigning),
+
 }
+
+
 
 impl<'de> Deserialize<'de> for LightsparkNodeEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -60,25 +67,25 @@ impl<'de> Deserialize<'de> for LightsparkNodeEnum {
         if let Some(typename) = value.get("__typename").and_then(Value::as_str) {
             match typename {
                 "LightsparkNodeWithOSK" => {
-                    let obj = LightsparkNodeWithOSK::deserialize(value).map_err(|err| {
-                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
-                    })?;
-                    Ok(LightsparkNodeEnum::LightsparkNodeWithOSK(obj))
-                }
-                "LightsparkNodeWithRemoteSigning" => {
-                    let obj =
-                        LightsparkNodeWithRemoteSigning::deserialize(value).map_err(|err| {
+                    let obj = LightsparkNodeWithOSK::deserialize(value)
+                        .map_err(|err|
                             serde::de::Error::custom(format!("Serde JSON Error {}", err))
-                        })?;
+                        )?;
+                    Ok(LightsparkNodeEnum::LightsparkNodeWithOSK(obj))
+                },
+                "LightsparkNodeWithRemoteSigning" => {
+                    let obj = LightsparkNodeWithRemoteSigning::deserialize(value)
+                        .map_err(|err|
+                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                        )?;
                     Ok(LightsparkNodeEnum::LightsparkNodeWithRemoteSigning(obj))
-                }
+                },
 
                 _ => Err(serde::de::Error::custom("unknown typename")),
             }
         } else {
-            Err(serde::de::Error::custom(
-                "missing __typename field on LightsparkNode",
-            ))
+            Err(serde::de::Error::custom("missing __typename field on LightsparkNode"))
         }
     }
 }
+

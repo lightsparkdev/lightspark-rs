@@ -1,74 +1,63 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::error::Error;
-use crate::objects::channel_snapshot::ChannelSnapshot;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
-use crate::objects::htlc_attempt_failure_code::HtlcAttemptFailureCode;
-use crate::objects::outgoing_payment_attempt_status::OutgoingPaymentAttemptStatus;
-use crate::objects::outgoing_payment_attempt_to_hops_connection::OutgoingPaymentAttemptToHopsConnection;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::custom_date_formats::custom_date_format_option;
+use serde::{Deserialize, Serialize};
 use crate::types::entity_wrapper::EntityWrapper;
-use crate::types::get_entity::GetEntity;
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::objects::entity::Entity;
+use serde_json::Value;
+use crate::error::Error;
+use std::collections::HashMap;
+use crate::objects::outgoing_payment_attempt_to_hops_connection::OutgoingPaymentAttemptToHopsConnection;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::collections::HashMap;
+use crate::objects::outgoing_payment_attempt_status::OutgoingPaymentAttemptStatus;
+use crate::types::get_entity::GetEntity;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::objects::htlc_attempt_failure_code::HtlcAttemptFailureCode;
+use crate::objects::currency_amount::CurrencyAmount;
 
 /// This object represents an attempted Lightning Network payment sent from a Lightspark Node. You can retrieve this object to receive payment related information about any payment attempt sent from your Lightspark Node on the Lightning Network, including any potential reasons the payment may have failed.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OutgoingPaymentAttempt {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "outgoing_payment_attempt_id")]
+    #[serde (rename = "outgoing_payment_attempt_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
-    #[serde(
-        with = "custom_date_format",
-        rename = "outgoing_payment_attempt_created_at"
-    )]
+    #[serde(with = "custom_date_format", rename = "outgoing_payment_attempt_created_at")]
     pub created_at: DateTime<Utc>,
 
     /// The date and time when the entity was last updated.
-    #[serde(
-        with = "custom_date_format",
-        rename = "outgoing_payment_attempt_updated_at"
-    )]
+    #[serde(with = "custom_date_format", rename = "outgoing_payment_attempt_updated_at")]
     pub updated_at: DateTime<Utc>,
 
     /// The status of an outgoing payment attempt.
-    #[serde(rename = "outgoing_payment_attempt_status")]
+    #[serde (rename = "outgoing_payment_attempt_status")]
     pub status: OutgoingPaymentAttemptStatus,
 
     /// If the payment attempt failed, then this contains the Bolt #4 failure code.
-    #[serde(rename = "outgoing_payment_attempt_failure_code")]
+    #[serde (rename = "outgoing_payment_attempt_failure_code")]
     pub failure_code: Option<HtlcAttemptFailureCode>,
 
     /// If the payment attempt failed, then this contains the index of the hop at which the problem occurred.
-    #[serde(rename = "outgoing_payment_attempt_failure_source_index")]
+    #[serde (rename = "outgoing_payment_attempt_failure_source_index")]
     pub failure_source_index: Option<i64>,
 
     /// The date and time when the attempt was initiated.
-    #[serde(
-        with = "custom_date_format",
-        rename = "outgoing_payment_attempt_attempted_at"
-    )]
+    #[serde(with = "custom_date_format", rename = "outgoing_payment_attempt_attempted_at")]
     pub attempted_at: DateTime<Utc>,
 
     /// The time the outgoing payment attempt failed or succeeded.
-    #[serde(
-        with = "custom_date_format_option",
-        rename = "outgoing_payment_attempt_resolved_at"
-    )]
+    #[serde(with = "custom_date_format_option", rename = "outgoing_payment_attempt_resolved_at")]
     pub resolved_at: Option<DateTime<Utc>>,
 
     /// The total amount of funds required to complete a payment over this route. This value includes the cumulative fees for each hop. As a result, the attempt extended to the first-hop in the route will need to have at least this much value, otherwise the route will fail at an intermediate node due to an insufficient amount.
-    #[serde(rename = "outgoing_payment_attempt_amount")]
+    #[serde (rename = "outgoing_payment_attempt_amount")]
     pub amount: Option<CurrencyAmount>,
 
     /// The sum of the fees paid at each hop within the route of this attempt. In the case of a one-hop payment, this value will be zero as we don't need to pay a fee to ourselves.
-    #[serde(rename = "outgoing_payment_attempt_fees")]
+    #[serde (rename = "outgoing_payment_attempt_fees")]
     pub fees: Option<CurrencyAmount>,
 
     /// The outgoing payment for this attempt.
@@ -77,14 +66,17 @@ pub struct OutgoingPaymentAttempt {
 
     /// The channel snapshot at the time the outgoing payment attempt was made.
     #[serde(rename = "outgoing_payment_attempt_channel_snapshot")]
-    pub channel_snapshot: Option<ChannelSnapshot>,
+    pub channel_snapshot: Option<EntityWrapper>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl Entity for OutgoingPaymentAttempt {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -100,15 +92,16 @@ impl Entity for OutgoingPaymentAttempt {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "OutgoingPaymentAttempt"
     }
 }
 
+
 impl GetEntity for OutgoingPaymentAttempt {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on OutgoingPaymentAttempt {{
@@ -117,11 +110,11 @@ impl GetEntity for OutgoingPaymentAttempt {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment OutgoingPaymentAttemptFragment on OutgoingPaymentAttempt {
@@ -154,62 +147,16 @@ fragment OutgoingPaymentAttemptFragment on OutgoingPaymentAttempt {
         id
     }
     outgoing_payment_attempt_channel_snapshot: channel_snapshot {
-        __typename
-        channel_snapshot_channel: channel {
-            id
-        }
-        channel_snapshot_timestamp: timestamp
-        channel_snapshot_local_balance: local_balance {
-            __typename
-            currency_amount_original_value: original_value
-            currency_amount_original_unit: original_unit
-            currency_amount_preferred_currency_unit: preferred_currency_unit
-            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-        }
-        channel_snapshot_local_unsettled_balance: local_unsettled_balance {
-            __typename
-            currency_amount_original_value: original_value
-            currency_amount_original_unit: original_unit
-            currency_amount_preferred_currency_unit: preferred_currency_unit
-            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-        }
-        channel_snapshot_local_channel_reserve: local_channel_reserve {
-            __typename
-            currency_amount_original_value: original_value
-            currency_amount_original_unit: original_unit
-            currency_amount_preferred_currency_unit: preferred_currency_unit
-            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-        }
-        channel_snapshot_remote_balance: remote_balance {
-            __typename
-            currency_amount_original_value: original_value
-            currency_amount_original_unit: original_unit
-            currency_amount_preferred_currency_unit: preferred_currency_unit
-            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-        }
-        channel_snapshot_remote_unsettled_balance: remote_unsettled_balance {
-            __typename
-            currency_amount_original_value: original_value
-            currency_amount_original_unit: original_unit
-            currency_amount_preferred_currency_unit: preferred_currency_unit
-            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-        }
+        id
     }
 }
 ";
 
+
 impl OutgoingPaymentAttempt {
-    pub async fn get_hops(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-    ) -> Result<OutgoingPaymentAttemptToHopsConnection, Error> {
+
+    
+    pub async fn get_hops(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>) -> Result<OutgoingPaymentAttemptToHopsConnection, Error> {
         let query = "query FetchOutgoingPaymentAttemptToHopsConnection($entity_id: ID!, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on OutgoingPaymentAttempt {
@@ -260,10 +207,12 @@ impl OutgoingPaymentAttempt {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["hops"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
+
 }

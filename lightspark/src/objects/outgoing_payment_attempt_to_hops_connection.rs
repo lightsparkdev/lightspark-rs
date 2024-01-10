@@ -1,31 +1,36 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::connection::Connection;
-use crate::objects::hop::Hop;
-use crate::objects::page_info::PageInfo;
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
+use crate::objects::hop::Hop;
+use crate::objects::page_info::PageInfo;
+use crate::objects::connection::Connection;
 
 /// The connection from an outgoing payment attempt to the list of sequential hops that define the path from sender node to recipient node.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OutgoingPaymentAttemptToHopsConnection {
+
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
-    #[serde(rename = "outgoing_payment_attempt_to_hops_connection_count")]
+    #[serde (rename = "outgoing_payment_attempt_to_hops_connection_count")]
     pub count: i64,
 
     /// An object that holds pagination information about the objects in this connection.
-    #[serde(rename = "outgoing_payment_attempt_to_hops_connection_page_info")]
+    #[serde (rename = "outgoing_payment_attempt_to_hops_connection_page_info")]
     pub page_info: PageInfo,
 
     /// The hops for the current page of this connection.
-    #[serde(rename = "outgoing_payment_attempt_to_hops_connection_entities")]
+    #[serde (rename = "outgoing_payment_attempt_to_hops_connection_entities")]
     pub entities: Vec<Hop>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl Connection for OutgoingPaymentAttemptToHopsConnection {
+
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     fn get_count(&self) -> i64 {
         self.count
@@ -36,10 +41,14 @@ impl Connection for OutgoingPaymentAttemptToHopsConnection {
         self.page_info.clone()
     }
 
+
     fn type_name(&self) -> &'static str {
         "OutgoingPaymentAttemptToHopsConnection"
     }
 }
+
+
+
 
 pub const FRAGMENT: &str = "
 fragment OutgoingPaymentAttemptToHopsConnectionFragment on OutgoingPaymentAttemptToHopsConnection {
@@ -57,3 +66,6 @@ fragment OutgoingPaymentAttemptToHopsConnectionFragment on OutgoingPaymentAttemp
     }
 }
 ";
+
+
+

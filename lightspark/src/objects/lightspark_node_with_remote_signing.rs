@@ -1,74 +1,70 @@
-// Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::error::Error;
-use crate::objects::blockchain_balance::BlockchainBalance;
-use crate::objects::channel_status::ChannelStatus;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::node::Node;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::types::get_entity::GetEntity;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
-use crate::objects::balances::Balances;
-use crate::objects::bitcoin_network::BitcoinNetwork;
-use crate::objects::entity::Entity;
-use crate::objects::lightning_payment_direction::LightningPaymentDirection;
-use crate::objects::lightspark_node::LightsparkNode;
-use crate::objects::lightspark_node_status::LightsparkNodeStatus;
-use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
-use crate::objects::lightspark_node_to_daily_liquidity_forecasts_connection::LightsparkNodeToDailyLiquidityForecastsConnection;
-use crate::objects::node_address_type::NodeAddressType;
-use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
+// Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use serde::{Deserialize, Serialize};
 use chrono::NaiveDate;
-use serde_json::Value;
+use crate::types::graphql_requester::GraphQLRequester;
+use crate::objects::lightspark_node::LightsparkNode;
+use chrono::{DateTime, Utc};
+use crate::objects::blockchain_balance::BlockchainBalance;
+use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::types::entity_wrapper::EntityWrapper;
 use std::vec::Vec;
+use crate::objects::entity::Entity;
+use crate::error::Error;
+use crate::objects::lightning_payment_direction::LightningPaymentDirection;
+use crate::types::get_entity::GetEntity;
+use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
+use serde_json::Value;
+use crate::objects::node::Node;
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::channel_status::ChannelStatus;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::objects::node_address_type::NodeAddressType;
+use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
+use crate::objects::lightspark_node_status::LightsparkNodeStatus;
+use std::collections::HashMap;
+use crate::objects::lightspark_node_to_daily_liquidity_forecasts_connection::LightsparkNodeToDailyLiquidityForecastsConnection;
+use crate::objects::balances::Balances;
 
 /// This is a Lightspark node with remote signing.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct LightsparkNodeWithRemoteSigning {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "lightspark_node_with_remote_signing_id")]
+    #[serde (rename = "lightspark_node_with_remote_signing_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
-    #[serde(
-        with = "custom_date_format",
-        rename = "lightspark_node_with_remote_signing_created_at"
-    )]
+    #[serde(with = "custom_date_format", rename = "lightspark_node_with_remote_signing_created_at")]
     pub created_at: DateTime<Utc>,
 
     /// The date and time when the entity was last updated.
-    #[serde(
-        with = "custom_date_format",
-        rename = "lightspark_node_with_remote_signing_updated_at"
-    )]
+    #[serde(with = "custom_date_format", rename = "lightspark_node_with_remote_signing_updated_at")]
     pub updated_at: DateTime<Utc>,
 
     /// A name that identifies the node. It has no importance in terms of operating the node, it is just a way to identify and search for commercial services or popular nodes. This alias can be changed at any time by the node operator.
-    #[serde(rename = "lightspark_node_with_remote_signing_alias")]
+    #[serde (rename = "lightspark_node_with_remote_signing_alias")]
     pub alias: Option<String>,
 
     /// The Bitcoin Network this node is deployed in.
-    #[serde(rename = "lightspark_node_with_remote_signing_bitcoin_network")]
+    #[serde (rename = "lightspark_node_with_remote_signing_bitcoin_network")]
     pub bitcoin_network: BitcoinNetwork,
 
     /// A hexadecimal string that describes a color. For example "#000000" is black, "#FFFFFF" is white. It has no importance in terms of operating the node, it is just a way to visually differentiate nodes. That color can be changed at any time by the node operator.
-    #[serde(rename = "lightspark_node_with_remote_signing_color")]
+    #[serde (rename = "lightspark_node_with_remote_signing_color")]
     pub color: Option<String>,
 
     /// A summary metric used to capture how well positioned a node is to send, receive, or route transactions efficiently. Maximizing a node's conductivity helps a node’s transactions to be capital efficient. The value is an integer ranging between 0 and 10 (bounds included).
-    #[serde(rename = "lightspark_node_with_remote_signing_conductivity")]
+    #[serde (rename = "lightspark_node_with_remote_signing_conductivity")]
     pub conductivity: Option<i64>,
 
     /// The name of this node in the network. It will be the most human-readable option possible, depending on the data available for this node.
-    #[serde(rename = "lightspark_node_with_remote_signing_display_name")]
+    #[serde (rename = "lightspark_node_with_remote_signing_display_name")]
     pub display_name: String,
 
     /// The public key of this node. It acts as a unique identifier of this node in the Lightning Network.
-    #[serde(rename = "lightspark_node_with_remote_signing_public_key")]
+    #[serde (rename = "lightspark_node_with_remote_signing_public_key")]
     pub public_key: Option<String>,
 
     /// The owner of this LightsparkNode.
@@ -76,43 +72,46 @@ pub struct LightsparkNodeWithRemoteSigning {
     pub owner: EntityWrapper,
 
     /// The current status of this node.
-    #[serde(rename = "lightspark_node_with_remote_signing_status")]
+    #[serde (rename = "lightspark_node_with_remote_signing_status")]
     pub status: Option<LightsparkNodeStatus>,
 
     /// The sum of the balance on the Bitcoin Network, channel balances, and commit fees on this node.
-    #[serde(rename = "lightspark_node_with_remote_signing_total_balance")]
+    #[serde (rename = "lightspark_node_with_remote_signing_total_balance")]
     pub total_balance: Option<CurrencyAmount>,
 
     /// The total sum of the channel balances (online and offline) on this node.
-    #[serde(rename = "lightspark_node_with_remote_signing_total_local_balance")]
+    #[serde (rename = "lightspark_node_with_remote_signing_total_local_balance")]
     pub total_local_balance: Option<CurrencyAmount>,
 
     /// The sum of the channel balances (online only) that are available to send on this node.
-    #[serde(rename = "lightspark_node_with_remote_signing_local_balance")]
+    #[serde (rename = "lightspark_node_with_remote_signing_local_balance")]
     pub local_balance: Option<CurrencyAmount>,
 
     /// The sum of the channel balances that are available to receive on this node.
-    #[serde(rename = "lightspark_node_with_remote_signing_remote_balance")]
+    #[serde (rename = "lightspark_node_with_remote_signing_remote_balance")]
     pub remote_balance: Option<CurrencyAmount>,
 
     /// The details of the balance of this node on the Bitcoin Network.
-    #[serde(rename = "lightspark_node_with_remote_signing_blockchain_balance")]
+    #[serde (rename = "lightspark_node_with_remote_signing_blockchain_balance")]
     pub blockchain_balance: Option<BlockchainBalance>,
 
     /// The utxos of the channels that are connected to this node. This is used in uma flow for pre-screening.
-    #[serde(rename = "lightspark_node_with_remote_signing_uma_prescreening_utxos")]
+    #[serde (rename = "lightspark_node_with_remote_signing_uma_prescreening_utxos")]
     pub uma_prescreening_utxos: Vec<String>,
 
     /// The balances that describe the funds in this node.
-    #[serde(rename = "lightspark_node_with_remote_signing_balances")]
+    #[serde (rename = "lightspark_node_with_remote_signing_balances")]
     pub balances: Option<Balances>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl LightsparkNode for LightsparkNodeWithRemoteSigning {
+
     /// The owner of this LightsparkNode.
     fn get_owner_id(&self) -> EntityWrapper {
         self.owner.clone()
@@ -158,12 +157,16 @@ impl LightsparkNode for LightsparkNodeWithRemoteSigning {
         self.balances.clone()
     }
 
+
     fn type_name(&self) -> &'static str {
         "LightsparkNodeWithRemoteSigning"
     }
 }
 
+
+
 impl Node for LightsparkNodeWithRemoteSigning {
+
     /// A name that identifies the node. It has no importance in terms of operating the node, it is just a way to identify and search for commercial services or popular nodes. This alias can be changed at any time by the node operator.
     fn get_alias(&self) -> Option<String> {
         self.alias.clone()
@@ -194,12 +197,16 @@ impl Node for LightsparkNodeWithRemoteSigning {
         self.public_key.clone()
     }
 
+
     fn type_name(&self) -> &'static str {
         "LightsparkNodeWithRemoteSigning"
     }
 }
 
+
+
 impl Entity for LightsparkNodeWithRemoteSigning {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -215,15 +222,16 @@ impl Entity for LightsparkNodeWithRemoteSigning {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "LightsparkNodeWithRemoteSigning"
     }
 }
 
+
 impl GetEntity for LightsparkNodeWithRemoteSigning {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on LightsparkNodeWithRemoteSigning {{
@@ -232,11 +240,11 @@ impl GetEntity for LightsparkNodeWithRemoteSigning {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment LightsparkNodeWithRemoteSigningFragment on LightsparkNodeWithRemoteSigning {
@@ -368,13 +376,11 @@ fragment LightsparkNodeWithRemoteSigningFragment on LightsparkNodeWithRemoteSign
 }
 ";
 
+
 impl LightsparkNodeWithRemoteSigning {
-    pub async fn get_addresses(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        types: Option<Vec<NodeAddressType>>,
-    ) -> Result<NodeToAddressesConnection, Error> {
+
+    
+    pub async fn get_addresses(&self, requester:&impl GraphQLRequester, first: Option<i64>, types: Option<Vec<NodeAddressType>>) -> Result<NodeToAddressesConnection, Error> {
         let query = "query FetchNodeToAddressesConnection($entity_id: ID!, $first: Int, $types: [NodeAddressType!]) {
     entity(id: $entity_id) {
         ... on LightsparkNodeWithRemoteSigning {
@@ -395,20 +401,16 @@ impl LightsparkNodeWithRemoteSigning {
         variables.insert("first", first.into());
         variables.insert("types", types.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["addresses"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_channels(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        statuses: Option<Vec<ChannelStatus>>,
-        after: Option<String>,
-    ) -> Result<LightsparkNodeToChannelsConnection, Error> {
+    
+    pub async fn get_channels(&self, requester:&impl GraphQLRequester, first: Option<i64>, statuses: Option<Vec<ChannelStatus>>, after: Option<String>) -> Result<LightsparkNodeToChannelsConnection, Error> {
         let query = "query FetchLightsparkNodeToChannelsConnection($entity_id: ID!, $first: Int, $statuses: [ChannelStatus!], $after: String) {
     entity(id: $entity_id) {
         ... on LightsparkNodeWithRemoteSigning {
@@ -526,20 +528,16 @@ impl LightsparkNodeWithRemoteSigning {
         variables.insert("statuses", statuses.into());
         variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["channels"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_daily_liquidity_forecasts(
-        &self,
-        requester: &impl GraphQLRequester,
-        from_date: NaiveDate,
-        to_date: NaiveDate,
-        direction: LightningPaymentDirection,
-    ) -> Result<LightsparkNodeToDailyLiquidityForecastsConnection, Error> {
+    
+    pub async fn get_daily_liquidity_forecasts(&self, requester:&impl GraphQLRequester, from_date: NaiveDate, to_date: NaiveDate, direction: LightningPaymentDirection) -> Result<LightsparkNodeToDailyLiquidityForecastsConnection, Error> {
         let query = "query FetchLightsparkNodeToDailyLiquidityForecastsConnection($entity_id: ID!, $from_date: Date!, $to_date: Date!, $direction: LightningPaymentDirection!) {
     entity(id: $entity_id) {
         ... on LightsparkNodeWithRemoteSigning {
@@ -571,10 +569,12 @@ impl LightsparkNodeWithRemoteSigning {
         variables.insert("to_date", to_date.format("%Y-%m-%d").to_string().into());
         variables.insert("direction", direction.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["daily_liquidity_forecasts"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
+
 }

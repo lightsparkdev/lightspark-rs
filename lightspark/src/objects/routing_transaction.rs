@@ -1,23 +1,25 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::currency_amount::CurrencyAmount;
+use serde::{Deserialize, Serialize};
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::objects::rich_text::RichText;
+use crate::objects::transaction::Transaction;
+use crate::types::custom_date_formats::custom_date_format_option;
 use crate::objects::entity::Entity;
 use crate::objects::lightning_transaction::LightningTransaction;
-use crate::objects::rich_text::RichText;
-use crate::objects::routing_transaction_failure_reason::RoutingTransactionFailureReason;
-use crate::objects::transaction::Transaction;
 use crate::objects::transaction_status::TransactionStatus;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::custom_date_formats::custom_date_format_option;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use crate::objects::routing_transaction_failure_reason::RoutingTransactionFailureReason;
+use crate::types::get_entity::GetEntity;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::objects::currency_amount::CurrencyAmount;
 
 /// This object represents a transaction that was forwarded through a Lightspark node on the Lightning Network, i.e., a routed transaction. You can retrieve this object to receive information about any transaction routed through your Lightspark Node.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct RoutingTransaction {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "routing_transaction_id")]
+    #[serde (rename = "routing_transaction_id")]
     pub id: String,
 
     /// The date and time when this transaction was initiated.
@@ -29,22 +31,19 @@ pub struct RoutingTransaction {
     pub updated_at: DateTime<Utc>,
 
     /// The current status of this transaction.
-    #[serde(rename = "routing_transaction_status")]
+    #[serde (rename = "routing_transaction_status")]
     pub status: TransactionStatus,
 
     /// The date and time when this transaction was completed or failed.
-    #[serde(
-        with = "custom_date_format_option",
-        rename = "routing_transaction_resolved_at"
-    )]
+    #[serde(with = "custom_date_format_option", rename = "routing_transaction_resolved_at")]
     pub resolved_at: Option<DateTime<Utc>>,
 
     /// The amount of money involved in this transaction.
-    #[serde(rename = "routing_transaction_amount")]
+    #[serde (rename = "routing_transaction_amount")]
     pub amount: CurrencyAmount,
 
     /// The hash of this transaction, so it can be uniquely identified on the Lightning Network.
-    #[serde(rename = "routing_transaction_transaction_hash")]
+    #[serde (rename = "routing_transaction_transaction_hash")]
     pub transaction_hash: Option<String>,
 
     /// If known, the channel this transaction was received from.
@@ -56,29 +55,36 @@ pub struct RoutingTransaction {
     pub outgoing_channel: Option<EntityWrapper>,
 
     /// The fees collected by the node when routing this transaction. We subtract the outgoing amount to the incoming amount to determine how much fees were collected.
-    #[serde(rename = "routing_transaction_fees")]
+    #[serde (rename = "routing_transaction_fees")]
     pub fees: Option<CurrencyAmount>,
 
     /// If applicable, user-facing error message describing why the routing failed.
-    #[serde(rename = "routing_transaction_failure_message")]
+    #[serde (rename = "routing_transaction_failure_message")]
     pub failure_message: Option<RichText>,
 
     /// If applicable, the reason why the routing failed.
-    #[serde(rename = "routing_transaction_failure_reason")]
+    #[serde (rename = "routing_transaction_failure_reason")]
     pub failure_reason: Option<RoutingTransactionFailureReason>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl LightningTransaction for RoutingTransaction {
+
+
     fn type_name(&self) -> &'static str {
         "RoutingTransaction"
     }
 }
 
+
+
 impl Transaction for RoutingTransaction {
+
     /// The current status of this transaction.
     fn get_status(&self) -> TransactionStatus {
         self.status.clone()
@@ -99,12 +105,16 @@ impl Transaction for RoutingTransaction {
         self.transaction_hash.clone()
     }
 
+
     fn type_name(&self) -> &'static str {
         "RoutingTransaction"
     }
 }
 
+
+
 impl Entity for RoutingTransaction {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -120,15 +130,16 @@ impl Entity for RoutingTransaction {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "RoutingTransaction"
     }
 }
 
+
 impl GetEntity for RoutingTransaction {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on RoutingTransaction {{
@@ -137,11 +148,11 @@ impl GetEntity for RoutingTransaction {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment RoutingTransactionFragment on RoutingTransaction {
@@ -181,3 +192,6 @@ fragment RoutingTransactionFragment on RoutingTransaction {
     routing_transaction_failure_reason: failure_reason
 }
 ";
+
+
+

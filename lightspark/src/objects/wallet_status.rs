@@ -1,52 +1,54 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
-/// This is an enum of the potential statuses that your Lightspark wallet can take.
+/// This is an enum of the potential statuses that your Lightspark wallet can take. 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum WalletStatus {
     /// The wallet has not been set up yet and is ready to be deployed. This is the default status after the first login.
 
-    #[serde(rename = "NOT_SETUP")]
+    #[serde(rename="NOT_SETUP")]
     NotSetup,
     /// The wallet is currently being deployed in the Lightspark infrastructure.
 
-    #[serde(rename = "DEPLOYING")]
+    #[serde(rename="DEPLOYING")]
     Deploying,
     /// The wallet has been deployed in the Lightspark infrastructure and is ready to be initialized.
 
-    #[serde(rename = "DEPLOYED")]
+    #[serde(rename="DEPLOYED")]
     Deployed,
     /// The wallet is currently being initialized.
 
-    #[serde(rename = "INITIALIZING")]
+    #[serde(rename="INITIALIZING")]
     Initializing,
     /// The wallet is available and ready to be used.
 
-    #[serde(rename = "READY")]
+    #[serde(rename="READY")]
     Ready,
     /// The wallet is temporarily available, due to a transient issue or a scheduled maintenance.
 
-    #[serde(rename = "UNAVAILABLE")]
+    #[serde(rename="UNAVAILABLE")]
     Unavailable,
     /// The wallet had an unrecoverable failure. This status is not expected to happend and will be investigated by the Lightspark team.
 
-    #[serde(rename = "FAILED")]
+    #[serde(rename="FAILED")]
     Failed,
     /// The wallet is being terminated.
 
-    #[serde(rename = "TERMINATING")]
+    #[serde(rename="TERMINATING")]
     Terminating,
     /// The wallet has been terminated and is not available in the Lightspark infrastructure anymore. It is not connected to the Lightning network and its funds can only be accessed using the Funds Recovery flow.
 
-    #[serde(rename = "TERMINATED")]
+    #[serde(rename="TERMINATED")]
     Terminated,
+
 }
 
-impl From<WalletStatus> for Value {
-    fn from(val: WalletStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for WalletStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -62,6 +64,8 @@ impl fmt::Display for WalletStatus {
             Self::Failed => write!(f, "FAILED"),
             Self::Terminating => write!(f, "TERMINATING"),
             Self::Terminated => write!(f, "TERMINATED"),
+
         }
     }
 }
+
