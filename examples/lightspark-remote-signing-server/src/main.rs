@@ -21,6 +21,17 @@ async fn ping() -> impl Responder {
     HttpResponse::NoContent().finish()
 }
 
+#[get("/derive_address")]
+async fn derive_address(data: web::Data<config::Config>) -> impl Responder {
+    let seed = Seed::new(hex::decode(data.master_seed_hex.clone()).unwrap());
+    let signer =
+        LightsparkSigner::new(&seed, lightspark_remote_signing::signer::Network::Regtest).unwrap();
+    let response = signer.derive_public_key("m/1/269018486/1".into()).unwrap();
+    debug!("Response {:?}", response);
+
+    HttpResponse::NoContent().finish()
+}
+
 #[post("/ln/webhooks")]
 async fn webhook_handler(
     req: HttpRequest,
@@ -81,6 +92,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(config.clone()))
             .wrap(middleware::NormalizePath::trim())
             .service(ping)
+            .service(derive_address)
             .service(webhook_handler)
     })
     .bind(("0.0.0.0", port))?
