@@ -4,6 +4,7 @@ use actix_web::{
 use futures_util::StreamExt as _;
 use lightspark::key::Secp256k1SigningKey;
 use lightspark::request::auth_provider::AccountAuthProvider;
+use lightspark_remote_signing::lightspark::objects::webhook_event_type::WebhookEventType::RemoteSigning;
 use lightspark_remote_signing::lightspark::webhooks::WebhookEvent;
 use lightspark_remote_signing::{
     handler::Handler,
@@ -50,18 +51,27 @@ async fn webhook_handler(
     let event =
         WebhookEvent::verify_and_parse(&bytes, signature.to_str().unwrap(), &data.webhook_secret)
             .unwrap();
-    let response = handler
-        .handle_remote_signing_webhook_msg(&event)
-        .unwrap()
-        .unwrap();
 
-    debug!("Response {:?}", response);
+    match event.event_type {
+        RemoteSigning => {
+            let response = handler
+                .handle_remote_signing_webhook_msg(&event)
+                .unwrap()
+                .unwrap();
 
-    let result = client
-        .execute_graphql_request_variable(&response.query, response.variables)
-        .await;
+            debug!("Response {:?}", response);
 
-    debug!("Graphql response {:?}", result);
+            let result = client
+                .execute_graphql_request_variable(&response.query, response.variables)
+                .await;
+
+            debug!("Graphql response {:?}", result);
+        }
+        _ => {
+            debug!("Webhook Event {} is not implemented.", event.event_type);
+        }
+    };
+
     HttpResponse::NoContent().finish()
 }
 
