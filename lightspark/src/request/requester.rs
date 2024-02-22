@@ -134,7 +134,7 @@ impl Requester {
         let mut body = json!({
             "operationName": operation_name,
             "query": operation,
-            "nonce": if signing_key.is_some() { Some(rand::thread_rng().next_u32()) } else { None },
+            "nonce": if signing_key.is_some() { Some(rand::thread_rng().next_u64()) } else { None },
             "expires_at": if signing_key.is_some() {
                 Some((Utc::now() + Duration::hours(1)).to_rfc3339())
             } else {
