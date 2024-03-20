@@ -61,6 +61,16 @@ async fn webhook_handler(
 
             debug!("Response {:?}", response);
 
+            if data.respond_directly {
+                let json_payload = lightspark::request::requester::build_graphql_request_body(
+                    &response.query,
+                    Some(response.variables),
+                    false,
+                )
+                .unwrap();
+                return HttpResponse::Ok().json(json_payload);
+            }
+
             let result = client
                 .execute_graphql_request_variable(&response.query, response.variables)
                 .await;
