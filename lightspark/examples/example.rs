@@ -313,7 +313,7 @@ async fn main() {
     println!();
 
     // Get transactions in the past 24 hours
-    let time = Utc::now() - Duration::hours(24);
+    let time = Utc::now() - Duration::try_hours(24).unwrap();
     let transactions_connection = match account
         .get_transactions(
             &client.requester,

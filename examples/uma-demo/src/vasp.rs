@@ -89,7 +89,7 @@ impl<T: PublicKeyCache> SendingVASP<T> {
         };
 
         let now = Utc::now();
-        let two_weeks_from_now = now + Duration::weeks(2);
+        let two_weeks_from_now = now + Duration::try_weeks(2).unwrap();
 
         let response = PubKeyResponse {
             signing_pub_key: signing_pubkey_bytes,

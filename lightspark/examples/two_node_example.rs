@@ -311,7 +311,7 @@ async fn main() {
     }
     println!();
 
-    let time = Utc::now() - Duration::hours(24);
+    let time = Utc::now() - Duration::try_hours(24).unwrap();
     let transactions_connection = match account
         .get_transactions(
             &client.requester,
