@@ -65,6 +65,40 @@ impl GraphQLRequester for Requester {
     }
 }
 
+pub fn build_graphql_request_body(
+    operation: &str,
+    variables: Option<Value>,
+    has_signing_key: bool,
+) -> Result<Value, Error> {
+    let re = regex::Regex::new(r"\s*(?:query|mutation)\s+(\w+)").map_err(|_| {
+        Error::GraphqlError("The operation is not a query or a mutation".to_owned())
+    })?;
+    let operation_name = re
+        .captures(operation)
+        .and_then(|caps| caps.get(1))
+        .map(|m| m.as_str())
+        .map(|s| s.to_owned());
+
+    let mut body = json!({
+        "operationName": operation_name,
+        "query": operation,
+        "nonce": if has_signing_key { Some(rand::thread_rng().next_u64()) } else { None },
+        "expires_at": if has_signing_key {
+            Some((Utc::now() + Duration::try_hours(1).expect("1 hour should not go out of bounds")).to_rfc3339())
+        } else {
+            None
+        },
+    });
+
+    if let Some(vars) = variables {
+        body["variables"] = vars
+    } else {
+        body["variables"] = serde_json::json!({});
+    }
+
+    Ok(body)
+}
+
 impl Requester {
     pub fn new<T: AuthProvider>(auth_provider: T) -> Result<Self, Error> {
         let mut headers = reqwest::header::HeaderMap::new();
@@ -122,37 +156,13 @@ impl Requester {
         variables: Option<Value>,
         signing_key: Option<T>,
     ) -> Result<Value, Error> {
-        let re = regex::Regex::new(r"\s*(?:query|mutation)\s+(\w+)").map_err(|_| {
-            Error::GraphqlError("The operation is not a query or a mutation".to_owned())
-        })?;
-        let operation_name = re
-            .captures(operation)
-            .and_then(|caps| caps.get(1))
-            .map(|m| m.as_str())
-            .map(|s| s.to_owned());
-
-        let mut body = json!({
-            "operationName": operation_name,
-            "query": operation,
-            "nonce": if signing_key.is_some() { Some(rand::thread_rng().next_u64()) } else { None },
-            "expires_at": if signing_key.is_some() {
-                Some((Utc::now() + Duration::hours(1)).to_rfc3339())
-            } else {
-                None
-            },
-        });
-
-        if let Some(vars) = variables {
-            body["variables"] = vars
-        } else {
-            body["variables"] = serde_json::json!({});
-        }
+        let body = build_graphql_request_body(operation, variables, signing_key.is_some())?;
 
         let mut headers = HeaderMap::new();
         headers.insert("Content-Type", HeaderValue::from_static("application/json"));
 
-        if let Some(op) = operation_name {
-            if let Ok(value) = HeaderValue::from_str(op.as_str()) {
+        if let Some(op) = body["operationName"].as_str() {
+            if let Ok(value) = HeaderValue::from_str(op) {
                 headers.insert("X-GraphQL-Operation", value);
             }
         }
