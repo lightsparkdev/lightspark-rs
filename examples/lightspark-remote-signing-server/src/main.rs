@@ -61,6 +61,10 @@ async fn webhook_handler(
 
             debug!("Response {:?}", response);
 
+            if data.respond_directly {
+                return HttpResponse::Ok().json(response.variables);
+            }
+
             let result = client
                 .execute_graphql_request_variable(&response.query, response.variables)
                 .await;

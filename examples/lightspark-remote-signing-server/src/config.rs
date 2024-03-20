@@ -6,6 +6,7 @@ pub struct Config {
     pub webhook_secret: String,
     pub master_seed_hex: String,
     pub api_port: u16,
+    pub respond_directly: bool,
 }
 
 impl Config {
@@ -16,6 +17,7 @@ impl Config {
         let webhook_secret = std::env::var("RK_WEBHOOK_SECRET").ok();
         let master_seed_hex = std::env::var("RK_MASTER_SEED_HEX").ok();
         let api_port = std::env::var("PORT").ok();
+        let respond_directly = std::env::var("RESPOND_DIRECTLY").is_ok();
 
         Self {
             api_endpoint,
@@ -27,6 +29,7 @@ impl Config {
                 .unwrap_or("8080".to_string())
                 .parse()
                 .expect("api port"),
+            respond_directly,
         }
     }
 }
