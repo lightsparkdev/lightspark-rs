@@ -22,6 +22,7 @@ use serde_json::{json, to_string, Value};
 const DEFAULT_BASE_URL: &str = "https://api.lightspark.com/graphql/server/2023-09-13";
 
 /// A Requester struct for graphql operations.
+#[derive(Clone)]
 pub struct Requester {
     client: reqwest::Client,
     base_url: Option<String>,
