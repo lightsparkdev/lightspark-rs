@@ -847,10 +847,9 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
 
-        let signing_key = self.get_node_signing_key(node_id)?;
         let json = self
             .requester
-            .execute_graphql_signing(&mutation, Some(value), Some(signing_key))
+            .execute_graphql(&mutation, Some(value))
             .await?;
 
         let result =
