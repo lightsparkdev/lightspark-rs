@@ -156,27 +156,37 @@ impl Requester {
         variables: Option<Value>,
         signing_key: Option<T>,
     ) -> Result<Value, Error> {
-        let body = build_graphql_request_body(operation, variables, signing_key.is_some())?;
+        let payload = build_graphql_request_body(operation, variables, signing_key.is_some())?;
 
         let mut headers = HeaderMap::new();
         headers.insert("Content-Type", HeaderValue::from_static("application/json"));
 
-        if let Some(op) = body["operationName"].as_str() {
+        if let Some(op) = payload["operationName"].as_str() {
             if let Ok(value) = HeaderValue::from_str(op) {
                 headers.insert("X-GraphQL-Operation", value);
             }
         }
 
+        let json_string = to_string(&payload)
+            .map_err(|_| Error::GraphqlError("Failed to serialise payload".to_owned()))?;
+
         if let Some(key) = signing_key {
-            let json_string =
-                to_string(&body).map_err(|_| Error::GraphqlError("Body malformat.".to_owned()))?;
-            let payload: Vec<u8> = json_string.into_bytes();
-            let signing = key.sign_payload(&payload).map_err(Error::CryptoError)?;
+            let signing = key
+                .sign_payload(&json_string.as_bytes())
+                .map_err(Error::CryptoError)?;
             headers.insert(
                 "X-Lightspark-Signing",
                 HeaderValue::from_str(signing.as_str()).map_err(|_| Error::InvalidHeaderValue)?,
             );
         }
+
+        let body = if json_string.len() > 1024 {
+            headers.insert("Content-Encoding", HeaderValue::from_static("zstd"));
+            zstd::bulk::compress(json_string.as_bytes(), 0)
+                .map_err(|_| Error::GraphqlError("Failed to compress payload".to_owned()))?
+        } else {
+            json_string.into_bytes()
+        };
 
         let url = match &self.base_url {
             Some(base_url) => base_url.clone(),
@@ -187,7 +197,7 @@ impl Requester {
             .client
             .post(url)
             .headers(headers)
-            .json(&body)
+            .body(body)
             .send()
             .await
             .map_err(|e| Error::ReqwestError(e.to_string()))?;
