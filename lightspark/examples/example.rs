@@ -32,7 +32,7 @@ async fn main() {
     let api_token = std::env::var("LIGHTSPARK_API_TOKEN_CLIENT_SECRET").unwrap();
 
     let node_password = std::env::var("LIGHTSPARK_TEST_NODE_PASSWORD").unwrap();
-    let base_url = std::env::var("LIGHTSPARK_API_ENDPOINT").unwrap();
+    let base_url = std::env::var("LIGHTSPARK_EXAMPLE_BASE_URL").unwrap();
 
     // Create LightsparkClient
     let auth_provider = AccountAuthProvider::new(api_id, api_token);
