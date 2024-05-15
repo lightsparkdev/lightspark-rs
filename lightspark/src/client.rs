@@ -805,8 +805,10 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             .execute_graphql(mutation, Some(value))
             .await?;
 
-        let result = json["create_test_mode_invoice"]["encoded_payment_request"].clone();
-        Ok(result.to_string())
+        Ok(json["create_test_mode_invoice"]["encoded_payment_request"]
+            .as_str()
+            .ok_or_else(|| Error::GraphqlError("unable to parse the encoded invoice".into()))?
+            .to_owned())
     }
 
     pub async fn create_test_mode_payment(
