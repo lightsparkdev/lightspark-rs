@@ -1,30 +1,30 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::error::Error;
-use crate::objects::blockchain_balance::BlockchainBalance;
-use crate::objects::channel_status::ChannelStatus;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::node::Node;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::types::get_entity::GetEntity;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-
 use crate::objects::balances::Balances;
-use crate::objects::bitcoin_network::BitcoinNetwork;
-use crate::objects::entity::Entity;
+use crate::objects::channel_status::ChannelStatus;
 use crate::objects::lightning_payment_direction::LightningPaymentDirection;
 use crate::objects::lightspark_node::LightsparkNode;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
-use crate::objects::lightspark_node_to_daily_liquidity_forecasts_connection::LightsparkNodeToDailyLiquidityForecastsConnection;
 use crate::objects::node_address_type::NodeAddressType;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
+use chrono::NaiveDate;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::blockchain_balance::BlockchainBalance;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::objects::entity::Entity;
+use crate::objects::lightspark_node_to_daily_liquidity_forecasts_connection::LightsparkNodeToDailyLiquidityForecastsConnection;
+use crate::objects::node::Node;
 use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
 use crate::objects::secret::Secret;
-use chrono::NaiveDate;
+use crate::types::entity_wrapper::EntityWrapper;
 use serde_json::Value;
+use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This is a Lightspark node with OSK.
@@ -416,13 +416,15 @@ impl LightsparkNodeWithOSK {
         &self,
         requester: &impl GraphQLRequester,
         first: Option<i64>,
-        statuses: Option<Vec<ChannelStatus>>,
         after: Option<String>,
+        before_date: Option<DateTime<Utc>>,
+        after_date: Option<DateTime<Utc>>,
+        statuses: Option<Vec<ChannelStatus>>,
     ) -> Result<LightsparkNodeToChannelsConnection, Error> {
-        let query = "query FetchLightsparkNodeToChannelsConnection($entity_id: ID!, $first: Int, $statuses: [ChannelStatus!], $after: String) {
+        let query = "query FetchLightsparkNodeToChannelsConnection($entity_id: ID!, $first: Int, $after: String, $before_date: DateTime, $after_date: DateTime, $statuses: [ChannelStatus!]) {
     entity(id: $entity_id) {
         ... on LightsparkNodeWithOSK {
-            channels(, first: $first, statuses: $statuses, after: $after) {
+            channels(, first: $first, after: $after, before_date: $before_date, after_date: $after_date, statuses: $statuses) {
                 __typename
                 lightspark_node_to_channels_connection_count: count
                 lightspark_node_to_channels_connection_page_info: page_info {
@@ -533,8 +535,10 @@ impl LightsparkNodeWithOSK {
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
-        variables.insert("statuses", statuses.into());
         variables.insert("after", after.into());
+        variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert("statuses", statuses.into());
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;

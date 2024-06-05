@@ -5,5 +5,5 @@ resolver = "2"
 members = [
     "lightspark",
     "lightspark-remote-signing",
-    "examples/*",
+    "examples/lightspark-remote-signing-server",
 ]

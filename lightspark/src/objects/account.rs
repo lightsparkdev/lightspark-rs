@@ -132,6 +132,7 @@ impl Account {
                     api_token_client_id: client_id
                     api_token_name: name
                     api_token_permissions: permissions
+                    api_token_is_deleted: is_deleted
                 }
             }
         }
@@ -958,6 +959,7 @@ impl Account {
                             currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
                         }
                         incoming_payment_transaction_hash: transaction_hash
+                        incoming_payment_is_uma: is_uma
                         incoming_payment_destination: destination {
                             id
                         }
@@ -976,6 +978,7 @@ impl Account {
                                 currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
                             }
                         }
+                        incoming_payment_is_internal_payment: is_internal_payment
                     }
                     ... on OutgoingPayment {
                         __typename
@@ -993,6 +996,7 @@ impl Account {
                             currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
                         }
                         outgoing_payment_transaction_hash: transaction_hash
+                        outgoing_payment_is_uma: is_uma
                         outgoing_payment_origin: origin {
                             id
                         }
@@ -1319,6 +1323,8 @@ impl Account {
                             }
                         }
                         outgoing_payment_payment_preimage: payment_preimage
+                        outgoing_payment_is_internal_payment: is_internal_payment
+                        outgoing_payment_idempotency_key: idempotency_key
                     }
                     ... on RoutingTransaction {
                         __typename
@@ -1777,13 +1783,14 @@ impl Account {
         bitcoin_networks: Option<Vec<BitcoinNetwork>>,
         statuses: Option<Vec<WithdrawalRequestStatus>>,
         node_ids: Option<Vec<String>>,
+        idempotency_keys: Option<Vec<String>>,
         after_date: Option<DateTime<Utc>>,
         before_date: Option<DateTime<Utc>>,
     ) -> Result<AccountToWithdrawalRequestsConnection, Error> {
-        let query = "query FetchAccountToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: String, $bitcoin_networks: [BitcoinNetwork!], $statuses: [WithdrawalRequestStatus!], $node_ids: [ID!], $after_date: DateTime, $before_date: DateTime) {
+        let query = "query FetchAccountToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: String, $bitcoin_networks: [BitcoinNetwork!], $statuses: [WithdrawalRequestStatus!], $node_ids: [ID!], $idempotency_keys: [String!], $after_date: DateTime, $before_date: DateTime) {
     entity(id: $entity_id) {
         ... on Account {
-            withdrawal_requests(, first: $first, after: $after, bitcoin_networks: $bitcoin_networks, statuses: $statuses, node_ids: $node_ids, after_date: $after_date, before_date: $before_date) {
+            withdrawal_requests(, first: $first, after: $after, bitcoin_networks: $bitcoin_networks, statuses: $statuses, node_ids: $node_ids, idempotency_keys: $idempotency_keys, after_date: $after_date, before_date: $before_date) {
                 __typename
                 account_to_withdrawal_requests_connection_count: count
                 account_to_withdrawal_requests_connection_page_info: page_info {
@@ -1830,6 +1837,14 @@ impl Account {
                         currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
                         currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
                     }
+                    withdrawal_request_total_fees: total_fees {
+                        __typename
+                        currency_amount_original_value: original_value
+                        currency_amount_original_unit: original_unit
+                        currency_amount_preferred_currency_unit: preferred_currency_unit
+                        currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
+                        currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
+                    }
                     withdrawal_request_bitcoin_address: bitcoin_address
                     withdrawal_request_withdrawal_mode: withdrawal_mode
                     withdrawal_request_status: status
@@ -1837,6 +1852,7 @@ impl Account {
                     withdrawal_request_withdrawal: withdrawal {
                         id
                     }
+                    withdrawal_request_idempotency_key: idempotency_key
                 }
             }
         }
@@ -1849,6 +1865,7 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("statuses", statuses.into());
         variables.insert("node_ids", node_ids.into());
+        variables.insert("idempotency_keys", idempotency_keys.into());
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 

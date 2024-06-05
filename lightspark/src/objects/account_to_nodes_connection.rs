@@ -3,6 +3,7 @@ use crate::objects::connection::Connection;
 use crate::objects::lightspark_node::LightsparkNodeEnum;
 use crate::objects::page_info::PageInfo;
 use serde::{Deserialize, Serialize};
+
 use std::vec::Vec;
 
 /// A connection between an account and the nodes it manages.

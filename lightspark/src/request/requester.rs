@@ -172,7 +172,7 @@ impl Requester {
 
         if let Some(key) = signing_key {
             let signing = key
-                .sign_payload(&json_string.as_bytes())
+                .sign_payload(json_string.as_bytes())
                 .map_err(Error::CryptoError)?;
             headers.insert(
                 "X-Lightspark-Signing",

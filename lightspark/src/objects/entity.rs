@@ -5,6 +5,7 @@ use super::api_token::ApiToken;
 use super::channel::Channel;
 use super::channel_closing_transaction::ChannelClosingTransaction;
 use super::channel_opening_transaction::ChannelOpeningTransaction;
+use super::channel_snapshot::ChannelSnapshot;
 use super::deposit::Deposit;
 use super::graph_node::GraphNode;
 use super::hop::Hop;
@@ -47,6 +48,7 @@ pub enum EntityEnum {
     Channel(Channel),
     ChannelClosingTransaction(ChannelClosingTransaction),
     ChannelOpeningTransaction(ChannelOpeningTransaction),
+    ChannelSnapshot(ChannelSnapshot),
     Deposit(Deposit),
     GraphNode(GraphNode),
     Hop(Hop),
@@ -103,6 +105,12 @@ impl<'de> Deserialize<'de> for EntityEnum {
                         serde::de::Error::custom(format!("Serde JSON Error {}", err))
                     })?;
                     Ok(EntityEnum::ChannelOpeningTransaction(obj))
+                }
+                "ChannelSnapshot" => {
+                    let obj = ChannelSnapshot::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
+                    Ok(EntityEnum::ChannelSnapshot(obj))
                 }
                 "Deposit" => {
                     let obj = Deposit::deserialize(value).map_err(|err| {

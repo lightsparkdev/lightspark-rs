@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.9.0
+- Update API objects.
+
 # v0.8.1
 - Remove openssl dependency from reqwest.
 

@@ -1,25 +1,25 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::objects::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsConnection;
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::types::graphql_requester::GraphQLRequester;
+use serde::{Deserialize, Serialize};
+
 use crate::error::Error;
 use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsConnection;
-use crate::objects::payment_failure_reason::PaymentFailureReason;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::types::get_entity::GetEntity;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-
 use crate::objects::entity::Entity;
 use crate::objects::lightning_transaction::LightningTransaction;
+use crate::objects::payment_failure_reason::PaymentFailureReason;
 use crate::objects::payment_request_data::PaymentRequestDataEnum;
 use crate::objects::post_transaction_data::PostTransactionData;
 use crate::objects::rich_text::RichText;
 use crate::objects::transaction::Transaction;
 use crate::objects::transaction_status::TransactionStatus;
-use crate::types::custom_date_formats::custom_date_format_option;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::types::get_entity::GetEntity;
+use chrono::{DateTime, Utc};
 use serde_json::Value;
+use std::collections::HashMap;
 use std::vec::Vec;
 
 /// This object represents a Lightning Network payment sent from a Lightspark Node. You can retrieve this object to receive payment related information about any payment sent from your Lightspark Node on the Lightning Network.
@@ -56,6 +56,10 @@ pub struct OutgoingPayment {
     #[serde(rename = "outgoing_payment_transaction_hash")]
     pub transaction_hash: Option<String>,
 
+    /// Whether this payment is an UMA payment or not. NOTE: this field is only set if the payment has been sent using the recommended `pay_uma_invoice` function.
+    #[serde(rename = "outgoing_payment_is_uma")]
+    pub is_uma: bool,
+
     /// The Lightspark node this payment originated from.
     #[serde(rename = "outgoing_payment_origin")]
     pub origin: EntityWrapper,
@@ -87,6 +91,14 @@ pub struct OutgoingPayment {
     /// The preimage of the payment.
     #[serde(rename = "outgoing_payment_payment_preimage")]
     pub payment_preimage: Option<String>,
+
+    /// Whether the payment is made to the same node.
+    #[serde(rename = "outgoing_payment_is_internal_payment")]
+    pub is_internal_payment: bool,
+
+    /// The idempotency key of the payment.
+    #[serde(rename = "outgoing_payment_idempotency_key")]
+    pub idempotency_key: Option<String>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
@@ -181,6 +193,7 @@ fragment OutgoingPaymentFragment on OutgoingPayment {
         currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
     }
     outgoing_payment_transaction_hash: transaction_hash
+    outgoing_payment_is_uma: is_uma
     outgoing_payment_origin: origin {
         id
     }
@@ -507,6 +520,8 @@ fragment OutgoingPaymentFragment on OutgoingPayment {
         }
     }
     outgoing_payment_payment_preimage: payment_preimage
+    outgoing_payment_is_internal_payment: is_internal_payment
+    outgoing_payment_idempotency_key: idempotency_key
 }
 ";
 
@@ -560,51 +575,7 @@ impl OutgoingPayment {
                         id
                     }
                     outgoing_payment_attempt_channel_snapshot: channel_snapshot {
-                        __typename
-                        channel_snapshot_channel: channel {
-                            id
-                        }
-                        channel_snapshot_timestamp: timestamp
-                        channel_snapshot_local_balance: local_balance {
-                            __typename
-                            currency_amount_original_value: original_value
-                            currency_amount_original_unit: original_unit
-                            currency_amount_preferred_currency_unit: preferred_currency_unit
-                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-                        }
-                        channel_snapshot_local_unsettled_balance: local_unsettled_balance {
-                            __typename
-                            currency_amount_original_value: original_value
-                            currency_amount_original_unit: original_unit
-                            currency_amount_preferred_currency_unit: preferred_currency_unit
-                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-                        }
-                        channel_snapshot_local_channel_reserve: local_channel_reserve {
-                            __typename
-                            currency_amount_original_value: original_value
-                            currency_amount_original_unit: original_unit
-                            currency_amount_preferred_currency_unit: preferred_currency_unit
-                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-                        }
-                        channel_snapshot_remote_balance: remote_balance {
-                            __typename
-                            currency_amount_original_value: original_value
-                            currency_amount_original_unit: original_unit
-                            currency_amount_preferred_currency_unit: preferred_currency_unit
-                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-                        }
-                        channel_snapshot_remote_unsettled_balance: remote_unsettled_balance {
-                            __typename
-                            currency_amount_original_value: original_value
-                            currency_amount_original_unit: original_unit
-                            currency_amount_preferred_currency_unit: preferred_currency_unit
-                            currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
-                            currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
-                        }
+                        id
                     }
                 }
             }

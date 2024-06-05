@@ -52,7 +52,7 @@ pub struct ChannelOpeningTransaction {
     #[serde(rename = "channel_opening_transaction_transaction_hash")]
     pub transaction_hash: Option<String>,
 
-    /// The fees that were paid by the wallet sending the transaction to commit it to the Bitcoin blockchain.
+    /// The fees that were paid by the node for this transaction.
     #[serde(rename = "channel_opening_transaction_fees")]
     pub fees: Option<CurrencyAmount>,
 
@@ -82,7 +82,7 @@ pub struct ChannelOpeningTransaction {
 }
 
 impl OnChainTransaction for ChannelOpeningTransaction {
-    /// The fees that were paid by the wallet sending the transaction to commit it to the Bitcoin blockchain.
+    /// The fees that were paid by the node for this transaction.
     fn get_fees(&self) -> Option<CurrencyAmount> {
         self.fees.clone()
     }

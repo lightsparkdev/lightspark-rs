@@ -527,7 +527,7 @@ async fn main() {
         }
     };
     if let Ok(channels_connection) = node
-        .get_channels(&client.requester, Some(10), None, None)
+        .get_channels(&client.requester, Some(10), None, None, None, None)
         .await
     {
         println!("{} has {} channel(s):", node_1, channels_connection.count);
