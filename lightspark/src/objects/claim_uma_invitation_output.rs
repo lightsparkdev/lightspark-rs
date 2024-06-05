@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ClaimUmaInvitationOutput {
+    /// An UMA.ME invitation object.
     #[serde(rename = "claim_uma_invitation_output_invitation")]
     pub invitation: EntityWrapper,
 }

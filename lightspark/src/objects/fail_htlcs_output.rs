@@ -2,17 +2,16 @@
 use crate::types::entity_wrapper::EntityWrapper;
 use serde::{Deserialize, Serialize};
 
-/// The Invoice that was cancelled. If the invoice was already cancelled, the same invoice is returned.
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct CancelInvoiceOutput {
-    #[serde(rename = "cancel_invoice_output_invoice")]
+pub struct FailHtlcsOutput {
+    #[serde(rename = "fail_htlcs_output_invoice")]
     pub invoice: EntityWrapper,
 }
 
 pub const FRAGMENT: &str = "
-fragment CancelInvoiceOutputFragment on CancelInvoiceOutput {
+fragment FailHtlcsOutputFragment on FailHtlcsOutput {
     __typename
-    cancel_invoice_output_invoice: invoice {
+    fail_htlcs_output_invoice: invoice {
         id
     }
 }

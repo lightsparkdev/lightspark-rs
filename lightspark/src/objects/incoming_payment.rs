@@ -53,6 +53,10 @@ pub struct IncomingPayment {
     #[serde(rename = "incoming_payment_transaction_hash")]
     pub transaction_hash: Option<String>,
 
+    /// Whether this payment is an UMA payment or not. NOTE: this field is only set if the invoice that is being paid has been created using the recommended `create_uma_invoice` function.
+    #[serde(rename = "incoming_payment_is_uma")]
+    pub is_uma: bool,
+
     /// The recipient Lightspark node this payment was sent to.
     #[serde(rename = "incoming_payment_destination")]
     pub destination: EntityWrapper,
@@ -64,6 +68,10 @@ pub struct IncomingPayment {
     /// The post transaction data which can be used in KYT payment registration.
     #[serde(rename = "incoming_payment_uma_post_transaction_data")]
     pub uma_post_transaction_data: Option<Vec<PostTransactionData>>,
+
+    /// Whether the payment is made from the same node.
+    #[serde(rename = "incoming_payment_is_internal_payment")]
+    pub is_internal_payment: bool,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
@@ -158,6 +166,7 @@ fragment IncomingPaymentFragment on IncomingPayment {
         currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
     }
     incoming_payment_transaction_hash: transaction_hash
+    incoming_payment_is_uma: is_uma
     incoming_payment_destination: destination {
         id
     }
@@ -176,6 +185,7 @@ fragment IncomingPaymentFragment on IncomingPayment {
             currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
         }
     }
+    incoming_payment_is_internal_payment: is_internal_payment
 }
 ";
 

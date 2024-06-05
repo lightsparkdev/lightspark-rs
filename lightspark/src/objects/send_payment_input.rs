@@ -17,4 +17,7 @@ pub struct SendPaymentInput {
 
     /// The maximum amount of fees that you want to pay for this payment to be sent, expressed in msats.
     pub maximum_fees_msats: i64,
+
+    /// The idempotency key of the request. The same result will be returned for the same idempotency key.
+    pub idempotency_key: Option<String>,
 }

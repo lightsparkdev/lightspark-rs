@@ -17,4 +17,7 @@ pub struct PayInvoiceInput {
 
     /// The amount you will pay for this invoice, expressed in msats. It should ONLY be set when the invoice amount is zero.
     pub amount_msats: Option<i64>,
+
+    /// The idempotency key of the request. The same result will be returned for the same idempotency key.
+    pub idempotency_key: Option<String>,
 }

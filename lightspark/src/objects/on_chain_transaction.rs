@@ -11,7 +11,7 @@ use serde_json::Value;
 use std::vec::Vec;
 
 pub trait OnChainTransaction: Transaction + Entity {
-    /// The fees that were paid by the wallet sending the transaction to commit it to the Bitcoin blockchain.
+    /// The fees that were paid by the node for this transaction.
     fn get_fees(&self) -> Option<CurrencyAmount>;
 
     /// The hash of the block that included this transaction. This will be null for unconfirmed transactions.

@@ -1,4 +1,5 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::objects::audit_log_actor::AuditLogActor;
 use crate::objects::entity::Entity;
 use crate::objects::permission::Permission;
 use crate::types::custom_date_formats::custom_date_format;
@@ -34,9 +35,19 @@ pub struct ApiToken {
     #[serde(rename = "api_token_permissions")]
     pub permissions: Vec<Permission>,
 
+    /// Whether the api token has been deleted.
+    #[serde(rename = "api_token_is_deleted")]
+    pub is_deleted: bool,
+
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+}
+
+impl AuditLogActor for ApiToken {
+    fn type_name(&self) -> &'static str {
+        "ApiToken"
+    }
 }
 
 impl Entity for ApiToken {
@@ -87,5 +98,6 @@ fragment ApiTokenFragment on ApiToken {
     api_token_client_id: client_id
     api_token_name: name
     api_token_permissions: permissions
+    api_token_is_deleted: is_deleted
 }
 ";

@@ -44,6 +44,9 @@ pub enum WebhookEventType {
 
     #[serde(rename = "LOW_BALANCE")]
     LowBalance,
+
+    #[serde(rename = "HIGH_BALANCE")]
+    HighBalance,
 }
 
 impl From<WebhookEventType> for Value {
@@ -68,6 +71,7 @@ impl fmt::Display for WebhookEventType {
             Self::WalletFundsReceived => write!(f, "WALLET_FUNDS_RECEIVED"),
             Self::RemoteSigning => write!(f, "REMOTE_SIGNING"),
             Self::LowBalance => write!(f, "LOW_BALANCE"),
+            Self::HighBalance => write!(f, "HIGH_BALANCE"),
         }
     }
 }

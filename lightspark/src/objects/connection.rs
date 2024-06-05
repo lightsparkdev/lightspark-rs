@@ -14,6 +14,8 @@ use super::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsCon
 use super::wallet_to_payment_requests_connection::WalletToPaymentRequestsConnection;
 use super::wallet_to_transactions_connection::WalletToTransactionsConnection;
 use super::wallet_to_withdrawal_requests_connection::WalletToWithdrawalRequestsConnection;
+use super::withdrawal_request_to_channel_closing_transactions_connection::WithdrawalRequestToChannelClosingTransactionsConnection;
+use super::withdrawal_request_to_channel_opening_transactions_connection::WithdrawalRequestToChannelOpeningTransactionsConnection;
 use crate::objects::page_info::PageInfo;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
@@ -45,6 +47,12 @@ pub enum ConnectionEnum {
     WalletToPaymentRequestsConnection(WalletToPaymentRequestsConnection),
     WalletToTransactionsConnection(WalletToTransactionsConnection),
     WalletToWithdrawalRequestsConnection(WalletToWithdrawalRequestsConnection),
+    WithdrawalRequestToChannelClosingTransactionsConnection(
+        WithdrawalRequestToChannelClosingTransactionsConnection,
+    ),
+    WithdrawalRequestToChannelOpeningTransactionsConnection(
+        WithdrawalRequestToChannelOpeningTransactionsConnection,
+    ),
 }
 
 impl<'de> Deserialize<'de> for ConnectionEnum {
@@ -145,6 +153,30 @@ impl<'de> Deserialize<'de> for ConnectionEnum {
                         |err| serde::de::Error::custom(format!("Serde JSON Error {}", err)),
                     )?;
                     Ok(ConnectionEnum::WalletToWithdrawalRequestsConnection(obj))
+                }
+                "WithdrawalRequestToChannelClosingTransactionsConnection" => {
+                    let obj =
+                        WithdrawalRequestToChannelClosingTransactionsConnection::deserialize(value)
+                            .map_err(|err| {
+                                serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                            })?;
+                    Ok(
+                        ConnectionEnum::WithdrawalRequestToChannelClosingTransactionsConnection(
+                            obj,
+                        ),
+                    )
+                }
+                "WithdrawalRequestToChannelOpeningTransactionsConnection" => {
+                    let obj =
+                        WithdrawalRequestToChannelOpeningTransactionsConnection::deserialize(value)
+                            .map_err(|err| {
+                                serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                            })?;
+                    Ok(
+                        ConnectionEnum::WithdrawalRequestToChannelOpeningTransactionsConnection(
+                            obj,
+                        ),
+                    )
                 }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),

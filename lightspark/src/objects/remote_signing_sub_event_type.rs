@@ -29,6 +29,9 @@ pub enum RemoteSigningSubEventType {
 
     #[serde(rename = "REVEAL_COUNTERPARTY_PER_COMMITMENT_SECRET")]
     RevealCounterpartyPerCommitmentSecret,
+
+    #[serde(rename = "VLS_MESSAGE")]
+    VlsMessage,
 }
 
 impl From<RemoteSigningSubEventType> for Value {
@@ -50,6 +53,7 @@ impl fmt::Display for RemoteSigningSubEventType {
             Self::RevealCounterpartyPerCommitmentSecret => {
                 write!(f, "REVEAL_COUNTERPARTY_PER_COMMITMENT_SECRET")
             }
+            Self::VlsMessage => write!(f, "VLS_MESSAGE"),
         }
     }
 }

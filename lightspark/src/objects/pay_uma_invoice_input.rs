@@ -12,4 +12,6 @@ pub struct PayUmaInvoiceInput {
     pub maximum_fees_msats: i64,
 
     pub amount_msats: Option<i64>,
+
+    pub idempotency_key: Option<String>,
 }

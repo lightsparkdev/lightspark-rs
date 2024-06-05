@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateUmaInvitationOutput {
+    /// The created invitation in the form of a string identifier.
     #[serde(rename = "create_uma_invitation_output_invitation")]
     pub invitation: EntityWrapper,
 }

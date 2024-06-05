@@ -33,8 +33,14 @@ pub enum PaymentFailureReason {
     #[serde(rename = "INVOICE_EXPIRED")]
     InvoiceExpired,
 
+    #[serde(rename = "INVOICE_CANCELLED")]
+    InvoiceCancelled,
+
     #[serde(rename = "RISK_SCREENING_FAILED")]
     RiskScreeningFailed,
+
+    #[serde(rename = "INSUFFICIENT_BALANCE_ON_SINGLE_PATH_INVOICE")]
+    InsufficientBalanceOnSinglePathInvoice,
 }
 
 impl From<PaymentFailureReason> for Value {
@@ -55,7 +61,11 @@ impl fmt::Display for PaymentFailureReason {
             Self::InvoiceAlreadyPaid => write!(f, "INVOICE_ALREADY_PAID"),
             Self::SelfPayment => write!(f, "SELF_PAYMENT"),
             Self::InvoiceExpired => write!(f, "INVOICE_EXPIRED"),
+            Self::InvoiceCancelled => write!(f, "INVOICE_CANCELLED"),
             Self::RiskScreeningFailed => write!(f, "RISK_SCREENING_FAILED"),
+            Self::InsufficientBalanceOnSinglePathInvoice => {
+                write!(f, "INSUFFICIENT_BALANCE_ON_SINGLE_PATH_INVOICE")
+            }
         }
     }
 }
