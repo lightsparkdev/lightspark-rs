@@ -28,7 +28,7 @@
 //! See more examples in examples/example.rs
 //!
 /// The version of this library.
-pub const VERSION: &str = "0.8.1";
+pub const VERSION: &str = "0.9.1";
 
 #[cfg(feature = "client")]
 pub mod client;

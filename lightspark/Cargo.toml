@@ -2,7 +2,7 @@
 name = "lightspark"
 description = "Lightspark Rust SDK"
 authors = ["Lightspark Group, Inc. <info@lightspark.com>"]
-version = "0.9.0"
+version = "0.9.1"
 edition = "2021"
 documentation = "https://docs.lightspark.com/lightspark-sdk/getting-started?language=Rust"
 homepage = "https://www.lightspark.com/"

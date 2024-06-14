@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.9.1
+- Fix a signing issue with RSA keys.
+
 # v0.9.0
 - Update API objects.
 
