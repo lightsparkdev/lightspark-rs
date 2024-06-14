@@ -20,7 +20,7 @@ impl OperationSigningKey for RSASigningKey {
     }
 
     fn sign_payload(&self, data: &[u8]) -> Result<String, CryptoError> {
-        crypto::sign_payload(&self.key_bytes, data)
+        crypto::sign_payload(data, &self.key_bytes)
     }
 }
 
