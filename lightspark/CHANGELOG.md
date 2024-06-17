@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.9.2
+- RSA signing should be PSS signatures.
+
 # v0.9.1
 - Fix a signing issue with RSA keys.
 
