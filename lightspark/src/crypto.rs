@@ -8,9 +8,10 @@ use cbc::cipher::block_padding::Pkcs7;
 use cbc::cipher::{BlockDecryptMut, KeyIvInit};
 use pbkdf2::pbkdf2_hmac;
 use rand::RngCore;
+use rsa::pss::BlindedSigningKey;
 use rsa::sha2::Sha256;
 use rsa::signature::{RandomizedSigner, SignatureEncoding};
-use rsa::{pkcs1v15::SigningKey, pkcs8::DecodePrivateKey, RsaPrivateKey};
+use rsa::{pkcs8::DecodePrivateKey, RsaPrivateKey};
 use serde_json::{json, Error, Value};
 
 const KEY_LEN: usize = 32;
@@ -156,7 +157,7 @@ pub fn sign_payload(payload: &[u8], signing_key: &[u8]) -> Result<String, Crypto
     };
 
     let key = RsaPrivateKey::from_pkcs8_der(&signing_key).expect("Fail to generate key");
-    let signing_key = SigningKey::<Sha256>::new(key);
+    let signing_key = BlindedSigningKey::<Sha256>::new(key);
     let mut rng = rand::thread_rng();
 
     let signature = signing_key.sign_with_rng(&mut rng, payload);
