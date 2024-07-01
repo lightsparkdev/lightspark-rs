@@ -124,6 +124,7 @@ pub mod release_channel_per_commitment_secret_output;
 pub mod release_payment_preimage_input;
 pub mod release_payment_preimage_output;
 pub mod remote_signing_sub_event_type;
+pub mod request_initiator;
 pub mod request_withdrawal_input;
 pub mod request_withdrawal_output;
 pub mod rich_text;
