@@ -2,6 +2,7 @@
 use crate::error::Error;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
+use crate::objects::request_initiator::RequestInitiator;
 use crate::objects::withdrawal_mode::WithdrawalMode;
 use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
 use crate::objects::withdrawal_request_to_channel_closing_transactions_connection::WithdrawalRequestToChannelClosingTransactionsConnection;
@@ -78,6 +79,10 @@ pub struct WithdrawalRequest {
     /// The idempotency key of the withdrawal request.
     #[serde(rename = "withdrawal_request_idempotency_key")]
     pub idempotency_key: Option<String>,
+
+    /// The initiator of the withdrawal.
+    #[serde(rename = "withdrawal_request_initiator")]
+    pub initiator: RequestInitiator,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
@@ -177,6 +182,7 @@ fragment WithdrawalRequestFragment on WithdrawalRequest {
         id
     }
     withdrawal_request_idempotency_key: idempotency_key
+    withdrawal_request_initiator: initiator
 }
 ";
 

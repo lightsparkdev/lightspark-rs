@@ -10,4 +10,6 @@ pub struct CreateUmaInvoiceInput {
     pub metadata_hash: String,
 
     pub expiry_secs: Option<i64>,
+
+    pub receiver_hash: Option<String>,
 }

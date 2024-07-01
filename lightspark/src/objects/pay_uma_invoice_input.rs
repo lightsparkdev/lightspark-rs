@@ -14,4 +14,7 @@ pub struct PayUmaInvoiceInput {
     pub amount_msats: Option<i64>,
 
     pub idempotency_key: Option<String>,
+
+    /// An optional, monthly-rotated, unique hashed identifier corresponding to the sender of the payment.
+    pub sender_hash: Option<String>,
 }
