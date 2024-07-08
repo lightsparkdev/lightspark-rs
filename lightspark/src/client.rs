@@ -5,6 +5,7 @@ use std::str::FromStr;
 
 use bitcoin::bip32::{DerivationPath, ExtendedPrivKey};
 use bitcoin::secp256k1::Secp256k1;
+use chrono::{DateTime, Datelike, Utc};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 
@@ -867,18 +868,40 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         metadata: &str,
         expiry_secs: Option<i32>,
     ) -> Result<Invoice, Error> {
+        self.create_uma_invoice_with_receiver_identifier(
+            node_id,
+            amount_msats,
+            metadata,
+            expiry_secs,
+            None,
+            None,
+        )
+        .await
+    }
+
+    pub async fn create_uma_invoice_with_receiver_identifier(
+        &self,
+        node_id: &str,
+        amount_msats: i64,
+        metadata: &str,
+        expiry_secs: Option<i32>,
+        signing_private_key: Option<&[u8]>,
+        receiver_identifier: Option<&str>,
+    ) -> Result<Invoice, Error> {
         let mutation = format!(
             "mutation CreateUmaInvoice(
             $node_id: ID!
             $amount_msats: Long!
             $metadata_hash: String!
             $expiry_secs: Int
+            $receiver_hash: String = null
         ) {{
             create_uma_invoice(input: {{
                 node_id: $node_id
                 amount_msats: $amount_msats
                 metadata_hash: $metadata_hash
                 expiry_secs: $expiry_secs
+                receiver_hash: $receiver_hash
             }}) {{
                 invoice {{
                     ...InvoiceFragment
@@ -891,6 +914,21 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             invoice::FRAGMENT
         );
 
+        let receiver_hash = if let Some(receiver_identifier) = receiver_identifier {
+            if signing_private_key.is_none() {
+                return Err(Error::InvalidArgumentError(
+                    "receiver identifier provided without signing private key".to_owned(),
+                ));
+            }
+            Some(Self::hash_uma_identifier(
+                receiver_identifier,
+                signing_private_key.unwrap(),
+                chrono::Utc::now(),
+            ))
+        } else {
+            None
+        };
+
         let mut hasher = Sha256::new();
         hasher.update(metadata.as_bytes());
 
@@ -902,6 +940,9 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         variables.insert("metadata_hash", metadata_hash.into());
         if let Some(expiry_secs) = expiry_secs {
             variables.insert("expiry_secs", expiry_secs.into());
+        }
+        if let Some(receiver_hash) = receiver_hash {
+            variables.insert("receiver_hash", receiver_hash.into());
         }
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
@@ -923,6 +964,28 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         maximum_fees_msats: i64,
         amount_msats: Option<i64>,
     ) -> Result<OutgoingPayment, Error> {
+        self.pay_uma_invoice_with_sender_identifier(
+            node_id,
+            encoded_invoice,
+            timeout_secs,
+            maximum_fees_msats,
+            amount_msats,
+            None,
+            None,
+        )
+        .await
+    }
+
+    pub async fn pay_uma_invoice_with_sender_identifier(
+        &self,
+        node_id: &str,
+        encoded_invoice: &str,
+        timeout_secs: i32,
+        maximum_fees_msats: i64,
+        amount_msats: Option<i64>,
+        signing_private_key: Option<&[u8]>,
+        sender_identifier: Option<&str>,
+    ) -> Result<OutgoingPayment, Error> {
         let operation = format!(
             "mutation PayUmaInvoice(
             $node_id: ID!
@@ -930,6 +993,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             $timeout_secs: Int!
             $maximum_fees_msats: Long!
             $amount_msats: Long
+            $sender_hash: String = null
         ) {{
             pay_uma_invoice(input: {{
                 node_id: $node_id
@@ -937,6 +1001,7 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
                 timeout_secs: $timeout_secs
                 maximum_fees_msats: $maximum_fees_msats
                 amount_msats: $amount_msats
+                sender_hash: $sender_hash
             }}) {{
                 payment {{
                     ...OutgoingPaymentFragment
@@ -949,6 +1014,21 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
             outgoing_payment::FRAGMENT
         );
 
+        let sender_hash = if let Some(sender_identifier) = sender_identifier {
+            if signing_private_key.is_none() {
+                return Err(Error::InvalidArgumentError(
+                    "sender identifier provided without signing private key".to_owned(),
+                ));
+            }
+            Some(Self::hash_uma_identifier(
+                sender_identifier,
+                signing_private_key.unwrap(),
+                chrono::Utc::now(),
+            ))
+        } else {
+            None
+        };
+
         let mut variables: HashMap<&str, Value> = HashMap::new();
         variables.insert("node_id", node_id.into());
         variables.insert("encoded_invoice", encoded_invoice.into());
@@ -957,6 +1037,9 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         }
         variables.insert("timeout_secs", timeout_secs.into());
         variables.insert("maximum_fees_msats", maximum_fees_msats.into());
+        if let Some(sender_hash) = sender_hash {
+            variables.insert("sender_hash", sender_hash.into());
+        }
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
 
@@ -1214,6 +1297,23 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         Ok(result)
     }
 
+    pub fn hash_uma_identifier(
+        identifier: &str,
+        signing_private_key: &[u8],
+        now: DateTime<Utc>,
+    ) -> String {
+        let input_data = format!(
+            "{}{}-{}{}",
+            identifier,
+            now.month(),
+            now.year(),
+            hex::encode(signing_private_key)
+        );
+        let mut hasher = Sha256::new();
+        hasher.update(input_data.as_bytes());
+        hex::encode(hasher.finalize())
+    }
+
     fn hash_phone_number(phone_number_e164: &str) -> Result<String, Error> {
         let e164_regex = regex::Regex::new(r"^\+[1-9]\d{1,14}$").unwrap();
         if !e164_regex.is_match(phone_number_e164) {
@@ -1222,5 +1322,38 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
         let mut hasher = Sha256::new();
         hasher.update(phone_number_e164.as_bytes());
         Ok(hex::encode(hasher.finalize()))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::key::Secp256k1SigningKey;
+    use chrono::prelude::*;
+
+    #[test]
+    fn test_hash_uma_identifier() {
+        let signing_key = "xyz".as_bytes();
+        let mock_time_jan = Utc.with_ymd_and_hms(2021, 1, 1, 0, 0, 0).unwrap();
+        let mock_time_feb = Utc.with_ymd_and_hms(2021, 2, 1, 0, 0, 0).unwrap();
+
+        let hashed_uma = LightsparkClient::<Secp256k1SigningKey>::hash_uma_identifier(
+            "user@domain.com",
+            signing_key,
+            mock_time_jan,
+        );
+        let hashed_uma_same_month = LightsparkClient::<Secp256k1SigningKey>::hash_uma_identifier(
+            "user@domain.com",
+            signing_key,
+            mock_time_jan,
+        );
+        assert_eq!(hashed_uma, hashed_uma_same_month);
+
+        let hashed_uma_diff_month = LightsparkClient::<Secp256k1SigningKey>::hash_uma_identifier(
+            "user@domain.com",
+            signing_key,
+            mock_time_feb,
+        );
+        assert_ne!(hashed_uma, hashed_uma_diff_month);
     }
 }
