@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.10.0
+- Add extra params to `create_uma_invoice` and `pay_uma_invoice` for analytics.
+
 # v0.9.2
 - RSA signing should be PSS signatures.
 
