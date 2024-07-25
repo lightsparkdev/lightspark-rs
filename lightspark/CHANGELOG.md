@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.10.1
+- Fix: Removes default params on graphql mutation `PayUmaInvoice`
+
 # v0.10.0
 - Add extra params to `create_uma_invoice` and `pay_uma_invoice` for analytics.
 
