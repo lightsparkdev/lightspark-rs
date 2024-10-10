@@ -1,35 +1,37 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::error::Error;
-use crate::objects::account_to_api_tokens_connection::AccountToApiTokensConnection;
-use crate::objects::account_to_channels_connection::AccountToChannelsConnection;
-use crate::objects::account_to_nodes_connection::AccountToNodesConnection;
-use crate::objects::account_to_payment_requests_connection::AccountToPaymentRequestsConnection;
-use crate::objects::account_to_transactions_connection::AccountToTransactionsConnection;
-use crate::objects::account_to_wallets_connection::AccountToWalletsConnection;
-use crate::objects::account_to_withdrawal_requests_connection::AccountToWithdrawalRequestsConnection;
-use crate::objects::bitcoin_network::BitcoinNetwork;
-use crate::objects::blockchain_balance::BlockchainBalance;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
-use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
-use crate::objects::transaction_failures::TransactionFailures;
-use crate::objects::transaction_status::TransactionStatus;
-use crate::objects::transaction_type::TransactionType;
-use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::get_entity::GetEntity;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::account_to_payment_requests_connection::AccountToPaymentRequestsConnection;
+use crate::objects::account_to_nodes_connection::AccountToNodesConnection;
+use crate::objects::transaction_status::TransactionStatus;
+use crate::types::graphql_requester::GraphQLRequester;
+use crate::objects::entity::Entity;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::objects::account_to_withdrawal_requests_connection::AccountToWithdrawalRequestsConnection;
+use crate::error::Error;
 use std::collections::HashMap;
 use std::vec::Vec;
+use crate::objects::blockchain_balance::BlockchainBalance;
+use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
+use crate::objects::account_to_channels_connection::AccountToChannelsConnection;
+use chrono::{DateTime, Utc};
+use crate::objects::account_to_wallets_connection::AccountToWalletsConnection;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::types::get_entity::GetEntity;
+use crate::objects::account_to_api_tokens_connection::AccountToApiTokensConnection;
+use crate::objects::account_to_transactions_connection::AccountToTransactionsConnection;
+use crate::objects::transaction_failures::TransactionFailures;
+use crate::objects::transaction_type::TransactionType;
 
 /// This is an object representing the connected Lightspark account. You can retrieve this object to see your account information and objects tied to your account.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Account {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "account_id")]
+    #[serde (rename = "account_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
@@ -41,21 +43,28 @@ pub struct Account {
     pub updated_at: DateTime<Utc>,
 
     /// The name of this account.
-    #[serde(rename = "account_name")]
+    #[serde (rename = "account_name")]
     pub name: Option<String>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl LightsparkNodeOwner for Account {
+
+
     fn type_name(&self) -> &'static str {
         "Account"
     }
 }
 
+
+
 impl Entity for Account {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -71,15 +80,16 @@ impl Entity for Account {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "Account"
     }
 }
 
+
 impl GetEntity for Account {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on Account {{
@@ -88,11 +98,11 @@ impl GetEntity for Account {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment AccountFragment on Account {
@@ -104,13 +114,11 @@ fragment AccountFragment on Account {
 }
 ";
 
+
 impl Account {
-    pub async fn get_api_tokens(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-    ) -> Result<AccountToApiTokensConnection, Error> {
+
+    
+    pub async fn get_api_tokens(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>) -> Result<AccountToApiTokensConnection, Error> {
         let query = "query FetchAccountToApiTokensConnection($entity_id: ID!, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on Account {
@@ -143,19 +151,16 @@ impl Account {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["api_tokens"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_blockchain_balance(
-        &self,
-        requester: &impl GraphQLRequester,
-        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
-        node_ids: Option<Vec<String>>,
-    ) -> Result<Option<BlockchainBalance>, Error> {
+    
+    pub async fn get_blockchain_balance(&self, requester:&impl GraphQLRequester, bitcoin_networks: Option<Vec<BitcoinNetwork>>, node_ids: Option<Vec<String>>) -> Result<Option<BlockchainBalance>, Error> {
         let query = "query FetchAccountBlockchainBalance($entity_id: ID!, $bitcoin_networks: [BitcoinNetwork!], $node_ids: [ID!]) {
     entity(id: $entity_id) {
         ... on Account {
@@ -218,23 +223,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["blockchain_balance"].clone();
-        let result = if json.is_null() {
-            None
-        } else {
-            Some(serde_json::from_value(json).map_err(Error::JsonError)?)
-        };
+        let result = if json.is_null() { None } else { Some(serde_json::from_value(json).map_err(|err| Error::JsonError(err))?) };
         Ok(result)
     }
 
-    pub async fn get_conductivity(
-        &self,
-        requester: &impl GraphQLRequester,
-        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
-        node_ids: Option<Vec<String>>,
-    ) -> Result<Option<i64>, Error> {
+    
+    pub async fn get_conductivity(&self, requester:&impl GraphQLRequester, bitcoin_networks: Option<Vec<BitcoinNetwork>>, node_ids: Option<Vec<String>>) -> Result<Option<i64>, Error> {
         let query = "query FetchAccountConductivity($entity_id: ID!, $bitcoin_networks: [BitcoinNetwork!], $node_ids: [ID!]) {
     entity(id: $entity_id) {
         ... on Account {
@@ -247,19 +245,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["conductivity"].clone();
         let result = json.as_i64();
         Ok(result)
     }
 
-    pub async fn get_local_balance(
-        &self,
-        requester: &impl GraphQLRequester,
-        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
-        node_ids: Option<Vec<String>>,
-    ) -> Result<Option<CurrencyAmount>, Error> {
+    
+    pub async fn get_local_balance(&self, requester:&impl GraphQLRequester, bitcoin_networks: Option<Vec<BitcoinNetwork>>, node_ids: Option<Vec<String>>) -> Result<Option<CurrencyAmount>, Error> {
         let query = "query FetchAccountLocalBalance($entity_id: ID!, $bitcoin_networks: [BitcoinNetwork!], $node_ids: [ID!]) {
     entity(id: $entity_id) {
         ... on Account {
@@ -279,25 +274,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["local_balance"].clone();
-        let result = if json.is_null() {
-            None
-        } else {
-            Some(serde_json::from_value(json).map_err(Error::JsonError)?)
-        };
+        let result = if json.is_null() { None } else { Some(serde_json::from_value(json).map_err(|err| Error::JsonError(err))?) };
         Ok(result)
     }
 
-    pub async fn get_nodes(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
-        node_ids: Option<Vec<String>>,
-        after: Option<String>,
-    ) -> Result<AccountToNodesConnection, Error> {
+    
+    pub async fn get_nodes(&self, requester:&impl GraphQLRequester, first: Option<i64>, bitcoin_networks: Option<Vec<BitcoinNetwork>>, node_ids: Option<Vec<String>>, after: Option<String>) -> Result<AccountToNodesConnection, Error> {
         let query = "query FetchAccountToNodesConnection($entity_id: ID!, $first: Int, $bitcoin_networks: [BitcoinNetwork!], $node_ids: [ID!], $after: String) {
     entity(id: $entity_id) {
         ... on Account {
@@ -584,19 +570,16 @@ impl Account {
         variables.insert("node_ids", node_ids.into());
         variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["nodes"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_remote_balance(
-        &self,
-        requester: &impl GraphQLRequester,
-        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
-        node_ids: Option<Vec<String>>,
-    ) -> Result<Option<CurrencyAmount>, Error> {
+    
+    pub async fn get_remote_balance(&self, requester:&impl GraphQLRequester, bitcoin_networks: Option<Vec<BitcoinNetwork>>, node_ids: Option<Vec<String>>) -> Result<Option<CurrencyAmount>, Error> {
         let query = "query FetchAccountRemoteBalance($entity_id: ID!, $bitcoin_networks: [BitcoinNetwork!], $node_ids: [ID!]) {
     entity(id: $entity_id) {
         ... on Account {
@@ -616,25 +599,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["remote_balance"].clone();
-        let result = if json.is_null() {
-            None
-        } else {
-            Some(serde_json::from_value(json).map_err(Error::JsonError)?)
-        };
+        let result = if json.is_null() { None } else { Some(serde_json::from_value(json).map_err(|err| Error::JsonError(err))?) };
         Ok(result)
     }
 
-    pub async fn get_uptime_percentage(
-        &self,
-        requester: &impl GraphQLRequester,
-        after_date: Option<DateTime<Utc>>,
-        before_date: Option<DateTime<Utc>>,
-        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
-        node_ids: Option<Vec<String>>,
-    ) -> Result<Option<i64>, Error> {
+    
+    pub async fn get_uptime_percentage(&self, requester:&impl GraphQLRequester, after_date: Option<DateTime<Utc>>, before_date: Option<DateTime<Utc>>, bitcoin_networks: Option<Vec<BitcoinNetwork>>, node_ids: Option<Vec<String>>) -> Result<Option<i64>, Error> {
         let query = "query FetchAccountUptimePercentage($entity_id: ID!, $after_date: DateTime, $before_date: DateTime, $bitcoin_networks: [BitcoinNetwork!], $node_ids: [ID!]) {
     entity(id: $entity_id) {
         ... on Account {
@@ -649,24 +623,16 @@ impl Account {
         variables.insert("bitcoin_networks", bitcoin_networks.into());
         variables.insert("node_ids", node_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["uptime_percentage"].clone();
         let result = json.as_i64();
         Ok(result)
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub async fn get_channels(
-        &self,
-        requester: &impl GraphQLRequester,
-        bitcoin_network: BitcoinNetwork,
-        lightning_node_id: Option<String>,
-        after_date: Option<DateTime<Utc>>,
-        before_date: Option<DateTime<Utc>>,
-        first: Option<i64>,
-        after: Option<String>,
-    ) -> Result<AccountToChannelsConnection, Error> {
+    pub async fn get_channels(&self, requester:&impl GraphQLRequester, bitcoin_network: BitcoinNetwork, lightning_node_id: Option<String>, after_date: Option<DateTime<Utc>>, before_date: Option<DateTime<Utc>>, first: Option<i64>, after: Option<String>) -> Result<AccountToChannelsConnection, Error> {
         let query = "query FetchAccountToChannelsConnection($entity_id: ID!, $bitcoin_network: BitcoinNetwork!, $lightning_node_id: ID, $after_date: DateTime, $before_date: DateTime, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on Account {
@@ -787,27 +753,16 @@ impl Account {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["channels"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub async fn get_transactions(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-        types: Option<Vec<TransactionType>>,
-        after_date: Option<DateTime<Utc>>,
-        before_date: Option<DateTime<Utc>>,
-        bitcoin_network: Option<BitcoinNetwork>,
-        lightning_node_id: Option<String>,
-        statuses: Option<Vec<TransactionStatus>>,
-        exclude_failures: Option<TransactionFailures>,
-    ) -> Result<AccountToTransactionsConnection, Error> {
+    pub async fn get_transactions(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>, types: Option<Vec<TransactionType>>, after_date: Option<DateTime<Utc>>, before_date: Option<DateTime<Utc>>, bitcoin_network: Option<BitcoinNetwork>, lightning_node_id: Option<String>, statuses: Option<Vec<TransactionStatus>>, exclude_failures: Option<TransactionFailures>) -> Result<AccountToTransactionsConnection, Error> {
         let query = "query FetchAccountToTransactionsConnection($entity_id: ID!, $first: Int, $after: String, $types: [TransactionType!], $after_date: DateTime, $before_date: DateTime, $bitcoin_network: BitcoinNetwork, $lightning_node_id: ID, $statuses: [TransactionStatus!], $exclude_failures: TransactionFailures) {
     entity(id: $entity_id) {
         ... on Account {
@@ -1409,29 +1364,18 @@ impl Account {
         variables.insert("bitcoin_network", bitcoin_network.into());
         variables.insert("lightning_node_id", lightning_node_id.into());
         variables.insert("statuses", statuses.into());
-        variables.insert(
-            "exclude_failures",
-            serde_json::to_value(&exclude_failures).map_err(Error::ConversionError)?,
-        );
+        variables.insert("exclude_failures", serde_json::to_value(&exclude_failures).map_err(|err| Error::ConversionError(err))?);
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["transactions"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub async fn get_payment_requests(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-        after_date: Option<DateTime<Utc>>,
-        before_date: Option<DateTime<Utc>>,
-        bitcoin_network: Option<BitcoinNetwork>,
-        lightning_node_id: Option<String>,
-    ) -> Result<AccountToPaymentRequestsConnection, Error> {
+    pub async fn get_payment_requests(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>, after_date: Option<DateTime<Utc>>, before_date: Option<DateTime<Utc>>, bitcoin_network: Option<BitcoinNetwork>, lightning_node_id: Option<String>) -> Result<AccountToPaymentRequestsConnection, Error> {
         let query = "query FetchAccountToPaymentRequestsConnection($entity_id: ID!, $first: Int, $after: String, $after_date: DateTime, $before_date: DateTime, $bitcoin_network: BitcoinNetwork, $lightning_node_id: ID) {
     entity(id: $entity_id) {
         ... on Account {
@@ -1752,6 +1696,8 @@ impl Account {
                             currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
                             currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
                         }
+                        invoice_is_uma: is_uma
+                        invoice_is_lnurl: is_lnurl
                     }
                 }
             }
@@ -1767,26 +1713,16 @@ impl Account {
         variables.insert("bitcoin_network", bitcoin_network.into());
         variables.insert("lightning_node_id", lightning_node_id.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["payment_requests"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub async fn get_withdrawal_requests(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-        bitcoin_networks: Option<Vec<BitcoinNetwork>>,
-        statuses: Option<Vec<WithdrawalRequestStatus>>,
-        node_ids: Option<Vec<String>>,
-        idempotency_keys: Option<Vec<String>>,
-        after_date: Option<DateTime<Utc>>,
-        before_date: Option<DateTime<Utc>>,
-    ) -> Result<AccountToWithdrawalRequestsConnection, Error> {
+    pub async fn get_withdrawal_requests(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>, bitcoin_networks: Option<Vec<BitcoinNetwork>>, statuses: Option<Vec<WithdrawalRequestStatus>>, node_ids: Option<Vec<String>>, idempotency_keys: Option<Vec<String>>, after_date: Option<DateTime<Utc>>, before_date: Option<DateTime<Utc>>) -> Result<AccountToWithdrawalRequestsConnection, Error> {
         let query = "query FetchAccountToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: String, $bitcoin_networks: [BitcoinNetwork!], $statuses: [WithdrawalRequestStatus!], $node_ids: [ID!], $idempotency_keys: [String!], $after_date: DateTime, $before_date: DateTime) {
     entity(id: $entity_id) {
         ... on Account {
@@ -1870,20 +1806,16 @@ impl Account {
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["withdrawal_requests"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 
-    pub async fn get_wallets(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        after: Option<String>,
-        third_party_ids: Option<Vec<String>>,
-    ) -> Result<AccountToWalletsConnection, Error> {
+    
+    pub async fn get_wallets(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>, third_party_ids: Option<Vec<String>>) -> Result<AccountToWalletsConnection, Error> {
         let query = "query FetchAccountToWalletsConnection($entity_id: ID!, $first: Int, $after: String, $third_party_ids: [String!]) {
     entity(id: $entity_id) {
         ... on Account {
@@ -1946,10 +1878,12 @@ impl Account {
         variables.insert("after", after.into());
         variables.insert("third_party_ids", third_party_ids.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["wallets"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
+
 }

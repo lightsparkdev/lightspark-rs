@@ -70,6 +70,8 @@ pub mod incoming_payment_attempt_status;
 pub mod incoming_payment_to_attempts_connection;
 pub mod incoming_payments_for_invoice_query_input;
 pub mod incoming_payments_for_invoice_query_output;
+pub mod incoming_payments_for_payment_hash_query_input;
+pub mod incoming_payments_for_payment_hash_query_output;
 pub mod invoice;
 pub mod invoice_data;
 pub mod invoice_for_payment_hash_input;

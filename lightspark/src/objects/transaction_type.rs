@@ -1,3 +1,4 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -8,49 +9,50 @@ use std::fmt;
 pub enum TransactionType {
     /// Transactions initiated from a Lightspark node on Lightning Network.
 
-    #[serde(rename = "OUTGOING_PAYMENT")]
+    #[serde(rename="OUTGOING_PAYMENT")]
     OutgoingPayment,
     /// Transactions received by a Lightspark node on Lightning Network.
 
-    #[serde(rename = "INCOMING_PAYMENT")]
+    #[serde(rename="INCOMING_PAYMENT")]
     IncomingPayment,
     /// Transactions that forwarded payments through Lightspark nodes on Lightning Network.
 
-    #[serde(rename = "ROUTED")]
+    #[serde(rename="ROUTED")]
     Routed,
     /// Transactions on the Bitcoin blockchain to withdraw funds from a Lightspark node to a Bitcoin wallet.
 
-    #[serde(rename = "L1_WITHDRAW")]
+    #[serde(rename="L1_WITHDRAW")]
     L1Withdraw,
     /// Transactions on Bitcoin blockchain to fund a Lightspark node's wallet.
 
-    #[serde(rename = "L1_DEPOSIT")]
+    #[serde(rename="L1_DEPOSIT")]
     L1Deposit,
     /// Transactions on Bitcoin blockchain to open a channel on Lightning Network funded by the local Lightspark node.
 
-    #[serde(rename = "CHANNEL_OPEN")]
+    #[serde(rename="CHANNEL_OPEN")]
     ChannelOpen,
     /// Transactions on Bitcoin blockchain to close a channel on Lightning Network where the balances are allocated back to local and remote nodes.
 
-    #[serde(rename = "CHANNEL_CLOSE")]
+    #[serde(rename="CHANNEL_CLOSE")]
     ChannelClose,
     /// Transactions initiated from a Lightspark node on Lightning Network.
 
-    #[serde(rename = "PAYMENT")]
+    #[serde(rename="PAYMENT")]
     Payment,
     /// Payment requests from a Lightspark node on Lightning Network
 
-    #[serde(rename = "PAYMENT_REQUEST")]
+    #[serde(rename="PAYMENT_REQUEST")]
     PaymentRequest,
     /// Transactions that forwarded payments through Lightspark nodes on Lightning Network.
 
-    #[serde(rename = "ROUTE")]
+    #[serde(rename="ROUTE")]
     Route,
+
 }
 
-impl From<TransactionType> for Value {
-    fn from(val: TransactionType) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for TransactionType {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -67,6 +69,8 @@ impl fmt::Display for TransactionType {
             Self::Payment => write!(f, "PAYMENT"),
             Self::PaymentRequest => write!(f, "PAYMENT_REQUEST"),
             Self::Route => write!(f, "ROUTE"),
+
         }
     }
 }
+

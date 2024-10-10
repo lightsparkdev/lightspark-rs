@@ -1,26 +1,30 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum SignablePayloadStatus {
-    #[serde(rename = "CREATED")]
+
+    #[serde(rename="CREATED")]
     Created,
 
-    #[serde(rename = "SIGNED")]
+    #[serde(rename="SIGNED")]
     Signed,
 
-    #[serde(rename = "VALIDATION_FAILED")]
+    #[serde(rename="VALIDATION_FAILED")]
     ValidationFailed,
 
-    #[serde(rename = "INVALID_SIGNATURE")]
+    #[serde(rename="INVALID_SIGNATURE")]
     InvalidSignature,
+
 }
 
-impl From<SignablePayloadStatus> for Value {
-    fn from(val: SignablePayloadStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for SignablePayloadStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -31,6 +35,8 @@ impl fmt::Display for SignablePayloadStatus {
             Self::Signed => write!(f, "SIGNED"),
             Self::ValidationFailed => write!(f, "VALIDATION_FAILED"),
             Self::InvalidSignature => write!(f, "INVALID_SIGNATURE"),
+
         }
     }
 }
+

@@ -1,16 +1,23 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::currency_amount::CurrencyAmount;
 use serde::{Deserialize, Serialize};
+use crate::objects::currency_amount::CurrencyAmount;
 
 /// This represents the fee policies set for a channel on the Lightning Network.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChannelFees {
-    #[serde(rename = "channel_fees_base_fee")]
+
+    
+    #[serde (rename = "channel_fees_base_fee")]
     pub base_fee: Option<CurrencyAmount>,
 
-    #[serde(rename = "channel_fees_fee_rate_per_mil")]
+    
+    #[serde (rename = "channel_fees_fee_rate_per_mil")]
     pub fee_rate_per_mil: Option<i64>,
+
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment ChannelFeesFragment on ChannelFees {
@@ -26,3 +33,6 @@ fragment ChannelFeesFragment on ChannelFees {
     channel_fees_fee_rate_per_mil: fee_rate_per_mil
 }
 ";
+
+
+

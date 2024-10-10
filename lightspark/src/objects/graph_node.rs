@@ -1,24 +1,26 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::error::Error;
-use crate::objects::bitcoin_network::BitcoinNetwork;
-use crate::objects::entity::Entity;
-use crate::objects::node::Node;
-use crate::objects::node_address_type::NodeAddressType;
-use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::get_entity::GetEntity;
-use crate::types::graphql_requester::GraphQLRequester;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use crate::objects::entity::Entity;
+use crate::error::Error;
+use crate::types::get_entity::GetEntity;
 use std::collections::HashMap;
 use std::vec::Vec;
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::node_to_addresses_connection::NodeToAddressesConnection;
+use crate::objects::node::Node;
+use crate::objects::node_address_type::NodeAddressType;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::graphql_requester::GraphQLRequester;
+use chrono::{DateTime, Utc};
 
 /// This object represents a node that exists on the Lightning Network, including nodes not managed by Lightspark. You can retrieve this object to get publicly available information about any node on the Lightning Network.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GraphNode {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "graph_node_id")]
+    #[serde (rename = "graph_node_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
@@ -30,35 +32,38 @@ pub struct GraphNode {
     pub updated_at: DateTime<Utc>,
 
     /// A name that identifies the node. It has no importance in terms of operating the node, it is just a way to identify and search for commercial services or popular nodes. This alias can be changed at any time by the node operator.
-    #[serde(rename = "graph_node_alias")]
+    #[serde (rename = "graph_node_alias")]
     pub alias: Option<String>,
 
     /// The Bitcoin Network this node is deployed in.
-    #[serde(rename = "graph_node_bitcoin_network")]
+    #[serde (rename = "graph_node_bitcoin_network")]
     pub bitcoin_network: BitcoinNetwork,
 
     /// A hexadecimal string that describes a color. For example "#000000" is black, "#FFFFFF" is white. It has no importance in terms of operating the node, it is just a way to visually differentiate nodes. That color can be changed at any time by the node operator.
-    #[serde(rename = "graph_node_color")]
+    #[serde (rename = "graph_node_color")]
     pub color: Option<String>,
 
     /// A summary metric used to capture how well positioned a node is to send, receive, or route transactions efficiently. Maximizing a node's conductivity helps a node’s transactions to be capital efficient. The value is an integer ranging between 0 and 10 (bounds included).
-    #[serde(rename = "graph_node_conductivity")]
+    #[serde (rename = "graph_node_conductivity")]
     pub conductivity: Option<i64>,
 
     /// The name of this node in the network. It will be the most human-readable option possible, depending on the data available for this node.
-    #[serde(rename = "graph_node_display_name")]
+    #[serde (rename = "graph_node_display_name")]
     pub display_name: String,
 
     /// The public key of this node. It acts as a unique identifier of this node in the Lightning Network.
-    #[serde(rename = "graph_node_public_key")]
+    #[serde (rename = "graph_node_public_key")]
     pub public_key: Option<String>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl Node for GraphNode {
+
     /// A name that identifies the node. It has no importance in terms of operating the node, it is just a way to identify and search for commercial services or popular nodes. This alias can be changed at any time by the node operator.
     fn get_alias(&self) -> Option<String> {
         self.alias.clone()
@@ -89,12 +94,16 @@ impl Node for GraphNode {
         self.public_key.clone()
     }
 
+
     fn type_name(&self) -> &'static str {
         "GraphNode"
     }
 }
 
+
+
 impl Entity for GraphNode {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -110,15 +119,16 @@ impl Entity for GraphNode {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "GraphNode"
     }
 }
 
+
 impl GetEntity for GraphNode {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on GraphNode {{
@@ -127,11 +137,11 @@ impl GetEntity for GraphNode {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment GraphNodeFragment on GraphNode {
@@ -148,13 +158,11 @@ fragment GraphNodeFragment on GraphNode {
 }
 ";
 
+
 impl GraphNode {
-    pub async fn get_addresses(
-        &self,
-        requester: &impl GraphQLRequester,
-        first: Option<i64>,
-        types: Option<Vec<NodeAddressType>>,
-    ) -> Result<NodeToAddressesConnection, Error> {
+
+    
+    pub async fn get_addresses(&self, requester:&impl GraphQLRequester, first: Option<i64>, types: Option<Vec<NodeAddressType>>) -> Result<NodeToAddressesConnection, Error> {
         let query = "query FetchNodeToAddressesConnection($entity_id: ID!, $first: Int, $types: [NodeAddressType!]) {
     entity(id: $entity_id) {
         ... on GraphNode {
@@ -175,10 +183,12 @@ impl GraphNode {
         variables.insert("first", first.into());
         variables.insert("types", types.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+                
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["addresses"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
+
 }

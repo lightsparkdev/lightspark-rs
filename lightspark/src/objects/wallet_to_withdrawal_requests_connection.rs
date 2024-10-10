@@ -1,30 +1,36 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::connection::Connection;
-use crate::objects::page_info::PageInfo;
-use crate::objects::withdrawal_request::WithdrawalRequest;
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
+use crate::objects::withdrawal_request::WithdrawalRequest;
+use crate::objects::page_info::PageInfo;
+use crate::objects::connection::Connection;
+
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct WalletToWithdrawalRequestsConnection {
+
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
-    #[serde(rename = "wallet_to_withdrawal_requests_connection_count")]
+    #[serde (rename = "wallet_to_withdrawal_requests_connection_count")]
     pub count: i64,
 
     /// An object that holds pagination information about the objects in this connection.
-    #[serde(rename = "wallet_to_withdrawal_requests_connection_page_info")]
+    #[serde (rename = "wallet_to_withdrawal_requests_connection_page_info")]
     pub page_info: PageInfo,
 
     /// The withdrawal requests for the current page of this connection.
-    #[serde(rename = "wallet_to_withdrawal_requests_connection_entities")]
+    #[serde (rename = "wallet_to_withdrawal_requests_connection_entities")]
     pub entities: Vec<WithdrawalRequest>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl Connection for WalletToWithdrawalRequestsConnection {
+
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     fn get_count(&self) -> i64 {
         self.count
@@ -35,10 +41,14 @@ impl Connection for WalletToWithdrawalRequestsConnection {
         self.page_info.clone()
     }
 
+
     fn type_name(&self) -> &'static str {
         "WalletToWithdrawalRequestsConnection"
     }
 }
+
+
+
 
 pub const FRAGMENT: &str = "
 fragment WalletToWithdrawalRequestsConnectionFragment on WalletToWithdrawalRequestsConnection {
@@ -56,3 +66,6 @@ fragment WalletToWithdrawalRequestsConnectionFragment on WalletToWithdrawalReque
     }
 }
 ";
+
+
+

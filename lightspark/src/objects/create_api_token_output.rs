@@ -1,18 +1,24 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::api_token::ApiToken;
 use serde::{Deserialize, Serialize};
+use crate::objects::api_token::ApiToken;
+
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CreateApiTokenOutput {
+
     /// The API Token that has been created.
-    #[serde(rename = "create_api_token_output_api_token")]
+    #[serde (rename = "create_api_token_output_api_token")]
     pub api_token: ApiToken,
 
     /// The secret that should be used to authenticate against our API.
     // This secret is not stored and will never be available again after this. You must keep this secret secure as it grants access to your account.
-    #[serde(rename = "create_api_token_output_client_secret")]
+    #[serde (rename = "create_api_token_output_client_secret")]
     pub client_secret: String,
+
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment CreateApiTokenOutputFragment on CreateApiTokenOutput {
@@ -30,3 +36,6 @@ fragment CreateApiTokenOutputFragment on CreateApiTokenOutput {
     create_api_token_output_client_secret: client_secret
 }
 ";
+
+
+

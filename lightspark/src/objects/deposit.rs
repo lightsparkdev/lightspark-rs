@@ -1,22 +1,24 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::entity::Entity;
-use crate::objects::on_chain_transaction::OnChainTransaction;
-use crate::objects::transaction::Transaction;
-use crate::objects::transaction_status::TransactionStatus;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::types::custom_date_formats::custom_date_format_option;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::types::get_entity::GetEntity;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::objects::transaction_status::TransactionStatus;
+use crate::objects::on_chain_transaction::OnChainTransaction;
+use crate::objects::entity::Entity;
+use crate::types::get_entity::GetEntity;
 use std::vec::Vec;
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::objects::transaction::Transaction;
+use crate::types::custom_date_formats::custom_date_format;
+use chrono::{DateTime, Utc};
 
 /// This object represents a Deposit made to a Lightspark node wallet. This operation occurs for any L1 funding transaction to the wallet. You can retrieve this object to receive detailed information about the deposit.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Deposit {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde(rename = "deposit_id")]
+    #[serde (rename = "deposit_id")]
     pub id: String,
 
     /// The date and time when this transaction was initiated.
@@ -28,7 +30,7 @@ pub struct Deposit {
     pub updated_at: DateTime<Utc>,
 
     /// The current status of this transaction.
-    #[serde(rename = "deposit_status")]
+    #[serde (rename = "deposit_status")]
     pub status: TransactionStatus,
 
     /// The date and time when this transaction was completed or failed.
@@ -36,31 +38,31 @@ pub struct Deposit {
     pub resolved_at: Option<DateTime<Utc>>,
 
     /// The amount of money involved in this transaction.
-    #[serde(rename = "deposit_amount")]
+    #[serde (rename = "deposit_amount")]
     pub amount: CurrencyAmount,
 
     /// The hash of this transaction, so it can be uniquely identified on the Lightning Network.
-    #[serde(rename = "deposit_transaction_hash")]
+    #[serde (rename = "deposit_transaction_hash")]
     pub transaction_hash: Option<String>,
 
     /// The fees that were paid by the node for this transaction.
-    #[serde(rename = "deposit_fees")]
+    #[serde (rename = "deposit_fees")]
     pub fees: Option<CurrencyAmount>,
 
     /// The hash of the block that included this transaction. This will be null for unconfirmed transactions.
-    #[serde(rename = "deposit_block_hash")]
+    #[serde (rename = "deposit_block_hash")]
     pub block_hash: Option<String>,
 
     /// The height of the block that included this transaction. This will be zero for unconfirmed transactions.
-    #[serde(rename = "deposit_block_height")]
+    #[serde (rename = "deposit_block_height")]
     pub block_height: i64,
 
     /// The Bitcoin blockchain addresses this transaction was sent to.
-    #[serde(rename = "deposit_destination_addresses")]
+    #[serde (rename = "deposit_destination_addresses")]
     pub destination_addresses: Vec<String>,
 
     /// The number of blockchain confirmations for this transaction in real time.
-    #[serde(rename = "deposit_num_confirmations")]
+    #[serde (rename = "deposit_num_confirmations")]
     pub num_confirmations: Option<i64>,
 
     /// The recipient Lightspark node this deposit was sent to.
@@ -70,9 +72,12 @@ pub struct Deposit {
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
+
 }
 
+
 impl OnChainTransaction for Deposit {
+
     /// The fees that were paid by the node for this transaction.
     fn get_fees(&self) -> Option<CurrencyAmount> {
         self.fees.clone()
@@ -98,12 +103,16 @@ impl OnChainTransaction for Deposit {
         self.num_confirmations
     }
 
+
     fn type_name(&self) -> &'static str {
         "Deposit"
     }
 }
 
+
+
 impl Transaction for Deposit {
+
     /// The current status of this transaction.
     fn get_status(&self) -> TransactionStatus {
         self.status.clone()
@@ -124,12 +133,16 @@ impl Transaction for Deposit {
         self.transaction_hash.clone()
     }
 
+
     fn type_name(&self) -> &'static str {
         "Deposit"
     }
 }
 
+
+
 impl Entity for Deposit {
+
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -145,15 +158,16 @@ impl Entity for Deposit {
         self.updated_at
     }
 
+
     fn type_name(&self) -> &'static str {
         "Deposit"
     }
 }
 
+
 impl GetEntity for Deposit {
     fn get_entity_query() -> String {
-        format!(
-            "
+        format!("
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on Deposit {{
@@ -162,11 +176,11 @@ impl GetEntity for Deposit {
             }}
         }}
 
-        {}",
-            FRAGMENT
-        )
-    }
+        {}", FRAGMENT)
+    }    
 }
+
+
 
 pub const FRAGMENT: &str = "
 fragment DepositFragment on Deposit {
@@ -202,3 +216,6 @@ fragment DepositFragment on Deposit {
     }
 }
 ";
+
+
+

@@ -1,3 +1,4 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -6,28 +7,30 @@ use std::fmt;
 /// This is an enum of the potential statuses that a Withdrawal can take.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum WithdrawalRequestStatus {
-    #[serde(rename = "CREATING")]
+
+    #[serde(rename="CREATING")]
     Creating,
 
-    #[serde(rename = "CREATED")]
+    #[serde(rename="CREATED")]
     Created,
 
-    #[serde(rename = "FAILED")]
+    #[serde(rename="FAILED")]
     Failed,
 
-    #[serde(rename = "IN_PROGRESS")]
+    #[serde(rename="IN_PROGRESS")]
     InProgress,
 
-    #[serde(rename = "SUCCESSFUL")]
+    #[serde(rename="SUCCESSFUL")]
     Successful,
 
-    #[serde(rename = "PARTIALLY_SUCCESSFUL")]
+    #[serde(rename="PARTIALLY_SUCCESSFUL")]
     PartiallySuccessful,
+
 }
 
-impl From<WithdrawalRequestStatus> for Value {
-    fn from(val: WithdrawalRequestStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for WithdrawalRequestStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -40,6 +43,8 @@ impl fmt::Display for WithdrawalRequestStatus {
             Self::InProgress => write!(f, "IN_PROGRESS"),
             Self::Successful => write!(f, "SUCCESSFUL"),
             Self::PartiallySuccessful => write!(f, "PARTIALLY_SUCCESSFUL"),
+
         }
     }
 }
+

@@ -1,3 +1,4 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -6,22 +7,24 @@ use std::fmt;
 /// This is an enum that enumerates all potential statuses for an incoming payment attempt.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum IncomingPaymentAttemptStatus {
-    #[serde(rename = "ACCEPTED")]
+
+    #[serde(rename="ACCEPTED")]
     Accepted,
 
-    #[serde(rename = "SETTLED")]
+    #[serde(rename="SETTLED")]
     Settled,
 
-    #[serde(rename = "CANCELED")]
+    #[serde(rename="CANCELED")]
     Canceled,
 
-    #[serde(rename = "UNKNOWN")]
+    #[serde(rename="UNKNOWN")]
     Unknown,
+
 }
 
-impl From<IncomingPaymentAttemptStatus> for Value {
-    fn from(val: IncomingPaymentAttemptStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for IncomingPaymentAttemptStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -32,6 +35,8 @@ impl fmt::Display for IncomingPaymentAttemptStatus {
             Self::Settled => write!(f, "SETTLED"),
             Self::Canceled => write!(f, "CANCELED"),
             Self::Unknown => write!(f, "UNKNOWN"),
+
         }
     }
 }
+

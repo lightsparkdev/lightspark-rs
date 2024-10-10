@@ -1,3 +1,4 @@
+
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -6,52 +7,57 @@ use std::fmt;
 /// This is an enum of the potential event types that can be associated with your Lightspark wallets.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum WebhookEventType {
-    #[serde(rename = "PAYMENT_FINISHED")]
+
+    #[serde(rename="PAYMENT_FINISHED")]
     PaymentFinished,
 
-    #[serde(rename = "FORCE_CLOSURE")]
+    #[serde(rename="FORCE_CLOSURE")]
     ForceClosure,
 
-    #[serde(rename = "WITHDRAWAL_FINISHED")]
+    #[serde(rename="WITHDRAWAL_FINISHED")]
     WithdrawalFinished,
 
-    #[serde(rename = "FUNDS_RECEIVED")]
+    #[serde(rename="FUNDS_RECEIVED")]
     FundsReceived,
 
-    #[serde(rename = "NODE_STATUS")]
+    #[serde(rename="NODE_STATUS")]
     NodeStatus,
 
-    #[serde(rename = "UMA_INVITATION_CLAIMED")]
+    #[serde(rename="UMA_INVITATION_CLAIMED")]
     UmaInvitationClaimed,
 
-    #[serde(rename = "WALLET_STATUS")]
+    #[serde(rename="WALLET_STATUS")]
     WalletStatus,
 
-    #[serde(rename = "WALLET_OUTGOING_PAYMENT_FINISHED")]
+    #[serde(rename="WALLET_OUTGOING_PAYMENT_FINISHED")]
     WalletOutgoingPaymentFinished,
 
-    #[serde(rename = "WALLET_INCOMING_PAYMENT_FINISHED")]
+    #[serde(rename="WALLET_INCOMING_PAYMENT_FINISHED")]
     WalletIncomingPaymentFinished,
 
-    #[serde(rename = "WALLET_WITHDRAWAL_FINISHED")]
+    #[serde(rename="WALLET_WITHDRAWAL_FINISHED")]
     WalletWithdrawalFinished,
 
-    #[serde(rename = "WALLET_FUNDS_RECEIVED")]
+    #[serde(rename="WALLET_FUNDS_RECEIVED")]
     WalletFundsReceived,
 
-    #[serde(rename = "REMOTE_SIGNING")]
+    #[serde(rename="REMOTE_SIGNING")]
     RemoteSigning,
 
-    #[serde(rename = "LOW_BALANCE")]
+    #[serde(rename="LOW_BALANCE")]
     LowBalance,
 
-    #[serde(rename = "HIGH_BALANCE")]
+    #[serde(rename="HIGH_BALANCE")]
     HighBalance,
+
+    #[serde(rename="CHANNEL_OPENING_FEES")]
+    ChannelOpeningFees,
+
 }
 
-impl From<WebhookEventType> for Value {
-    fn from(val: WebhookEventType) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for WebhookEventType {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -72,6 +78,9 @@ impl fmt::Display for WebhookEventType {
             Self::RemoteSigning => write!(f, "REMOTE_SIGNING"),
             Self::LowBalance => write!(f, "LOW_BALANCE"),
             Self::HighBalance => write!(f, "HIGH_BALANCE"),
+            Self::ChannelOpeningFees => write!(f, "CHANNEL_OPENING_FEES"),
+
         }
     }
 }
+

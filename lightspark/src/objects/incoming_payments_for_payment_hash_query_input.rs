@@ -6,13 +6,13 @@ use std::vec::Vec;
 
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct OutgoingPaymentsForPaymentHashQueryInput {
+pub struct IncomingPaymentsForPaymentHashQueryInput {
 
     /// The 32-byte hash of the payment preimage for which to fetch payments
     
     pub payment_hash: String,
 
-    /// An optional filter to only query outgoing payments of given statuses.
+    /// An optional filter to only query incoming payments of given statuses.
     
     pub statuses: Option<Vec<TransactionStatus>>,
 
