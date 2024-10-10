@@ -5,7 +5,6 @@ use crate::objects::balances::Balances;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
-use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::node::Node;
 use crate::types::entity_wrapper::EntityWrapper;

@@ -1008,9 +1008,9 @@ pub enum RegionCode {
     Nn,
 }
 
-impl Into<Value> for RegionCode {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<RegionCode> for Value {
+    fn from(val: RegionCode) -> Self {
+        Value::from(val.to_string())
     }
 }
 

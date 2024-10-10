@@ -36,9 +36,9 @@ pub enum ChannelStatus {
     Error,
 }
 
-impl Into<Value> for ChannelStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<ChannelStatus> for Value {
+    fn from(val: ChannelStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

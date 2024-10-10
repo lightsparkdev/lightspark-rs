@@ -251,8 +251,8 @@ impl Channel {
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
-        let result = requester.execute_graphql(&query, Some(value)).await?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["uptime_percentage"].clone();
         let result = json.as_i64();
         Ok(result)
@@ -305,10 +305,10 @@ impl Channel {
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
-        let result = requester.execute_graphql(&query, Some(value)).await?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["transactions"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

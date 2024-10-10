@@ -23,9 +23,9 @@ pub enum OnChainFeeTarget {
     Background,
 }
 
-impl Into<Value> for OnChainFeeTarget {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<OnChainFeeTarget> for Value {
+    fn from(val: OnChainFeeTarget) -> Self {
+        Value::from(val.to_string())
     }
 }
 

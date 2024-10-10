@@ -1,6 +1,5 @@
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use crate::objects::connection::Connection;
-use crate::objects::lightspark_node::LightsparkNode;
 use crate::objects::lightspark_node::LightsparkNodeEnum;
 use crate::objects::page_info::PageInfo;
 use serde::{Deserialize, Serialize};

@@ -13,9 +13,9 @@ pub enum PaymentDirection {
     Received,
 }
 
-impl Into<Value> for PaymentDirection {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<PaymentDirection> for Value {
+    fn from(val: PaymentDirection) -> Self {
+        Value::from(val.to_string())
     }
 }
 

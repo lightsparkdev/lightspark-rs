@@ -91,9 +91,9 @@ pub enum HtlcAttemptFailureCode {
     UnreadableFailure,
 }
 
-impl Into<Value> for HtlcAttemptFailureCode {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<HtlcAttemptFailureCode> for Value {
+    fn from(val: HtlcAttemptFailureCode) -> Self {
+        Value::from(val.to_string())
     }
 }
 

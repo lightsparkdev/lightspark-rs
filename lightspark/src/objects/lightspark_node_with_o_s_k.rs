@@ -8,7 +8,6 @@ use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::entity::Entity;
 use crate::objects::lightning_payment_direction::LightningPaymentDirection;
 use crate::objects::lightspark_node::LightsparkNode;
-use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
 use crate::objects::lightspark_node_status::LightsparkNodeStatus;
 use crate::objects::lightspark_node_to_channels_connection::LightsparkNodeToChannelsConnection;
 use crate::objects::lightspark_node_to_daily_liquidity_forecasts_connection::LightsparkNodeToDailyLiquidityForecastsConnection;
@@ -405,10 +404,10 @@ impl LightsparkNodeWithOSK {
         variables.insert("first", first.into());
         variables.insert("types", types.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
-        let result = requester.execute_graphql(&query, Some(value)).await?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["addresses"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
@@ -540,10 +539,10 @@ impl LightsparkNodeWithOSK {
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("statuses", statuses.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
-        let result = requester.execute_graphql(&query, Some(value)).await?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["channels"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 
@@ -585,10 +584,10 @@ impl LightsparkNodeWithOSK {
         variables.insert("to_date", to_date.format("%Y-%m-%d").to_string().into());
         variables.insert("direction", direction.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
-        let result = requester.execute_graphql(&query, Some(value)).await?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["daily_liquidity_forecasts"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

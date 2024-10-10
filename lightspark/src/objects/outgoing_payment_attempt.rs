@@ -215,10 +215,10 @@ impl OutgoingPaymentAttempt {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
-        let result = requester.execute_graphql(&query, Some(value)).await?;
+        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
+        let result = requester.execute_graphql(query, Some(value)).await?;
         let json = result["entity"]["hops"].clone();
-        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
+        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
         Ok(result)
     }
 }

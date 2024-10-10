@@ -40,9 +40,9 @@ pub enum CurrencyUnit {
     Millibitcoin,
 }
 
-impl Into<Value> for CurrencyUnit {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<CurrencyUnit> for Value {
+    fn from(val: CurrencyUnit) -> Self {
+        Value::from(val.to_string())
     }
 }
 

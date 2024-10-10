@@ -18,9 +18,9 @@ pub enum SignablePayloadStatus {
     InvalidSignature,
 }
 
-impl Into<Value> for SignablePayloadStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<SignablePayloadStatus> for Value {
+    fn from(val: SignablePayloadStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

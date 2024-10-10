@@ -32,9 +32,9 @@ pub enum TransactionStatus {
     Cancelled,
 }
 
-impl Into<Value> for TransactionStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<TransactionStatus> for Value {
+    fn from(val: TransactionStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

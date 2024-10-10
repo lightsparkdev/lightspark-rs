@@ -36,9 +36,9 @@ pub enum LightsparkNodeStatus {
     FailedToDeploy,
 }
 
-impl Into<Value> for LightsparkNodeStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<LightsparkNodeStatus> for Value {
+    fn from(val: LightsparkNodeStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

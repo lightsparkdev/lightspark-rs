@@ -25,9 +25,9 @@ pub enum WithdrawalRequestStatus {
     PartiallySuccessful,
 }
 
-impl Into<Value> for WithdrawalRequestStatus {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<WithdrawalRequestStatus> for Value {
+    fn from(val: WithdrawalRequestStatus) -> Self {
+        Value::from(val.to_string())
     }
 }
 

@@ -16,9 +16,9 @@ pub enum RiskRating {
     Unknown,
 }
 
-impl Into<Value> for RiskRating {
-    fn into(self) -> Value {
-        Value::from(self.to_string())
+impl From<RiskRating> for Value {
+    fn from(val: RiskRating) -> Self {
+        Value::from(val.to_string())
     }
 }
 
