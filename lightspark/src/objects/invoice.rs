@@ -37,6 +37,14 @@ pub struct Invoice {
     #[serde(rename = "invoice_amount_paid")]
     pub amount_paid: Option<CurrencyAmount>,
 
+    /// Whether this invoice is an UMA invoice or not. NOTE: this field is only set if the invoice was created using the recommended `create_uma_invoice` function.
+    #[serde(rename = "invoice_is_uma")]
+    pub is_uma: Option<bool>,
+
+    /// Whether this invoice is an LNURL invoice or not. NOTE: this field is only set if the invoice was created using the recommended `create_lnurl_invoice` function.
+    #[serde(rename = "invoice_is_lnurl")]
+    pub is_lnurl: Option<bool>,
+
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
@@ -403,5 +411,7 @@ fragment InvoiceFragment on Invoice {
         currency_amount_preferred_currency_value_rounded: preferred_currency_value_rounded
         currency_amount_preferred_currency_value_approx: preferred_currency_value_approx
     }
+    invoice_is_uma: is_uma
+    invoice_is_lnurl: is_lnurl
 }
 ";

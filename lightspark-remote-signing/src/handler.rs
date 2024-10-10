@@ -62,7 +62,7 @@ impl Handler {
                 SigningRequest::ReleaseCounterpartyPerCommitmentSecretRequest(_) => None,
             };
 
-            Ok(response.map(|r| Some(r.graphql_response())).flatten())
+            Ok(response.map(|r| r.graphql_response()))
         }
     }
 
