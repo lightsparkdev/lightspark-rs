@@ -1002,6 +1002,10 @@ pub enum RegionCode {
 
     #[serde(rename = "ZW")]
     Zw,
+    /// The code representing a fake region for testing.
+
+    #[serde(rename = "NN")]
+    Nn,
 }
 
 impl From<RegionCode> for Value {
@@ -1262,6 +1266,7 @@ impl fmt::Display for RegionCode {
             Self::Ye => write!(f, "YE"),
             Self::Zm => write!(f, "ZM"),
             Self::Zw => write!(f, "ZW"),
+            Self::Nn => write!(f, "NN"),
         }
     }
 }

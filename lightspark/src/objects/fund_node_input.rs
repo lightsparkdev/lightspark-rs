@@ -6,4 +6,6 @@ pub struct FundNodeInput {
     pub node_id: String,
 
     pub amount_sats: Option<i64>,
+
+    pub funding_address: Option<String>,
 }

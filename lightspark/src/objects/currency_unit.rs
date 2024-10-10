@@ -22,6 +22,10 @@ pub enum CurrencyUnit {
 
     #[serde(rename = "USD")]
     Usd,
+    /// Mexican Peso.
+
+    #[serde(rename = "MXN")]
+    Mxn,
     /// 0.000000001 (10e-9) Bitcoin or a billionth of a Bitcoin. We recommend using the Satoshi unit instead when possible.
 
     #[serde(rename = "NANOBITCOIN")]
@@ -49,6 +53,7 @@ impl fmt::Display for CurrencyUnit {
             Self::Satoshi => write!(f, "SATOSHI"),
             Self::Millisatoshi => write!(f, "MILLISATOSHI"),
             Self::Usd => write!(f, "USD"),
+            Self::Mxn => write!(f, "MXN"),
             Self::Nanobitcoin => write!(f, "NANOBITCOIN"),
             Self::Microbitcoin => write!(f, "MICROBITCOIN"),
             Self::Millibitcoin => write!(f, "MILLIBITCOIN"),

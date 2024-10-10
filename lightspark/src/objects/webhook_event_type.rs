@@ -47,6 +47,9 @@ pub enum WebhookEventType {
 
     #[serde(rename = "HIGH_BALANCE")]
     HighBalance,
+
+    #[serde(rename = "CHANNEL_OPENING_FEES")]
+    ChannelOpeningFees,
 }
 
 impl From<WebhookEventType> for Value {
@@ -72,6 +75,7 @@ impl fmt::Display for WebhookEventType {
             Self::RemoteSigning => write!(f, "REMOTE_SIGNING"),
             Self::LowBalance => write!(f, "LOW_BALANCE"),
             Self::HighBalance => write!(f, "HIGH_BALANCE"),
+            Self::ChannelOpeningFees => write!(f, "CHANNEL_OPENING_FEES"),
         }
     }
 }
