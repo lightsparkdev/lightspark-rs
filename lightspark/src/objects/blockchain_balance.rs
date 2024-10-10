@@ -1,39 +1,34 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
 use crate::objects::currency_amount::CurrencyAmount;
+use serde::{Deserialize, Serialize};
 
 /// This is an object representing a detailed breakdown of the balance for a Lightspark Node.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct BlockchainBalance {
-
     /// The total wallet balance, including unconfirmed UTXOs.
-    #[serde (rename = "blockchain_balance_total_balance")]
+    #[serde(rename = "blockchain_balance_total_balance")]
     pub total_balance: Option<CurrencyAmount>,
 
     /// The balance of confirmed UTXOs in the wallet.
-    #[serde (rename = "blockchain_balance_confirmed_balance")]
+    #[serde(rename = "blockchain_balance_confirmed_balance")]
     pub confirmed_balance: Option<CurrencyAmount>,
 
     /// The balance of unconfirmed UTXOs in the wallet.
-    #[serde (rename = "blockchain_balance_unconfirmed_balance")]
+    #[serde(rename = "blockchain_balance_unconfirmed_balance")]
     pub unconfirmed_balance: Option<CurrencyAmount>,
 
     /// The balance that's locked by an on-chain transaction.
-    #[serde (rename = "blockchain_balance_locked_balance")]
+    #[serde(rename = "blockchain_balance_locked_balance")]
     pub locked_balance: Option<CurrencyAmount>,
 
     /// Funds required to be held in reserve for channel bumping.
-    #[serde (rename = "blockchain_balance_required_reserve")]
+    #[serde(rename = "blockchain_balance_required_reserve")]
     pub required_reserve: Option<CurrencyAmount>,
 
     /// Funds available for creating channels or withdrawing.
-    #[serde (rename = "blockchain_balance_available_balance")]
+    #[serde(rename = "blockchain_balance_available_balance")]
     pub available_balance: Option<CurrencyAmount>,
-
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment BlockchainBalanceFragment on BlockchainBalance {
@@ -88,6 +83,3 @@ fragment BlockchainBalanceFragment on BlockchainBalance {
     }
 }
 ";
-
-
-

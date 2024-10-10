@@ -1,34 +1,32 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::error::Error;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::objects::entity::Entity;
+use crate::objects::lightning_transaction::LightningTransaction;
+use crate::objects::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsConnection;
+use crate::objects::payment_failure_reason::PaymentFailureReason;
+use crate::objects::payment_request_data::PaymentRequestData;
+use crate::objects::payment_request_data::PaymentRequestDataEnum;
+use crate::objects::post_transaction_data::PostTransactionData;
+use crate::objects::rich_text::RichText;
+use crate::objects::transaction::Transaction;
+use crate::objects::transaction_status::TransactionStatus;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::types::get_entity::GetEntity;
+use crate::types::graphql_requester::GraphQLRequester;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::objects::transaction_status::TransactionStatus;
-use crate::types::graphql_requester::GraphQLRequester;
-use crate::objects::payment_request_data::PaymentRequestData;
-use crate::objects::entity::Entity;
-use crate::objects::post_transaction_data::PostTransactionData;
-use crate::objects::lightning_transaction::LightningTransaction;
-use crate::objects::rich_text::RichText;
-use crate::types::custom_date_formats::custom_date_format;
-use crate::error::Error;
 use std::collections::HashMap;
 use std::vec::Vec;
-use crate::objects::transaction::Transaction;
-use chrono::{DateTime, Utc};
-use crate::objects::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsConnection;
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::payment_failure_reason::PaymentFailureReason;
-use crate::types::get_entity::GetEntity;
-use crate::types::custom_date_formats::custom_date_format_option;
-use crate::objects::payment_request_data::PaymentRequestDataEnum;
 
 /// This object represents a Lightning Network payment sent from a Lightspark Node. You can retrieve this object to receive payment related information about any payment sent from your Lightspark Node on the Lightning Network.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OutgoingPayment {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde (rename = "outgoing_payment_id")]
+    #[serde(rename = "outgoing_payment_id")]
     pub id: String,
 
     /// The date and time when this transaction was initiated.
@@ -40,23 +38,26 @@ pub struct OutgoingPayment {
     pub updated_at: DateTime<Utc>,
 
     /// The current status of this transaction.
-    #[serde (rename = "outgoing_payment_status")]
+    #[serde(rename = "outgoing_payment_status")]
     pub status: TransactionStatus,
 
     /// The date and time when this transaction was completed or failed.
-    #[serde(with = "custom_date_format_option", rename = "outgoing_payment_resolved_at")]
+    #[serde(
+        with = "custom_date_format_option",
+        rename = "outgoing_payment_resolved_at"
+    )]
     pub resolved_at: Option<DateTime<Utc>>,
 
     /// The amount of money involved in this transaction.
-    #[serde (rename = "outgoing_payment_amount")]
+    #[serde(rename = "outgoing_payment_amount")]
     pub amount: CurrencyAmount,
 
     /// The hash of this transaction, so it can be uniquely identified on the Lightning Network.
-    #[serde (rename = "outgoing_payment_transaction_hash")]
+    #[serde(rename = "outgoing_payment_transaction_hash")]
     pub transaction_hash: Option<String>,
 
     /// Whether this payment is an UMA payment or not. NOTE: this field is only set if the payment has been sent using the recommended `pay_uma_invoice` function.
-    #[serde (rename = "outgoing_payment_is_uma")]
+    #[serde(rename = "outgoing_payment_is_uma")]
     pub is_uma: bool,
 
     /// The Lightspark node this payment originated from.
@@ -68,56 +69,49 @@ pub struct OutgoingPayment {
     pub destination: Option<EntityWrapper>,
 
     /// The fees paid by the sender node to send the payment.
-    #[serde (rename = "outgoing_payment_fees")]
+    #[serde(rename = "outgoing_payment_fees")]
     pub fees: Option<CurrencyAmount>,
 
     /// The data of the payment request that was paid by this transaction, if known.
-    #[serde (rename = "outgoing_payment_payment_request_data")]
+    #[serde(rename = "outgoing_payment_payment_request_data")]
     pub payment_request_data: Option<PaymentRequestDataEnum>,
 
     /// If applicable, the reason why the payment failed.
-    #[serde (rename = "outgoing_payment_failure_reason")]
+    #[serde(rename = "outgoing_payment_failure_reason")]
     pub failure_reason: Option<PaymentFailureReason>,
 
     /// If applicable, user-facing error message describing why the payment failed.
-    #[serde (rename = "outgoing_payment_failure_message")]
+    #[serde(rename = "outgoing_payment_failure_message")]
     pub failure_message: Option<RichText>,
 
     /// The post transaction data which can be used in KYT payment registration.
-    #[serde (rename = "outgoing_payment_uma_post_transaction_data")]
+    #[serde(rename = "outgoing_payment_uma_post_transaction_data")]
     pub uma_post_transaction_data: Option<Vec<PostTransactionData>>,
 
     /// The preimage of the payment.
-    #[serde (rename = "outgoing_payment_payment_preimage")]
+    #[serde(rename = "outgoing_payment_payment_preimage")]
     pub payment_preimage: Option<String>,
 
     /// Whether the payment is made to the same node.
-    #[serde (rename = "outgoing_payment_is_internal_payment")]
+    #[serde(rename = "outgoing_payment_is_internal_payment")]
     pub is_internal_payment: bool,
 
     /// The idempotency key of the payment.
-    #[serde (rename = "outgoing_payment_idempotency_key")]
+    #[serde(rename = "outgoing_payment_idempotency_key")]
     pub idempotency_key: Option<String>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl LightningTransaction for OutgoingPayment {
-
-
     fn type_name(&self) -> &'static str {
         "OutgoingPayment"
     }
 }
 
-
-
 impl Transaction for OutgoingPayment {
-
     /// The current status of this transaction.
     fn get_status(&self) -> TransactionStatus {
         self.status.clone()
@@ -138,16 +132,12 @@ impl Transaction for OutgoingPayment {
         self.transaction_hash.clone()
     }
 
-
     fn type_name(&self) -> &'static str {
         "OutgoingPayment"
     }
 }
 
-
-
 impl Entity for OutgoingPayment {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -163,16 +153,15 @@ impl Entity for OutgoingPayment {
         self.updated_at
     }
 
-
     fn type_name(&self) -> &'static str {
         "OutgoingPayment"
     }
 }
 
-
 impl GetEntity for OutgoingPayment {
     fn get_entity_query() -> String {
-        format!("
+        format!(
+            "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on OutgoingPayment {{
@@ -181,11 +170,11 @@ impl GetEntity for OutgoingPayment {
             }}
         }}
 
-        {}", FRAGMENT)
-    }    
+        {}",
+            FRAGMENT
+        )
+    }
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment OutgoingPaymentFragment on OutgoingPayment {
@@ -536,11 +525,13 @@ fragment OutgoingPaymentFragment on OutgoingPayment {
 }
 ";
 
-
 impl OutgoingPayment {
-
-    
-    pub async fn get_attempts(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>) -> Result<OutgoingPaymentToAttemptsConnection, Error> {
+    pub async fn get_attempts(
+        &self,
+        requester: &impl GraphQLRequester,
+        first: Option<i64>,
+        after: Option<String>,
+    ) -> Result<OutgoingPaymentToAttemptsConnection, Error> {
         let query = "query FetchOutgoingPaymentToAttemptsConnection($entity_id: ID!, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on OutgoingPayment {
@@ -596,12 +587,10 @@ impl OutgoingPayment {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-                
         let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
         let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["attempts"].clone();
         let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
-
 }

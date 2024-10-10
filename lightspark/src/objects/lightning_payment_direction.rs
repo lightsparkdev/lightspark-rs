@@ -1,4 +1,3 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -9,13 +8,12 @@ use std::fmt;
 pub enum LightningPaymentDirection {
     /// A payment that is received by the node.
 
-    #[serde(rename="INCOMING")]
+    #[serde(rename = "INCOMING")]
     Incoming,
     /// A payment that is sent by the node.
 
-    #[serde(rename="OUTGOING")]
+    #[serde(rename = "OUTGOING")]
     Outgoing,
-
 }
 
 impl Into<Value> for LightningPaymentDirection {
@@ -29,8 +27,6 @@ impl fmt::Display for LightningPaymentDirection {
         match self {
             Self::Incoming => write!(f, "INCOMING"),
             Self::Outgoing => write!(f, "OUTGOING"),
-
         }
     }
 }
-

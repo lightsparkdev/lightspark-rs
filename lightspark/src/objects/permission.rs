@@ -1,4 +1,3 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -7,49 +6,47 @@ use std::fmt;
 /// This is an enum of the potential permissions that a Lightspark user can have in regards to account management.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum Permission {
-
-    #[serde(rename="ALL")]
+    #[serde(rename = "ALL")]
     All,
 
-    #[serde(rename="MAINNET_VIEW")]
+    #[serde(rename = "MAINNET_VIEW")]
     MainnetView,
 
-    #[serde(rename="MAINNET_TRANSACT")]
+    #[serde(rename = "MAINNET_TRANSACT")]
     MainnetTransact,
 
-    #[serde(rename="MAINNET_MANAGE")]
+    #[serde(rename = "MAINNET_MANAGE")]
     MainnetManage,
 
-    #[serde(rename="TESTNET_VIEW")]
+    #[serde(rename = "TESTNET_VIEW")]
     TestnetView,
 
-    #[serde(rename="TESTNET_TRANSACT")]
+    #[serde(rename = "TESTNET_TRANSACT")]
     TestnetTransact,
 
-    #[serde(rename="TESTNET_MANAGE")]
+    #[serde(rename = "TESTNET_MANAGE")]
     TestnetManage,
 
-    #[serde(rename="REGTEST_VIEW")]
+    #[serde(rename = "REGTEST_VIEW")]
     RegtestView,
 
-    #[serde(rename="REGTEST_TRANSACT")]
+    #[serde(rename = "REGTEST_TRANSACT")]
     RegtestTransact,
 
-    #[serde(rename="REGTEST_MANAGE")]
+    #[serde(rename = "REGTEST_MANAGE")]
     RegtestManage,
 
-    #[serde(rename="USER_VIEW")]
+    #[serde(rename = "USER_VIEW")]
     UserView,
 
-    #[serde(rename="USER_MANAGE")]
+    #[serde(rename = "USER_MANAGE")]
     UserManage,
 
-    #[serde(rename="ACCOUNT_VIEW")]
+    #[serde(rename = "ACCOUNT_VIEW")]
     AccountView,
 
-    #[serde(rename="ACCOUNT_MANAGE")]
+    #[serde(rename = "ACCOUNT_MANAGE")]
     AccountManage,
-
 }
 
 impl Into<Value> for Permission {
@@ -75,8 +72,6 @@ impl fmt::Display for Permission {
             Self::UserManage => write!(f, "USER_MANAGE"),
             Self::AccountView => write!(f, "ACCOUNT_VIEW"),
             Self::AccountManage => write!(f, "ACCOUNT_MANAGE"),
-
         }
     }
 }
-

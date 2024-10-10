@@ -1,68 +1,75 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
 use crate::objects::currency_amount::CurrencyAmount;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::objects::transaction_status::TransactionStatus;
-use crate::objects::on_chain_transaction::OnChainTransaction;
 use crate::objects::entity::Entity;
-use crate::types::get_entity::GetEntity;
-use std::vec::Vec;
-use crate::types::custom_date_formats::custom_date_format_option;
+use crate::objects::on_chain_transaction::OnChainTransaction;
 use crate::objects::transaction::Transaction;
+use crate::objects::transaction_status::TransactionStatus;
 use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use std::vec::Vec;
 
 /// This is an object representing a transaction which closes a channel on the Lightning Network. This operation allocates balances back to the local and remote nodes.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChannelClosingTransaction {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde (rename = "channel_closing_transaction_id")]
+    #[serde(rename = "channel_closing_transaction_id")]
     pub id: String,
 
     /// The date and time when this transaction was initiated.
-    #[serde(with = "custom_date_format", rename = "channel_closing_transaction_created_at")]
+    #[serde(
+        with = "custom_date_format",
+        rename = "channel_closing_transaction_created_at"
+    )]
     pub created_at: DateTime<Utc>,
 
     /// The date and time when the entity was last updated.
-    #[serde(with = "custom_date_format", rename = "channel_closing_transaction_updated_at")]
+    #[serde(
+        with = "custom_date_format",
+        rename = "channel_closing_transaction_updated_at"
+    )]
     pub updated_at: DateTime<Utc>,
 
     /// The current status of this transaction.
-    #[serde (rename = "channel_closing_transaction_status")]
+    #[serde(rename = "channel_closing_transaction_status")]
     pub status: TransactionStatus,
 
     /// The date and time when this transaction was completed or failed.
-    #[serde(with = "custom_date_format_option", rename = "channel_closing_transaction_resolved_at")]
+    #[serde(
+        with = "custom_date_format_option",
+        rename = "channel_closing_transaction_resolved_at"
+    )]
     pub resolved_at: Option<DateTime<Utc>>,
 
     /// The amount of money involved in this transaction.
-    #[serde (rename = "channel_closing_transaction_amount")]
+    #[serde(rename = "channel_closing_transaction_amount")]
     pub amount: CurrencyAmount,
 
     /// The hash of this transaction, so it can be uniquely identified on the Lightning Network.
-    #[serde (rename = "channel_closing_transaction_transaction_hash")]
+    #[serde(rename = "channel_closing_transaction_transaction_hash")]
     pub transaction_hash: Option<String>,
 
     /// The fees that were paid by the node for this transaction.
-    #[serde (rename = "channel_closing_transaction_fees")]
+    #[serde(rename = "channel_closing_transaction_fees")]
     pub fees: Option<CurrencyAmount>,
 
     /// The hash of the block that included this transaction. This will be null for unconfirmed transactions.
-    #[serde (rename = "channel_closing_transaction_block_hash")]
+    #[serde(rename = "channel_closing_transaction_block_hash")]
     pub block_hash: Option<String>,
 
     /// The height of the block that included this transaction. This will be zero for unconfirmed transactions.
-    #[serde (rename = "channel_closing_transaction_block_height")]
+    #[serde(rename = "channel_closing_transaction_block_height")]
     pub block_height: i64,
 
     /// The Bitcoin blockchain addresses this transaction was sent to.
-    #[serde (rename = "channel_closing_transaction_destination_addresses")]
+    #[serde(rename = "channel_closing_transaction_destination_addresses")]
     pub destination_addresses: Vec<String>,
 
     /// The number of blockchain confirmations for this transaction in real time.
-    #[serde (rename = "channel_closing_transaction_num_confirmations")]
+    #[serde(rename = "channel_closing_transaction_num_confirmations")]
     pub num_confirmations: Option<i64>,
 
     /// If known, the channel this transaction is closing.
@@ -72,12 +79,9 @@ pub struct ChannelClosingTransaction {
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl OnChainTransaction for ChannelClosingTransaction {
-
     /// The fees that were paid by the node for this transaction.
     fn get_fees(&self) -> Option<CurrencyAmount> {
         self.fees.clone()
@@ -103,16 +107,12 @@ impl OnChainTransaction for ChannelClosingTransaction {
         self.num_confirmations
     }
 
-
     fn type_name(&self) -> &'static str {
         "ChannelClosingTransaction"
     }
 }
 
-
-
 impl Transaction for ChannelClosingTransaction {
-
     /// The current status of this transaction.
     fn get_status(&self) -> TransactionStatus {
         self.status.clone()
@@ -133,16 +133,12 @@ impl Transaction for ChannelClosingTransaction {
         self.transaction_hash.clone()
     }
 
-
     fn type_name(&self) -> &'static str {
         "ChannelClosingTransaction"
     }
 }
 
-
-
 impl Entity for ChannelClosingTransaction {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -158,16 +154,15 @@ impl Entity for ChannelClosingTransaction {
         self.updated_at
     }
 
-
     fn type_name(&self) -> &'static str {
         "ChannelClosingTransaction"
     }
 }
 
-
 impl GetEntity for ChannelClosingTransaction {
     fn get_entity_query() -> String {
-        format!("
+        format!(
+            "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on ChannelClosingTransaction {{
@@ -176,11 +171,11 @@ impl GetEntity for ChannelClosingTransaction {
             }}
         }}
 
-        {}", FRAGMENT)
-    }    
+        {}",
+            FRAGMENT
+        )
+    }
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment ChannelClosingTransactionFragment on ChannelClosingTransaction {
@@ -216,6 +211,3 @@ fragment ChannelClosingTransactionFragment on ChannelClosingTransaction {
     }
 }
 ";
-
-
-

@@ -1,19 +1,13 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
 use crate::objects::currency_amount::CurrencyAmount;
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct LightningFeeEstimateOutput {
-
     /// The estimated fees for the payment.
-    #[serde (rename = "lightning_fee_estimate_output_fee_estimate")]
+    #[serde(rename = "lightning_fee_estimate_output_fee_estimate")]
     pub fee_estimate: CurrencyAmount,
-
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment LightningFeeEstimateOutputFragment on LightningFeeEstimateOutput {
@@ -28,6 +22,3 @@ fragment LightningFeeEstimateOutputFragment on LightningFeeEstimateOutput {
     }
 }
 ";
-
-
-

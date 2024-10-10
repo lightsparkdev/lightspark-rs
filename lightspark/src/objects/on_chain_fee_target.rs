@@ -1,29 +1,26 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fmt;
 
-
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum OnChainFeeTarget {
     /// Transaction expected to be confirmed within 2 blocks.
 
-    #[serde(rename="HIGH")]
+    #[serde(rename = "HIGH")]
     High,
     /// Transaction expected to be confirmed within 6 blocks.
 
-    #[serde(rename="MEDIUM")]
+    #[serde(rename = "MEDIUM")]
     Medium,
     /// Transaction expected to be confirmed within 18 blocks.
 
-    #[serde(rename="LOW")]
+    #[serde(rename = "LOW")]
     Low,
     /// Transaction expected to be confirmed within 50 blocks.
 
-    #[serde(rename="BACKGROUND")]
+    #[serde(rename = "BACKGROUND")]
     Background,
-
 }
 
 impl Into<Value> for OnChainFeeTarget {
@@ -39,8 +36,6 @@ impl fmt::Display for OnChainFeeTarget {
             Self::Medium => write!(f, "MEDIUM"),
             Self::Low => write!(f, "LOW"),
             Self::Background => write!(f, "BACKGROUND"),
-
         }
     }
 }
-

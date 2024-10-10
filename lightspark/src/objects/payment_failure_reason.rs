@@ -1,4 +1,3 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -7,43 +6,41 @@ use std::fmt;
 /// This is an enum of the potential reasons why an OutgoingPayment sent from a Lightspark Node may have failed.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum PaymentFailureReason {
-
-    #[serde(rename="NONE")]
+    #[serde(rename = "NONE")]
     None,
 
-    #[serde(rename="TIMEOUT")]
+    #[serde(rename = "TIMEOUT")]
     Timeout,
 
-    #[serde(rename="NO_ROUTE")]
+    #[serde(rename = "NO_ROUTE")]
     NoRoute,
 
-    #[serde(rename="ERROR")]
+    #[serde(rename = "ERROR")]
     Error,
 
-    #[serde(rename="INCORRECT_PAYMENT_DETAILS")]
+    #[serde(rename = "INCORRECT_PAYMENT_DETAILS")]
     IncorrectPaymentDetails,
 
-    #[serde(rename="INSUFFICIENT_BALANCE")]
+    #[serde(rename = "INSUFFICIENT_BALANCE")]
     InsufficientBalance,
 
-    #[serde(rename="INVOICE_ALREADY_PAID")]
+    #[serde(rename = "INVOICE_ALREADY_PAID")]
     InvoiceAlreadyPaid,
 
-    #[serde(rename="SELF_PAYMENT")]
+    #[serde(rename = "SELF_PAYMENT")]
     SelfPayment,
 
-    #[serde(rename="INVOICE_EXPIRED")]
+    #[serde(rename = "INVOICE_EXPIRED")]
     InvoiceExpired,
 
-    #[serde(rename="INVOICE_CANCELLED")]
+    #[serde(rename = "INVOICE_CANCELLED")]
     InvoiceCancelled,
 
-    #[serde(rename="RISK_SCREENING_FAILED")]
+    #[serde(rename = "RISK_SCREENING_FAILED")]
     RiskScreeningFailed,
 
-    #[serde(rename="INSUFFICIENT_BALANCE_ON_SINGLE_PATH_INVOICE")]
+    #[serde(rename = "INSUFFICIENT_BALANCE_ON_SINGLE_PATH_INVOICE")]
     InsufficientBalanceOnSinglePathInvoice,
-
 }
 
 impl Into<Value> for PaymentFailureReason {
@@ -66,9 +63,9 @@ impl fmt::Display for PaymentFailureReason {
             Self::InvoiceExpired => write!(f, "INVOICE_EXPIRED"),
             Self::InvoiceCancelled => write!(f, "INVOICE_CANCELLED"),
             Self::RiskScreeningFailed => write!(f, "RISK_SCREENING_FAILED"),
-            Self::InsufficientBalanceOnSinglePathInvoice => write!(f, "INSUFFICIENT_BALANCE_ON_SINGLE_PATH_INVOICE"),
-
+            Self::InsufficientBalanceOnSinglePathInvoice => {
+                write!(f, "INSUFFICIENT_BALANCE_ON_SINGLE_PATH_INVOICE")
+            }
         }
     }
 }
-

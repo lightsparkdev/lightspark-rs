@@ -1,32 +1,28 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::node::NodeEnum;
 use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::currency_amount::CurrencyAmount;
 use crate::objects::node::Node;
-use crate::types::custom_date_formats::custom_date_format;
+use crate::objects::node::NodeEnum;
 use crate::objects::payment_request_data::PaymentRequestData;
+use crate::types::custom_date_formats::custom_date_format;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 /// This object represents the data associated with a BOLT #11 invoice. You can retrieve this object to receive the relevant data associated with a specific invoice.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct InvoiceData {
-
-    
-    #[serde (rename = "invoice_data_encoded_payment_request")]
+    #[serde(rename = "invoice_data_encoded_payment_request")]
     pub encoded_payment_request: String,
 
-    
-    #[serde (rename = "invoice_data_bitcoin_network")]
+    #[serde(rename = "invoice_data_bitcoin_network")]
     pub bitcoin_network: BitcoinNetwork,
 
     /// The payment hash of this invoice.
-    #[serde (rename = "invoice_data_payment_hash")]
+    #[serde(rename = "invoice_data_payment_hash")]
     pub payment_hash: String,
 
     /// The requested amount in this invoice. If it is equal to 0, the sender should choose the amount to send.
-    #[serde (rename = "invoice_data_amount")]
+    #[serde(rename = "invoice_data_amount")]
     pub amount: CurrencyAmount,
 
     /// The date and time when this invoice was created.
@@ -38,40 +34,31 @@ pub struct InvoiceData {
     pub expires_at: DateTime<Utc>,
 
     /// A short, UTF-8 encoded, description of the purpose of this invoice.
-    #[serde (rename = "invoice_data_memo")]
+    #[serde(rename = "invoice_data_memo")]
     pub memo: Option<String>,
 
     /// The lightning node that will be paid when fulfilling this invoice.
-    #[serde (rename = "invoice_data_destination")]
+    #[serde(rename = "invoice_data_destination")]
     pub destination: NodeEnum,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl PaymentRequestData for InvoiceData {
-
-    
     fn get_encoded_payment_request(&self) -> String {
         self.encoded_payment_request.clone()
     }
 
-    
     fn get_bitcoin_network(&self) -> BitcoinNetwork {
         self.bitcoin_network.clone()
     }
-
 
     fn type_name(&self) -> &'static str {
         "InvoiceData"
     }
 }
-
-
-
 
 pub const FRAGMENT: &str = "
 fragment InvoiceDataFragment on InvoiceData {
@@ -366,6 +353,3 @@ fragment InvoiceDataFragment on InvoiceData {
     }
 }
 ";
-
-
-

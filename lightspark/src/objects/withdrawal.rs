@@ -1,24 +1,22 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
 use crate::objects::currency_amount::CurrencyAmount;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::objects::transaction_status::TransactionStatus;
-use crate::objects::on_chain_transaction::OnChainTransaction;
 use crate::objects::entity::Entity;
-use crate::types::get_entity::GetEntity;
-use std::vec::Vec;
-use crate::types::custom_date_formats::custom_date_format_option;
+use crate::objects::on_chain_transaction::OnChainTransaction;
 use crate::objects::transaction::Transaction;
+use crate::objects::transaction_status::TransactionStatus;
 use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::types::get_entity::GetEntity;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use std::vec::Vec;
 
 /// This object represents an L1 withdrawal from your Lightspark Node to any Bitcoin wallet. You can retrieve this object to receive detailed information about any L1 withdrawal associated with your Lightspark Node or account.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Withdrawal {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde (rename = "withdrawal_id")]
+    #[serde(rename = "withdrawal_id")]
     pub id: String,
 
     /// The date and time when this transaction was initiated.
@@ -30,7 +28,7 @@ pub struct Withdrawal {
     pub updated_at: DateTime<Utc>,
 
     /// The current status of this transaction.
-    #[serde (rename = "withdrawal_status")]
+    #[serde(rename = "withdrawal_status")]
     pub status: TransactionStatus,
 
     /// The date and time when this transaction was completed or failed.
@@ -38,31 +36,31 @@ pub struct Withdrawal {
     pub resolved_at: Option<DateTime<Utc>>,
 
     /// The amount of money involved in this transaction.
-    #[serde (rename = "withdrawal_amount")]
+    #[serde(rename = "withdrawal_amount")]
     pub amount: CurrencyAmount,
 
     /// The hash of this transaction, so it can be uniquely identified on the Lightning Network.
-    #[serde (rename = "withdrawal_transaction_hash")]
+    #[serde(rename = "withdrawal_transaction_hash")]
     pub transaction_hash: Option<String>,
 
     /// The fees that were paid by the node for this transaction.
-    #[serde (rename = "withdrawal_fees")]
+    #[serde(rename = "withdrawal_fees")]
     pub fees: Option<CurrencyAmount>,
 
     /// The hash of the block that included this transaction. This will be null for unconfirmed transactions.
-    #[serde (rename = "withdrawal_block_hash")]
+    #[serde(rename = "withdrawal_block_hash")]
     pub block_hash: Option<String>,
 
     /// The height of the block that included this transaction. This will be zero for unconfirmed transactions.
-    #[serde (rename = "withdrawal_block_height")]
+    #[serde(rename = "withdrawal_block_height")]
     pub block_height: i64,
 
     /// The Bitcoin blockchain addresses this transaction was sent to.
-    #[serde (rename = "withdrawal_destination_addresses")]
+    #[serde(rename = "withdrawal_destination_addresses")]
     pub destination_addresses: Vec<String>,
 
     /// The number of blockchain confirmations for this transaction in real time.
-    #[serde (rename = "withdrawal_num_confirmations")]
+    #[serde(rename = "withdrawal_num_confirmations")]
     pub num_confirmations: Option<i64>,
 
     /// The Lightspark node this withdrawal originated from.
@@ -72,12 +70,9 @@ pub struct Withdrawal {
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl OnChainTransaction for Withdrawal {
-
     /// The fees that were paid by the node for this transaction.
     fn get_fees(&self) -> Option<CurrencyAmount> {
         self.fees.clone()
@@ -103,16 +98,12 @@ impl OnChainTransaction for Withdrawal {
         self.num_confirmations
     }
 
-
     fn type_name(&self) -> &'static str {
         "Withdrawal"
     }
 }
 
-
-
 impl Transaction for Withdrawal {
-
     /// The current status of this transaction.
     fn get_status(&self) -> TransactionStatus {
         self.status.clone()
@@ -133,16 +124,12 @@ impl Transaction for Withdrawal {
         self.transaction_hash.clone()
     }
 
-
     fn type_name(&self) -> &'static str {
         "Withdrawal"
     }
 }
 
-
-
 impl Entity for Withdrawal {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -158,16 +145,15 @@ impl Entity for Withdrawal {
         self.updated_at
     }
 
-
     fn type_name(&self) -> &'static str {
         "Withdrawal"
     }
 }
 
-
 impl GetEntity for Withdrawal {
     fn get_entity_query() -> String {
-        format!("
+        format!(
+            "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on Withdrawal {{
@@ -176,11 +162,11 @@ impl GetEntity for Withdrawal {
             }}
         }}
 
-        {}", FRAGMENT)
-    }    
+        {}",
+            FRAGMENT
+        )
+    }
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment WithdrawalFragment on Withdrawal {
@@ -216,6 +202,3 @@ fragment WithdrawalFragment on Withdrawal {
     }
 }
 ";
-
-
-

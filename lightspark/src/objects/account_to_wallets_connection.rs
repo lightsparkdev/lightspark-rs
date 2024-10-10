@@ -1,36 +1,30 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::objects::connection::Connection;
+use crate::objects::page_info::PageInfo;
+use crate::objects::wallet::Wallet;
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
-use crate::objects::wallet::Wallet;
-use crate::objects::page_info::PageInfo;
-use crate::objects::connection::Connection;
-
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AccountToWalletsConnection {
-
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
-    #[serde (rename = "account_to_wallets_connection_count")]
+    #[serde(rename = "account_to_wallets_connection_count")]
     pub count: i64,
 
     /// An object that holds pagination information about the objects in this connection.
-    #[serde (rename = "account_to_wallets_connection_page_info")]
+    #[serde(rename = "account_to_wallets_connection_page_info")]
     pub page_info: PageInfo,
 
     /// The wallets for the current page of this connection.
-    #[serde (rename = "account_to_wallets_connection_entities")]
+    #[serde(rename = "account_to_wallets_connection_entities")]
     pub entities: Vec<Wallet>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl Connection for AccountToWalletsConnection {
-
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     fn get_count(&self) -> i64 {
         self.count
@@ -41,14 +35,10 @@ impl Connection for AccountToWalletsConnection {
         self.page_info.clone()
     }
 
-
     fn type_name(&self) -> &'static str {
         "AccountToWalletsConnection"
     }
 }
-
-
-
 
 pub const FRAGMENT: &str = "
 fragment AccountToWalletsConnectionFragment on AccountToWalletsConnection {
@@ -66,6 +56,3 @@ fragment AccountToWalletsConnectionFragment on AccountToWalletsConnection {
     }
 }
 ";
-
-
-

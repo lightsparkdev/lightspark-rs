@@ -1,15 +1,13 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use crate::objects::entity::Entity;
-use serde_json::Value;
-use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
-use crate::objects::bitcoin_network::BitcoinNetwork;
-use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
-use serde::{Deserialize, Deserializer, Serialize};
 use super::graph_node::GraphNode;
+use super::lightspark_node_with_o_s_k::LightsparkNodeWithOSK;
+use super::lightspark_node_with_remote_signing::LightsparkNodeWithRemoteSigning;
+use crate::objects::bitcoin_network::BitcoinNetwork;
+use crate::objects::entity::Entity;
+use serde::{Deserialize, Deserializer, Serialize};
+use serde_json::Value;
 
-pub trait Node : Entity {
-
+pub trait Node: Entity {
     /// A name that identifies the node. It has no importance in terms of operating the node, it is just a way to identify and search for commercial services or popular nodes. This alias can be changed at any time by the node operator.
     fn get_alias(&self) -> Option<String>;
 
@@ -28,10 +26,8 @@ pub trait Node : Entity {
     /// The public key of this node. It acts as a unique identifier of this node in the Lightning Network.
     fn get_public_key(&self) -> Option<String>;
 
-
-fn type_name(&self) -> &'static str;
+    fn type_name(&self) -> &'static str;
 }
-
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
@@ -39,10 +35,7 @@ pub enum NodeEnum {
     GraphNode(GraphNode),
     LightsparkNodeWithOSK(LightsparkNodeWithOSK),
     LightsparkNodeWithRemoteSigning(LightsparkNodeWithRemoteSigning),
-
 }
-
-
 
 impl<'de> Deserialize<'de> for NodeEnum {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -53,26 +46,24 @@ impl<'de> Deserialize<'de> for NodeEnum {
         if let Some(typename) = value.get("__typename").and_then(Value::as_str) {
             match typename {
                 "GraphNode" => {
-                    let obj = GraphNode::deserialize(value)
-                        .map_err(|err|
-                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
-                        )?;
+                    let obj = GraphNode::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
                     Ok(NodeEnum::GraphNode(obj))
-                },
+                }
                 "LightsparkNodeWithOSK" => {
-                    let obj = LightsparkNodeWithOSK::deserialize(value)
-                        .map_err(|err|
-                            serde::de::Error::custom(format!("Serde JSON Error {}", err))
-                        )?;
+                    let obj = LightsparkNodeWithOSK::deserialize(value).map_err(|err| {
+                        serde::de::Error::custom(format!("Serde JSON Error {}", err))
+                    })?;
                     Ok(NodeEnum::LightsparkNodeWithOSK(obj))
-                },
+                }
                 "LightsparkNodeWithRemoteSigning" => {
-                    let obj = LightsparkNodeWithRemoteSigning::deserialize(value)
-                        .map_err(|err|
+                    let obj =
+                        LightsparkNodeWithRemoteSigning::deserialize(value).map_err(|err| {
                             serde::de::Error::custom(format!("Serde JSON Error {}", err))
-                        )?;
+                        })?;
                     Ok(NodeEnum::LightsparkNodeWithRemoteSigning(obj))
-                },
+                }
 
                 _ => Err(serde::de::Error::custom("unknown typename")),
             }
@@ -81,4 +72,3 @@ impl<'de> Deserialize<'de> for NodeEnum {
         }
     }
 }
-

@@ -1,4 +1,3 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -9,29 +8,28 @@ use std::fmt;
 pub enum TransactionStatus {
     /// Transaction succeeded.
 
-    #[serde(rename="SUCCESS")]
+    #[serde(rename = "SUCCESS")]
     Success,
     /// Transaction failed.
 
-    #[serde(rename="FAILED")]
+    #[serde(rename = "FAILED")]
     Failed,
     /// Transaction has been initiated and is currently in-flight.
 
-    #[serde(rename="PENDING")]
+    #[serde(rename = "PENDING")]
     Pending,
     /// For transaction type PAYMENT_REQUEST only. No payments have been made to a payment request.
 
-    #[serde(rename="NOT_STARTED")]
+    #[serde(rename = "NOT_STARTED")]
     NotStarted,
     /// For transaction type PAYMENT_REQUEST only. A payment request has expired.
 
-    #[serde(rename="EXPIRED")]
+    #[serde(rename = "EXPIRED")]
     Expired,
     /// For transaction type PAYMENT_REQUEST only.
 
-    #[serde(rename="CANCELLED")]
+    #[serde(rename = "CANCELLED")]
     Cancelled,
-
 }
 
 impl Into<Value> for TransactionStatus {
@@ -49,8 +47,6 @@ impl fmt::Display for TransactionStatus {
             Self::NotStarted => write!(f, "NOT_STARTED"),
             Self::Expired => write!(f, "EXPIRED"),
             Self::Cancelled => write!(f, "CANCELLED"),
-
         }
     }
 }
-

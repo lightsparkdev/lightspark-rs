@@ -1,4 +1,3 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -9,1005 +8,1004 @@ use std::fmt;
 pub enum RegionCode {
     /// The code representing the country of Afghanistan.
 
-    #[serde(rename="AF")]
+    #[serde(rename = "AF")]
     Af,
     /// The code representing the country of Åland Islands.
 
-    #[serde(rename="AX")]
+    #[serde(rename = "AX")]
     Ax,
     /// The code representing the country of Albania.
 
-    #[serde(rename="AL")]
+    #[serde(rename = "AL")]
     Al,
     /// The code representing the country of Algeria.
 
-    #[serde(rename="DZ")]
+    #[serde(rename = "DZ")]
     Dz,
     /// The code representing the country of American Samoa.
 
-    #[serde(rename="AS")]
+    #[serde(rename = "AS")]
     As,
     /// The code representing the country of Andorra.
 
-    #[serde(rename="AD")]
+    #[serde(rename = "AD")]
     Ad,
     /// The code representing the country of Angola.
 
-    #[serde(rename="AO")]
+    #[serde(rename = "AO")]
     Ao,
     /// The code representing the country of Anguilla.
 
-    #[serde(rename="AI")]
+    #[serde(rename = "AI")]
     Ai,
     /// The code representing the country of Antarctica.
 
-    #[serde(rename="AQ")]
+    #[serde(rename = "AQ")]
     Aq,
     /// The code representing the country of Antigua and Barbuda.
 
-    #[serde(rename="AG")]
+    #[serde(rename = "AG")]
     Ag,
     /// The code representing the country of Argentina.
 
-    #[serde(rename="AR")]
+    #[serde(rename = "AR")]
     Ar,
     /// The code representing the country of Armenia.
 
-    #[serde(rename="AM")]
+    #[serde(rename = "AM")]
     Am,
     /// The code representing the country of Aruba.
 
-    #[serde(rename="AW")]
+    #[serde(rename = "AW")]
     Aw,
     /// The code representing the country of Australia.
 
-    #[serde(rename="AU")]
+    #[serde(rename = "AU")]
     Au,
     /// The code representing the country of Austria.
 
-    #[serde(rename="AT")]
+    #[serde(rename = "AT")]
     At,
     /// The code representing the country of Azerbaijan.
 
-    #[serde(rename="AZ")]
+    #[serde(rename = "AZ")]
     Az,
     /// The code representing the country of Bahamas.
 
-    #[serde(rename="BS")]
+    #[serde(rename = "BS")]
     Bs,
     /// The code representing the country of Bahrain.
 
-    #[serde(rename="BH")]
+    #[serde(rename = "BH")]
     Bh,
     /// The code representing the country of Bangladesh.
 
-    #[serde(rename="BD")]
+    #[serde(rename = "BD")]
     Bd,
     /// The code representing the country of Barbados.
 
-    #[serde(rename="BB")]
+    #[serde(rename = "BB")]
     Bb,
     /// The code representing the country of Belarus.
 
-    #[serde(rename="BY")]
+    #[serde(rename = "BY")]
     By,
     /// The code representing the country of Belgium.
 
-    #[serde(rename="BE")]
+    #[serde(rename = "BE")]
     Be,
     /// The code representing the country of Belize.
 
-    #[serde(rename="BZ")]
+    #[serde(rename = "BZ")]
     Bz,
     /// The code representing the country of Benin.
 
-    #[serde(rename="BJ")]
+    #[serde(rename = "BJ")]
     Bj,
     /// The code representing the country of Bermuda.
 
-    #[serde(rename="BM")]
+    #[serde(rename = "BM")]
     Bm,
     /// The code representing the country of Bhutan.
 
-    #[serde(rename="BT")]
+    #[serde(rename = "BT")]
     Bt,
     /// The code representing the country of The Plurinational State of Bolivia.
 
-    #[serde(rename="BO")]
+    #[serde(rename = "BO")]
     Bo,
     /// The code representing the country of Bonaire, Sint Eustatius, and Saba.
 
-    #[serde(rename="BQ")]
+    #[serde(rename = "BQ")]
     Bq,
     /// The code representing the country of Bosnia and Herzegovina.
 
-    #[serde(rename="BA")]
+    #[serde(rename = "BA")]
     Ba,
     /// The code representing the country of Botswana.
 
-    #[serde(rename="BW")]
+    #[serde(rename = "BW")]
     Bw,
     /// The code representing the country of Bouvet Island.
 
-    #[serde(rename="BV")]
+    #[serde(rename = "BV")]
     Bv,
     /// The code representing the country of Brazil.
 
-    #[serde(rename="BR")]
+    #[serde(rename = "BR")]
     Br,
     /// The code representing the country of British Indian Ocean Territory.
 
-    #[serde(rename="IO")]
+    #[serde(rename = "IO")]
     Io,
     /// The code representing the country of Brunei Darussalam.
 
-    #[serde(rename="BN")]
+    #[serde(rename = "BN")]
     Bn,
     /// The code representing the country of Bulgaria.
 
-    #[serde(rename="BG")]
+    #[serde(rename = "BG")]
     Bg,
     /// The code representing the country of Burkina Faso.
 
-    #[serde(rename="BF")]
+    #[serde(rename = "BF")]
     Bf,
     /// The code representing the country of Burundi.
 
-    #[serde(rename="BI")]
+    #[serde(rename = "BI")]
     Bi,
     /// The code representing the country of Cambodia.
 
-    #[serde(rename="KH")]
+    #[serde(rename = "KH")]
     Kh,
     /// The code representing the country of Cameroon.
 
-    #[serde(rename="CM")]
+    #[serde(rename = "CM")]
     Cm,
     /// The code representing the country of Canada.
 
-    #[serde(rename="CA")]
+    #[serde(rename = "CA")]
     Ca,
     /// The code representing the country of Cape Verde.
 
-    #[serde(rename="CV")]
+    #[serde(rename = "CV")]
     Cv,
     /// The code representing the country of Cayman Islands.
 
-    #[serde(rename="KY")]
+    #[serde(rename = "KY")]
     Ky,
     /// The code representing the country of Central African Republic.
 
-    #[serde(rename="CF")]
+    #[serde(rename = "CF")]
     Cf,
     /// The code representing the country of Chad.
 
-    #[serde(rename="TD")]
+    #[serde(rename = "TD")]
     Td,
     /// The code representing the country of Chile.
 
-    #[serde(rename="CL")]
+    #[serde(rename = "CL")]
     Cl,
     /// The code representing the country of China.
 
-    #[serde(rename="CN")]
+    #[serde(rename = "CN")]
     Cn,
     /// The code representing the country of Christmas Island.
 
-    #[serde(rename="CX")]
+    #[serde(rename = "CX")]
     Cx,
     /// The code representing the country of Cocos (Keeling) Islands.
 
-    #[serde(rename="CC")]
+    #[serde(rename = "CC")]
     Cc,
     /// The code representing the country of Colombia.
 
-    #[serde(rename="CO")]
+    #[serde(rename = "CO")]
     Co,
     /// The code representing the country of Comoros.
 
-    #[serde(rename="KM")]
+    #[serde(rename = "KM")]
     Km,
     /// The code representing the country of Congo.
 
-    #[serde(rename="CG")]
+    #[serde(rename = "CG")]
     Cg,
     /// The code representing the country of The Democratic Republic of the Congo.
 
-    #[serde(rename="CD")]
+    #[serde(rename = "CD")]
     Cd,
     /// The code representing the country of Cook Islands.
 
-    #[serde(rename="CK")]
+    #[serde(rename = "CK")]
     Ck,
     /// The code representing the country of Costa Rica.
 
-    #[serde(rename="CR")]
+    #[serde(rename = "CR")]
     Cr,
     /// The code representing the country of Côte d'Ivoire.
 
-    #[serde(rename="CI")]
+    #[serde(rename = "CI")]
     Ci,
     /// The code representing the country of Croatia.
 
-    #[serde(rename="HR")]
+    #[serde(rename = "HR")]
     Hr,
     /// The code representing the country of Cuba.
 
-    #[serde(rename="CU")]
+    #[serde(rename = "CU")]
     Cu,
     /// The code representing the country of Curaçao.
 
-    #[serde(rename="CW")]
+    #[serde(rename = "CW")]
     Cw,
     /// The code representing the country of Cyprus.
 
-    #[serde(rename="CY")]
+    #[serde(rename = "CY")]
     Cy,
     /// The code representing the country of Czech Republic.
 
-    #[serde(rename="CZ")]
+    #[serde(rename = "CZ")]
     Cz,
     /// The code representing the country of Denmark.
 
-    #[serde(rename="DK")]
+    #[serde(rename = "DK")]
     Dk,
     /// The code representing the country of Djibouti.
 
-    #[serde(rename="DJ")]
+    #[serde(rename = "DJ")]
     Dj,
     /// The code representing the country of Dominica.
 
-    #[serde(rename="DM")]
+    #[serde(rename = "DM")]
     Dm,
     /// The code representing the country of Dominican Republic.
 
-    #[serde(rename="DO")]
+    #[serde(rename = "DO")]
     Do,
     /// The code representing the country of Ecuador.
 
-    #[serde(rename="EC")]
+    #[serde(rename = "EC")]
     Ec,
     /// The code representing the country of Egypt.
 
-    #[serde(rename="EG")]
+    #[serde(rename = "EG")]
     Eg,
     /// The code representing the country of El Salvador.
 
-    #[serde(rename="SV")]
+    #[serde(rename = "SV")]
     Sv,
     /// The code representing the country of Equatorial Guinea.
 
-    #[serde(rename="GQ")]
+    #[serde(rename = "GQ")]
     Gq,
     /// The code representing the country of Eritrea.
 
-    #[serde(rename="ER")]
+    #[serde(rename = "ER")]
     Er,
     /// The code representing the country of Estonia.
 
-    #[serde(rename="EE")]
+    #[serde(rename = "EE")]
     Ee,
     /// The code representing the country of Ethiopia.
 
-    #[serde(rename="ET")]
+    #[serde(rename = "ET")]
     Et,
     /// The code representing the country of Falkland Islands (Malvinas).
 
-    #[serde(rename="FK")]
+    #[serde(rename = "FK")]
     Fk,
     /// The code representing the country of Faroe Islands.
 
-    #[serde(rename="FO")]
+    #[serde(rename = "FO")]
     Fo,
     /// The code representing the country of Fiji.
 
-    #[serde(rename="FJ")]
+    #[serde(rename = "FJ")]
     Fj,
     /// The code representing the country of Finland.
 
-    #[serde(rename="FI")]
+    #[serde(rename = "FI")]
     Fi,
     /// The code representing the country of France.
 
-    #[serde(rename="FR")]
+    #[serde(rename = "FR")]
     Fr,
     /// The code representing the country of French Guiana.
 
-    #[serde(rename="GF")]
+    #[serde(rename = "GF")]
     Gf,
     /// The code representing the country of French Polynesia.
 
-    #[serde(rename="PF")]
+    #[serde(rename = "PF")]
     Pf,
     /// The code representing the country of French Southern Territories.
 
-    #[serde(rename="TF")]
+    #[serde(rename = "TF")]
     Tf,
     /// The code representing the country of Gabon.
 
-    #[serde(rename="GA")]
+    #[serde(rename = "GA")]
     Ga,
     /// The code representing the country of Gambia.
 
-    #[serde(rename="GM")]
+    #[serde(rename = "GM")]
     Gm,
     /// The code representing the country of Georgia.
 
-    #[serde(rename="GE")]
+    #[serde(rename = "GE")]
     Ge,
     /// The code representing the country of Germany.
 
-    #[serde(rename="DE")]
+    #[serde(rename = "DE")]
     De,
     /// The code representing the country of Ghana.
 
-    #[serde(rename="GH")]
+    #[serde(rename = "GH")]
     Gh,
     /// The code representing the country of Gibraltar.
 
-    #[serde(rename="GI")]
+    #[serde(rename = "GI")]
     Gi,
     /// The code representing the country of Greece.
 
-    #[serde(rename="GR")]
+    #[serde(rename = "GR")]
     Gr,
     /// The code representing the country of Greenland.
 
-    #[serde(rename="GL")]
+    #[serde(rename = "GL")]
     Gl,
     /// The code representing the country of Grenada.
 
-    #[serde(rename="GD")]
+    #[serde(rename = "GD")]
     Gd,
     /// The code representing the country of Guadeloupe.
 
-    #[serde(rename="GP")]
+    #[serde(rename = "GP")]
     Gp,
     /// The code representing the country of Guam.
 
-    #[serde(rename="GU")]
+    #[serde(rename = "GU")]
     Gu,
     /// The code representing the country of Guatemala.
 
-    #[serde(rename="GT")]
+    #[serde(rename = "GT")]
     Gt,
     /// The code representing the country of Guernsey.
 
-    #[serde(rename="GG")]
+    #[serde(rename = "GG")]
     Gg,
     /// The code representing the country of Guinea.
 
-    #[serde(rename="GN")]
+    #[serde(rename = "GN")]
     Gn,
     /// The code representing the country of Guinea-Bissau.
 
-    #[serde(rename="GW")]
+    #[serde(rename = "GW")]
     Gw,
     /// The code representing the country of Guyana.
 
-    #[serde(rename="GY")]
+    #[serde(rename = "GY")]
     Gy,
     /// The code representing the country of Haiti.
 
-    #[serde(rename="HT")]
+    #[serde(rename = "HT")]
     Ht,
     /// The code representing the country of Heard Island and McDonald Islands.
 
-    #[serde(rename="HM")]
+    #[serde(rename = "HM")]
     Hm,
     /// The code representing the country of Holy See (Vatican City State).
 
-    #[serde(rename="VA")]
+    #[serde(rename = "VA")]
     Va,
     /// The code representing the country of Honduras.
 
-    #[serde(rename="HN")]
+    #[serde(rename = "HN")]
     Hn,
     /// The code representing the country of Hong Kong.
 
-    #[serde(rename="HK")]
+    #[serde(rename = "HK")]
     Hk,
     /// The code representing the country of Hungary.
 
-    #[serde(rename="HU")]
+    #[serde(rename = "HU")]
     Hu,
     /// The code representing the country of Iceland.
 
-    #[serde(rename="IS")]
+    #[serde(rename = "IS")]
     Is,
     /// The code representing the country of India.
 
-    #[serde(rename="IN")]
+    #[serde(rename = "IN")]
     In,
     /// The code representing the country of Indonesia.
 
-    #[serde(rename="ID")]
+    #[serde(rename = "ID")]
     Id,
     /// The code representing the country of Islamic Republic of Iran.
 
-    #[serde(rename="IR")]
+    #[serde(rename = "IR")]
     Ir,
     /// The code representing the country of Iraq.
 
-    #[serde(rename="IQ")]
+    #[serde(rename = "IQ")]
     Iq,
     /// The code representing the country of Ireland.
 
-    #[serde(rename="IE")]
+    #[serde(rename = "IE")]
     Ie,
     /// The code representing the country of Isle of Man.
 
-    #[serde(rename="IM")]
+    #[serde(rename = "IM")]
     Im,
     /// The code representing the country of Israel.
 
-    #[serde(rename="IL")]
+    #[serde(rename = "IL")]
     Il,
     /// The code representing the country of Italy.
 
-    #[serde(rename="IT")]
+    #[serde(rename = "IT")]
     It,
     /// The code representing the country of Jamaica.
 
-    #[serde(rename="JM")]
+    #[serde(rename = "JM")]
     Jm,
     /// The code representing the country of Japan.
 
-    #[serde(rename="JP")]
+    #[serde(rename = "JP")]
     Jp,
     /// The code representing the country of Jersey.
 
-    #[serde(rename="JE")]
+    #[serde(rename = "JE")]
     Je,
     /// The code representing the country of Jordan.
 
-    #[serde(rename="JO")]
+    #[serde(rename = "JO")]
     Jo,
     /// The code representing the country of Kazakhstan.
 
-    #[serde(rename="KZ")]
+    #[serde(rename = "KZ")]
     Kz,
     /// The code representing the country of Kenya.
 
-    #[serde(rename="KE")]
+    #[serde(rename = "KE")]
     Ke,
     /// The code representing the country of Kiribati.
 
-    #[serde(rename="KI")]
+    #[serde(rename = "KI")]
     Ki,
     /// The code representing the country of Democratic People's Republic ofKorea.
 
-    #[serde(rename="KP")]
+    #[serde(rename = "KP")]
     Kp,
     /// The code representing the country of Republic of Korea.
 
-    #[serde(rename="KR")]
+    #[serde(rename = "KR")]
     Kr,
     /// The code representing the country of Kuwait.
 
-    #[serde(rename="KW")]
+    #[serde(rename = "KW")]
     Kw,
     /// The code representing the country of Kyrgyzstan.
 
-    #[serde(rename="KG")]
+    #[serde(rename = "KG")]
     Kg,
     /// The code representing the country of Lao People's Democratic Republic.
 
-    #[serde(rename="LA")]
+    #[serde(rename = "LA")]
     La,
     /// The code representing the country of Latvia.
 
-    #[serde(rename="LV")]
+    #[serde(rename = "LV")]
     Lv,
     /// The code representing the country of Lebanon.
 
-    #[serde(rename="LB")]
+    #[serde(rename = "LB")]
     Lb,
     /// The code representing the country of Lesotho.
 
-    #[serde(rename="LS")]
+    #[serde(rename = "LS")]
     Ls,
     /// The code representing the country of Liberia.
 
-    #[serde(rename="LR")]
+    #[serde(rename = "LR")]
     Lr,
     /// The code representing the country of Libya.
 
-    #[serde(rename="LY")]
+    #[serde(rename = "LY")]
     Ly,
     /// The code representing the country of Liechtenstein.
 
-    #[serde(rename="LI")]
+    #[serde(rename = "LI")]
     Li,
     /// The code representing the country of Lithuania.
 
-    #[serde(rename="LT")]
+    #[serde(rename = "LT")]
     Lt,
     /// The code representing the country of Luxembourg.
 
-    #[serde(rename="LU")]
+    #[serde(rename = "LU")]
     Lu,
     /// The code representing the country of Macao.
 
-    #[serde(rename="MO")]
+    #[serde(rename = "MO")]
     Mo,
     /// The code representing the country of The Former Yugoslav Republic of Macedonia.
 
-    #[serde(rename="MK")]
+    #[serde(rename = "MK")]
     Mk,
     /// The code representing the country of Madagascar.
 
-    #[serde(rename="MG")]
+    #[serde(rename = "MG")]
     Mg,
     /// The code representing the country of Malawi.
 
-    #[serde(rename="MW")]
+    #[serde(rename = "MW")]
     Mw,
     /// The code representing the country of Malaysia.
 
-    #[serde(rename="MY")]
+    #[serde(rename = "MY")]
     My,
     /// The code representing the country of Maldives.
 
-    #[serde(rename="MV")]
+    #[serde(rename = "MV")]
     Mv,
     /// The code representing the country of Mali.
 
-    #[serde(rename="ML")]
+    #[serde(rename = "ML")]
     Ml,
     /// The code representing the country of Malta.
 
-    #[serde(rename="MT")]
+    #[serde(rename = "MT")]
     Mt,
     /// The code representing the country of Marshall Islands.
 
-    #[serde(rename="MH")]
+    #[serde(rename = "MH")]
     Mh,
     /// The code representing the country of Martinique.
 
-    #[serde(rename="MQ")]
+    #[serde(rename = "MQ")]
     Mq,
     /// The code representing the country of Mauritania.
 
-    #[serde(rename="MR")]
+    #[serde(rename = "MR")]
     Mr,
     /// The code representing the country of Mauritius.
 
-    #[serde(rename="MU")]
+    #[serde(rename = "MU")]
     Mu,
     /// The code representing the country of Mayotte.
 
-    #[serde(rename="YT")]
+    #[serde(rename = "YT")]
     Yt,
     /// The code representing the country of Mexico.
 
-    #[serde(rename="MX")]
+    #[serde(rename = "MX")]
     Mx,
     /// The code representing the country of Federated States ofMicronesia.
 
-    #[serde(rename="FM")]
+    #[serde(rename = "FM")]
     Fm,
     /// The code representing the country of Republic of Moldova.
 
-    #[serde(rename="MD")]
+    #[serde(rename = "MD")]
     Md,
     /// The code representing the country of Monaco.
 
-    #[serde(rename="MC")]
+    #[serde(rename = "MC")]
     Mc,
     /// The code representing the country of Mongolia.
 
-    #[serde(rename="MN")]
+    #[serde(rename = "MN")]
     Mn,
     /// The code representing the country of Montenegro.
 
-    #[serde(rename="ME")]
+    #[serde(rename = "ME")]
     Me,
     /// The code representing the country of Montserrat.
 
-    #[serde(rename="MS")]
+    #[serde(rename = "MS")]
     Ms,
     /// The code representing the country of Morocco.
 
-    #[serde(rename="MA")]
+    #[serde(rename = "MA")]
     Ma,
     /// The code representing the country of Mozambique.
 
-    #[serde(rename="MZ")]
+    #[serde(rename = "MZ")]
     Mz,
     /// The code representing the country of Myanmar.
 
-    #[serde(rename="MM")]
+    #[serde(rename = "MM")]
     Mm,
     /// The code representing the country of Namibia.
 
-    #[serde(rename="NA")]
+    #[serde(rename = "NA")]
     Na,
     /// The code representing the country of Nauru.
 
-    #[serde(rename="NR")]
+    #[serde(rename = "NR")]
     Nr,
     /// The code representing the country of Nepal.
 
-    #[serde(rename="NP")]
+    #[serde(rename = "NP")]
     Np,
     /// The code representing the country of Netherlands.
 
-    #[serde(rename="NL")]
+    #[serde(rename = "NL")]
     Nl,
     /// The code representing the country of New Caledonia.
 
-    #[serde(rename="NC")]
+    #[serde(rename = "NC")]
     Nc,
     /// The code representing the country of New Zealand.
 
-    #[serde(rename="NZ")]
+    #[serde(rename = "NZ")]
     Nz,
     /// The code representing the country of Nicaragua.
 
-    #[serde(rename="NI")]
+    #[serde(rename = "NI")]
     Ni,
     /// The code representing the country of Niger.
 
-    #[serde(rename="NE")]
+    #[serde(rename = "NE")]
     Ne,
     /// The code representing the country of Nigeria.
 
-    #[serde(rename="NG")]
+    #[serde(rename = "NG")]
     Ng,
     /// The code representing the country of Niue.
 
-    #[serde(rename="NU")]
+    #[serde(rename = "NU")]
     Nu,
     /// The code representing the country of Norfolk Island.
 
-    #[serde(rename="NF")]
+    #[serde(rename = "NF")]
     Nf,
     /// The code representing the country of Northern Mariana Islands.
 
-    #[serde(rename="MP")]
+    #[serde(rename = "MP")]
     Mp,
     /// The code representing the country of Norway.
 
-    #[serde(rename="NO")]
+    #[serde(rename = "NO")]
     No,
     /// The code representing the country of Oman.
 
-    #[serde(rename="OM")]
+    #[serde(rename = "OM")]
     Om,
     /// The code representing the country of Pakistan.
 
-    #[serde(rename="PK")]
+    #[serde(rename = "PK")]
     Pk,
     /// The code representing the country of Palau.
 
-    #[serde(rename="PW")]
+    #[serde(rename = "PW")]
     Pw,
     /// The code representing the country of State of Palestine.
 
-    #[serde(rename="PS")]
+    #[serde(rename = "PS")]
     Ps,
     /// The code representing the country of Panama.
 
-    #[serde(rename="PA")]
+    #[serde(rename = "PA")]
     Pa,
     /// The code representing the country of Papua New Guinea.
 
-    #[serde(rename="PG")]
+    #[serde(rename = "PG")]
     Pg,
     /// The code representing the country of Paraguay.
 
-    #[serde(rename="PY")]
+    #[serde(rename = "PY")]
     Py,
     /// The code representing the country of Peru.
 
-    #[serde(rename="PE")]
+    #[serde(rename = "PE")]
     Pe,
     /// The code representing the country of Philippines.
 
-    #[serde(rename="PH")]
+    #[serde(rename = "PH")]
     Ph,
     /// The code representing the country of Pitcairn.
 
-    #[serde(rename="PN")]
+    #[serde(rename = "PN")]
     Pn,
     /// The code representing the country of Poland.
 
-    #[serde(rename="PL")]
+    #[serde(rename = "PL")]
     Pl,
     /// The code representing the country of Portugal.
 
-    #[serde(rename="PT")]
+    #[serde(rename = "PT")]
     Pt,
     /// The code representing the country of Puerto Rico.
 
-    #[serde(rename="PR")]
+    #[serde(rename = "PR")]
     Pr,
     /// The code representing the country of Qatar.
 
-    #[serde(rename="QA")]
+    #[serde(rename = "QA")]
     Qa,
     /// The code representing the country of Réunion.
 
-    #[serde(rename="RE")]
+    #[serde(rename = "RE")]
     Re,
     /// The code representing the country of Romania.
 
-    #[serde(rename="RO")]
+    #[serde(rename = "RO")]
     Ro,
     /// The code representing the country of Russian Federation.
 
-    #[serde(rename="RU")]
+    #[serde(rename = "RU")]
     Ru,
     /// The code representing the country of Rwanda.
 
-    #[serde(rename="RW")]
+    #[serde(rename = "RW")]
     Rw,
     /// The code representing the country of Saint Barthélemy.
 
-    #[serde(rename="BL")]
+    #[serde(rename = "BL")]
     Bl,
     /// The code representing the country of Saint Helena  Ascension and Tristan da Cunha.
 
-    #[serde(rename="SH")]
+    #[serde(rename = "SH")]
     Sh,
     /// The code representing the country of Saint Kitts and Nevis.
 
-    #[serde(rename="KN")]
+    #[serde(rename = "KN")]
     Kn,
     /// The code representing the country of Saint Lucia.
 
-    #[serde(rename="LC")]
+    #[serde(rename = "LC")]
     Lc,
     /// The code representing the country of Saint Martin (French part).
 
-    #[serde(rename="MF")]
+    #[serde(rename = "MF")]
     Mf,
     /// The code representing the country of Saint Pierre and Miquelon.
 
-    #[serde(rename="PM")]
+    #[serde(rename = "PM")]
     Pm,
     /// The code representing the country of Saint Vincent and the Grenadines.
 
-    #[serde(rename="VC")]
+    #[serde(rename = "VC")]
     Vc,
     /// The code representing the country of Samoa.
 
-    #[serde(rename="WS")]
+    #[serde(rename = "WS")]
     Ws,
     /// The code representing the country of San Marino.
 
-    #[serde(rename="SM")]
+    #[serde(rename = "SM")]
     Sm,
     /// The code representing the country of Sao Tome and Principe.
 
-    #[serde(rename="ST")]
+    #[serde(rename = "ST")]
     St,
     /// The code representing the country of Saudi Arabia.
 
-    #[serde(rename="SA")]
+    #[serde(rename = "SA")]
     Sa,
     /// The code representing the country of Senegal.
 
-    #[serde(rename="SN")]
+    #[serde(rename = "SN")]
     Sn,
     /// The code representing the country of Serbia.
 
-    #[serde(rename="RS")]
+    #[serde(rename = "RS")]
     Rs,
     /// The code representing the country of Seychelles.
 
-    #[serde(rename="SC")]
+    #[serde(rename = "SC")]
     Sc,
     /// The code representing the country of Sierra Leone.
 
-    #[serde(rename="SL")]
+    #[serde(rename = "SL")]
     Sl,
     /// The code representing the country of Singapore.
 
-    #[serde(rename="SG")]
+    #[serde(rename = "SG")]
     Sg,
     /// The code representing the country of Sint Maarten (Dutch part).
 
-    #[serde(rename="SX")]
+    #[serde(rename = "SX")]
     Sx,
     /// The code representing the country of Slovakia.
 
-    #[serde(rename="SK")]
+    #[serde(rename = "SK")]
     Sk,
     /// The code representing the country of Slovenia.
 
-    #[serde(rename="SI")]
+    #[serde(rename = "SI")]
     Si,
     /// The code representing the country of Solomon Islands.
 
-    #[serde(rename="SB")]
+    #[serde(rename = "SB")]
     Sb,
     /// The code representing the country of Somalia.
 
-    #[serde(rename="SO")]
+    #[serde(rename = "SO")]
     So,
     /// The code representing the country of South Africa.
 
-    #[serde(rename="ZA")]
+    #[serde(rename = "ZA")]
     Za,
     /// The code representing the country of South Georgia and the South Sandwich Islands.
 
-    #[serde(rename="GS")]
+    #[serde(rename = "GS")]
     Gs,
     /// The code representing the country of South Sudan.
 
-    #[serde(rename="SS")]
+    #[serde(rename = "SS")]
     Ss,
     /// The code representing the country of Spain.
 
-    #[serde(rename="ES")]
+    #[serde(rename = "ES")]
     Es,
     /// The code representing the country of Sri Lanka.
 
-    #[serde(rename="LK")]
+    #[serde(rename = "LK")]
     Lk,
     /// The code representing the country of Sudan.
 
-    #[serde(rename="SD")]
+    #[serde(rename = "SD")]
     Sd,
     /// The code representing the country of Suriname.
 
-    #[serde(rename="SR")]
+    #[serde(rename = "SR")]
     Sr,
     /// The code representing the country of Svalbard and Jan Mayen.
 
-    #[serde(rename="SJ")]
+    #[serde(rename = "SJ")]
     Sj,
     /// The code representing the country of Swaziland.
 
-    #[serde(rename="SZ")]
+    #[serde(rename = "SZ")]
     Sz,
     /// The code representing the country of Sweden.
 
-    #[serde(rename="SE")]
+    #[serde(rename = "SE")]
     Se,
     /// The code representing the country of Switzerland.
 
-    #[serde(rename="CH")]
+    #[serde(rename = "CH")]
     Ch,
     /// The code representing the country of Syrian Arab Republic.
 
-    #[serde(rename="SY")]
+    #[serde(rename = "SY")]
     Sy,
     /// The code representing the country of Taiwan, Province of China.
 
-    #[serde(rename="TW")]
+    #[serde(rename = "TW")]
     Tw,
     /// The code representing the country of Tajikistan.
 
-    #[serde(rename="TJ")]
+    #[serde(rename = "TJ")]
     Tj,
     /// The code representing the country of United Republic of Tanzania.
 
-    #[serde(rename="TZ")]
+    #[serde(rename = "TZ")]
     Tz,
     /// The code representing the country of Thailand.
 
-    #[serde(rename="TH")]
+    #[serde(rename = "TH")]
     Th,
     /// The code representing the country of Timor-Leste.
 
-    #[serde(rename="TL")]
+    #[serde(rename = "TL")]
     Tl,
     /// The code representing the country of Togo.
 
-    #[serde(rename="TG")]
+    #[serde(rename = "TG")]
     Tg,
     /// The code representing the country of Tokelau.
 
-    #[serde(rename="TK")]
+    #[serde(rename = "TK")]
     Tk,
     /// The code representing the country of Tonga.
 
-    #[serde(rename="TO")]
+    #[serde(rename = "TO")]
     To,
     /// The code representing the country of Trinidad and Tobago.
 
-    #[serde(rename="TT")]
+    #[serde(rename = "TT")]
     Tt,
     /// The code representing the country of Tunisia.
 
-    #[serde(rename="TN")]
+    #[serde(rename = "TN")]
     Tn,
     /// The code representing the country of Turkey.
 
-    #[serde(rename="TR")]
+    #[serde(rename = "TR")]
     Tr,
     /// The code representing the country of Turkmenistan.
 
-    #[serde(rename="TM")]
+    #[serde(rename = "TM")]
     Tm,
     /// The code representing the country of Turks and Caicos Islands.
 
-    #[serde(rename="TC")]
+    #[serde(rename = "TC")]
     Tc,
     /// The code representing the country of Tuvalu.
 
-    #[serde(rename="TV")]
+    #[serde(rename = "TV")]
     Tv,
     /// The code representing the country of Uganda.
 
-    #[serde(rename="UG")]
+    #[serde(rename = "UG")]
     Ug,
     /// The code representing the country of Ukraine.
 
-    #[serde(rename="UA")]
+    #[serde(rename = "UA")]
     Ua,
     /// The code representing the country of United Arab Emirates.
 
-    #[serde(rename="AE")]
+    #[serde(rename = "AE")]
     Ae,
     /// The code representing the country of United Kingdom.
 
-    #[serde(rename="GB")]
+    #[serde(rename = "GB")]
     Gb,
     /// The code representing the country of United States.
 
-    #[serde(rename="US")]
+    #[serde(rename = "US")]
     Us,
     /// The code representing the country of United States Minor Outlying Islands.
 
-    #[serde(rename="UM")]
+    #[serde(rename = "UM")]
     Um,
     /// The code representing the country of Uruguay.
 
-    #[serde(rename="UY")]
+    #[serde(rename = "UY")]
     Uy,
     /// The code representing the country of Uzbekistan.
 
-    #[serde(rename="UZ")]
+    #[serde(rename = "UZ")]
     Uz,
     /// The code representing the country of Vanuatu.
 
-    #[serde(rename="VU")]
+    #[serde(rename = "VU")]
     Vu,
     /// The code representing the country of Bolivarian Republic of Venezuela.
 
-    #[serde(rename="VE")]
+    #[serde(rename = "VE")]
     Ve,
     /// The code representing the country of Viet Nam.
 
-    #[serde(rename="VN")]
+    #[serde(rename = "VN")]
     Vn,
     /// The code representing the country of British Virgin Islands.
 
-    #[serde(rename="VG")]
+    #[serde(rename = "VG")]
     Vg,
     /// The code representing the country of U.S. Virgin Islands.
 
-    #[serde(rename="VI")]
+    #[serde(rename = "VI")]
     Vi,
     /// The code representing the country of Wallis and Futuna.
 
-    #[serde(rename="WF")]
+    #[serde(rename = "WF")]
     Wf,
     /// The code representing the country of Western Sahara.
 
-    #[serde(rename="EH")]
+    #[serde(rename = "EH")]
     Eh,
     /// The code representing the country of Yemen.
 
-    #[serde(rename="YE")]
+    #[serde(rename = "YE")]
     Ye,
     /// The code representing the country of Zambia.
 
-    #[serde(rename="ZM")]
+    #[serde(rename = "ZM")]
     Zm,
     /// The code representing the country of Zimbabwe.
 
-    #[serde(rename="ZW")]
+    #[serde(rename = "ZW")]
     Zw,
     /// The code representing a fake region for testing.
 
-    #[serde(rename="NN")]
+    #[serde(rename = "NN")]
     Nn,
-
 }
 
 impl Into<Value> for RegionCode {
@@ -1269,8 +1267,6 @@ impl fmt::Display for RegionCode {
             Self::Zm => write!(f, "ZM"),
             Self::Zw => write!(f, "ZW"),
             Self::Nn => write!(f, "NN"),
-
         }
     }
 }
-

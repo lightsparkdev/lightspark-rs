@@ -1,31 +1,25 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
 use crate::objects::currency_amount::CurrencyAmount;
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ChannelToTransactionsConnection {
-
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
-    #[serde (rename = "channel_to_transactions_connection_count")]
+    #[serde(rename = "channel_to_transactions_connection_count")]
     pub count: i64,
 
     /// The average fee for the transactions that transited through this channel, according to the filters and constraints of the connection.
-    #[serde (rename = "channel_to_transactions_connection_average_fee")]
+    #[serde(rename = "channel_to_transactions_connection_average_fee")]
     pub average_fee: Option<CurrencyAmount>,
 
     /// The total amount transacted for the transactions that transited through this channel, according to the filters and constraints of the connection.
-    #[serde (rename = "channel_to_transactions_connection_total_amount_transacted")]
+    #[serde(rename = "channel_to_transactions_connection_total_amount_transacted")]
     pub total_amount_transacted: Option<CurrencyAmount>,
 
     /// The total amount of fees for the transactions that transited through this channel, according to the filters and constraints of the connection.
-    #[serde (rename = "channel_to_transactions_connection_total_fees")]
+    #[serde(rename = "channel_to_transactions_connection_total_fees")]
     pub total_fees: Option<CurrencyAmount>,
-
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment ChannelToTransactionsConnectionFragment on ChannelToTransactionsConnection {
@@ -57,6 +51,3 @@ fragment ChannelToTransactionsConnectionFragment on ChannelToTransactionsConnect
     }
 }
 ";
-
-
-

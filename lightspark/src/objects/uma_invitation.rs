@@ -1,19 +1,17 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
 use crate::objects::entity::Entity;
-use crate::types::get_entity::GetEntity;
-use crate::types::custom_date_formats::custom_date_format;
 use crate::objects::incentives_ineligibility_reason::IncentivesIneligibilityReason;
-use chrono::{DateTime, Utc};
 use crate::objects::incentives_status::IncentivesStatus;
+use crate::types::custom_date_formats::custom_date_format;
+use crate::types::get_entity::GetEntity;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 /// This is an object representing an UMA.ME invitation.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UmaInvitation {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde (rename = "uma_invitation_id")]
+    #[serde(rename = "uma_invitation_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
@@ -25,38 +23,35 @@ pub struct UmaInvitation {
     pub updated_at: DateTime<Utc>,
 
     /// The code that uniquely identifies this invitation.
-    #[serde (rename = "uma_invitation_code")]
+    #[serde(rename = "uma_invitation_code")]
     pub code: String,
 
     /// The URL where this invitation can be claimed.
-    #[serde (rename = "uma_invitation_url")]
+    #[serde(rename = "uma_invitation_url")]
     pub url: String,
 
     /// The UMA of the user who created the invitation.
-    #[serde (rename = "uma_invitation_inviter_uma")]
+    #[serde(rename = "uma_invitation_inviter_uma")]
     pub inviter_uma: String,
 
     /// The UMA of the user who claimed the invitation.
-    #[serde (rename = "uma_invitation_invitee_uma")]
+    #[serde(rename = "uma_invitation_invitee_uma")]
     pub invitee_uma: Option<String>,
 
     /// The current status of the incentives that may be tied to this invitation.
-    #[serde (rename = "uma_invitation_incentives_status")]
+    #[serde(rename = "uma_invitation_incentives_status")]
     pub incentives_status: IncentivesStatus,
 
     /// The reason why the invitation is not eligible for incentives, if applicable.
-    #[serde (rename = "uma_invitation_incentives_ineligibility_reason")]
+    #[serde(rename = "uma_invitation_incentives_ineligibility_reason")]
     pub incentives_ineligibility_reason: Option<IncentivesIneligibilityReason>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl Entity for UmaInvitation {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -72,16 +67,15 @@ impl Entity for UmaInvitation {
         self.updated_at
     }
 
-
     fn type_name(&self) -> &'static str {
         "UmaInvitation"
     }
 }
 
-
 impl GetEntity for UmaInvitation {
     fn get_entity_query() -> String {
-        format!("
+        format!(
+            "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on UmaInvitation {{
@@ -90,11 +84,11 @@ impl GetEntity for UmaInvitation {
             }}
         }}
 
-        {}", FRAGMENT)
-    }    
+        {}",
+            FRAGMENT
+        )
+    }
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment UmaInvitationFragment on UmaInvitation {
@@ -110,6 +104,3 @@ fragment UmaInvitationFragment on UmaInvitation {
     uma_invitation_incentives_ineligibility_reason: incentives_ineligibility_reason
 }
 ";
-
-
-

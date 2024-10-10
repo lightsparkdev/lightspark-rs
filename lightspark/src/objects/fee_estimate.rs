@@ -1,23 +1,16 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
 use crate::objects::currency_amount::CurrencyAmount;
+use serde::{Deserialize, Serialize};
 
 /// This object represents the estimated L1 transaction fees for the Bitcoin network. Fee estimates are separated by potential confirmation speeds for settlement.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FeeEstimate {
-
-    
-    #[serde (rename = "fee_estimate_fee_fast")]
+    #[serde(rename = "fee_estimate_fee_fast")]
     pub fee_fast: CurrencyAmount,
 
-    
-    #[serde (rename = "fee_estimate_fee_min")]
+    #[serde(rename = "fee_estimate_fee_min")]
     pub fee_min: CurrencyAmount,
-
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment FeeEstimateFragment on FeeEstimate {
@@ -40,6 +33,3 @@ fragment FeeEstimateFragment on FeeEstimate {
     }
 }
 ";
-
-
-

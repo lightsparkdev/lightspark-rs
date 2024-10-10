@@ -1,30 +1,28 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
-use serde::{Deserialize, Serialize};
-use crate::objects::currency_amount::CurrencyAmount;
-use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
-use serde_json::Value;
-use crate::types::entity_wrapper::EntityWrapper;
-use crate::objects::withdrawal_request_to_channel_closing_transactions_connection::WithdrawalRequestToChannelClosingTransactionsConnection;
-use crate::objects::entity::Entity;
-use crate::objects::withdrawal_mode::WithdrawalMode;
 use crate::error::Error;
-use crate::types::get_entity::GetEntity;
-use std::collections::HashMap;
-use crate::types::custom_date_formats::custom_date_format_option;
-use crate::objects::withdrawal_request_to_withdrawals_connection::WithdrawalRequestToWithdrawalsConnection;
+use crate::objects::currency_amount::CurrencyAmount;
+use crate::objects::entity::Entity;
 use crate::objects::request_initiator::RequestInitiator;
+use crate::objects::withdrawal_mode::WithdrawalMode;
+use crate::objects::withdrawal_request_status::WithdrawalRequestStatus;
+use crate::objects::withdrawal_request_to_channel_closing_transactions_connection::WithdrawalRequestToChannelClosingTransactionsConnection;
+use crate::objects::withdrawal_request_to_channel_opening_transactions_connection::WithdrawalRequestToChannelOpeningTransactionsConnection;
+use crate::objects::withdrawal_request_to_withdrawals_connection::WithdrawalRequestToWithdrawalsConnection;
 use crate::types::custom_date_formats::custom_date_format;
+use crate::types::custom_date_formats::custom_date_format_option;
+use crate::types::entity_wrapper::EntityWrapper;
+use crate::types::get_entity::GetEntity;
 use crate::types::graphql_requester::GraphQLRequester;
 use chrono::{DateTime, Utc};
-use crate::objects::withdrawal_request_to_channel_opening_transactions_connection::WithdrawalRequestToChannelOpeningTransactionsConnection;
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashMap;
 
 /// This object represents a request made for an L1 withdrawal from your Lightspark Node to any Bitcoin wallet. You can retrieve this object to receive detailed information about any withdrawal request made from your Lightspark account.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct WithdrawalRequest {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
-    #[serde (rename = "withdrawal_request_id")]
+    #[serde(rename = "withdrawal_request_id")]
     pub id: String,
 
     /// The date and time when the entity was first created.
@@ -36,39 +34,42 @@ pub struct WithdrawalRequest {
     pub updated_at: DateTime<Utc>,
 
     /// The requested amount of money to be withdrawn. If the requested amount is -1, it means to withdraw all.
-    #[serde (rename = "withdrawal_request_requested_amount")]
+    #[serde(rename = "withdrawal_request_requested_amount")]
     pub requested_amount: CurrencyAmount,
 
     /// The amount of money that should be withdrawn in this request.
-    #[serde (rename = "withdrawal_request_amount")]
+    #[serde(rename = "withdrawal_request_amount")]
     pub amount: CurrencyAmount,
 
     /// If the requested amount is `-1` (i.e. everything), this field may contain an estimate of the amount for the withdrawal.
-    #[serde (rename = "withdrawal_request_estimated_amount")]
+    #[serde(rename = "withdrawal_request_estimated_amount")]
     pub estimated_amount: Option<CurrencyAmount>,
 
     /// The actual amount that is withdrawn to the bitcoin address. It will be set once the request is completed.
-    #[serde (rename = "withdrawal_request_amount_withdrawn")]
+    #[serde(rename = "withdrawal_request_amount_withdrawn")]
     pub amount_withdrawn: Option<CurrencyAmount>,
 
     /// The total fees the node paid for the withdrawal. It will be set once the request is completed.
-    #[serde (rename = "withdrawal_request_total_fees")]
+    #[serde(rename = "withdrawal_request_total_fees")]
     pub total_fees: Option<CurrencyAmount>,
 
     /// The bitcoin address where the funds should be sent.
-    #[serde (rename = "withdrawal_request_bitcoin_address")]
+    #[serde(rename = "withdrawal_request_bitcoin_address")]
     pub bitcoin_address: String,
 
     /// The strategy that should be used to withdraw the funds from the account.
-    #[serde (rename = "withdrawal_request_withdrawal_mode")]
+    #[serde(rename = "withdrawal_request_withdrawal_mode")]
     pub withdrawal_mode: WithdrawalMode,
 
     /// The current status of this withdrawal request.
-    #[serde (rename = "withdrawal_request_status")]
+    #[serde(rename = "withdrawal_request_status")]
     pub status: WithdrawalRequestStatus,
 
     /// The time at which this request was completed.
-    #[serde(with = "custom_date_format_option", rename = "withdrawal_request_completed_at")]
+    #[serde(
+        with = "custom_date_format_option",
+        rename = "withdrawal_request_completed_at"
+    )]
     pub completed_at: Option<DateTime<Utc>>,
 
     /// The withdrawal transaction that has been generated by this request.
@@ -76,22 +77,19 @@ pub struct WithdrawalRequest {
     pub withdrawal: Option<EntityWrapper>,
 
     /// The idempotency key of the withdrawal request.
-    #[serde (rename = "withdrawal_request_idempotency_key")]
+    #[serde(rename = "withdrawal_request_idempotency_key")]
     pub idempotency_key: Option<String>,
 
     /// The initiator of the withdrawal.
-    #[serde (rename = "withdrawal_request_initiator")]
+    #[serde(rename = "withdrawal_request_initiator")]
     pub initiator: RequestInitiator,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl Entity for WithdrawalRequest {
-
     /// The unique identifier of this entity across all Lightspark systems. Should be treated as an opaque string.
     fn get_id(&self) -> String {
         self.id.clone()
@@ -107,16 +105,15 @@ impl Entity for WithdrawalRequest {
         self.updated_at
     }
 
-
     fn type_name(&self) -> &'static str {
         "WithdrawalRequest"
     }
 }
 
-
 impl GetEntity for WithdrawalRequest {
     fn get_entity_query() -> String {
-        format!("
+        format!(
+            "
         query GetEntity($id: ID!) {{
             entity(id: $id) {{
                 ... on WithdrawalRequest {{
@@ -125,11 +122,11 @@ impl GetEntity for WithdrawalRequest {
             }}
         }}
 
-        {}", FRAGMENT)
-    }    
+        {}",
+            FRAGMENT
+        )
+    }
 }
-
-
 
 pub const FRAGMENT: &str = "
 fragment WithdrawalRequestFragment on WithdrawalRequest {
@@ -189,11 +186,13 @@ fragment WithdrawalRequestFragment on WithdrawalRequest {
 }
 ";
 
-
 impl WithdrawalRequest {
-
-    
-    pub async fn get_channel_closing_transactions(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>) -> Result<WithdrawalRequestToChannelClosingTransactionsConnection, Error> {
+    pub async fn get_channel_closing_transactions(
+        &self,
+        requester: &impl GraphQLRequester,
+        first: Option<i64>,
+        after: Option<String>,
+    ) -> Result<WithdrawalRequestToChannelClosingTransactionsConnection, Error> {
         let query = "query FetchWithdrawalRequestToChannelClosingTransactionsConnection($entity_id: ID!, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on WithdrawalRequest {
@@ -248,7 +247,6 @@ impl WithdrawalRequest {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-                
         let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
         let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["channel_closing_transactions"].clone();
@@ -256,8 +254,12 @@ impl WithdrawalRequest {
         Ok(result)
     }
 
-    
-    pub async fn get_channel_opening_transactions(&self, requester:&impl GraphQLRequester, first: Option<i64>, after: Option<String>) -> Result<WithdrawalRequestToChannelOpeningTransactionsConnection, Error> {
+    pub async fn get_channel_opening_transactions(
+        &self,
+        requester: &impl GraphQLRequester,
+        first: Option<i64>,
+        after: Option<String>,
+    ) -> Result<WithdrawalRequestToChannelOpeningTransactionsConnection, Error> {
         let query = "query FetchWithdrawalRequestToChannelOpeningTransactionsConnection($entity_id: ID!, $first: Int, $after: String) {
     entity(id: $entity_id) {
         ... on WithdrawalRequest {
@@ -312,7 +314,6 @@ impl WithdrawalRequest {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-                
         let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
         let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["channel_opening_transactions"].clone();
@@ -320,8 +321,11 @@ impl WithdrawalRequest {
         Ok(result)
     }
 
-    
-    pub async fn get_withdrawals(&self, requester:&impl GraphQLRequester, first: Option<i64>) -> Result<WithdrawalRequestToWithdrawalsConnection, Error> {
+    pub async fn get_withdrawals(
+        &self,
+        requester: &impl GraphQLRequester,
+        first: Option<i64>,
+    ) -> Result<WithdrawalRequestToWithdrawalsConnection, Error> {
         let query = "query FetchWithdrawalRequestToWithdrawalsConnection($entity_id: ID!, $first: Int) {
     entity(id: $entity_id) {
         ... on WithdrawalRequest {
@@ -368,12 +372,10 @@ impl WithdrawalRequest {
         variables.insert("entity_id", self.id.clone().into());
         variables.insert("first", first.into());
 
-                
         let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
         let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["withdrawals"].clone();
         let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
-
 }

@@ -1,37 +1,31 @@
-
 // Copyright ©, 2023-present, Lightspark Group, Inc. - All Rights Reserved
+use crate::objects::connection::Connection;
+use crate::objects::page_info::PageInfo;
+use crate::objects::payment_request::PaymentRequest;
+use crate::objects::payment_request::PaymentRequestEnum;
 use serde::{Deserialize, Serialize};
 use std::vec::Vec;
-use crate::objects::payment_request::PaymentRequest;
-use crate::objects::connection::Connection;
-use crate::objects::payment_request::PaymentRequestEnum;
-use crate::objects::page_info::PageInfo;
-
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AccountToPaymentRequestsConnection {
-
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
-    #[serde (rename = "account_to_payment_requests_connection_count")]
+    #[serde(rename = "account_to_payment_requests_connection_count")]
     pub count: i64,
 
     /// An object that holds pagination information about the objects in this connection.
-    #[serde (rename = "account_to_payment_requests_connection_page_info")]
+    #[serde(rename = "account_to_payment_requests_connection_page_info")]
     pub page_info: PageInfo,
 
     /// The payment requests for the current page of this connection.
-    #[serde (rename = "account_to_payment_requests_connection_entities")]
+    #[serde(rename = "account_to_payment_requests_connection_entities")]
     pub entities: Vec<PaymentRequestEnum>,
 
     /// The typename of the object
     #[serde(rename = "__typename")]
     pub typename: String,
-
 }
 
-
 impl Connection for AccountToPaymentRequestsConnection {
-
     /// The total count of objects in this connection, using the current filters. It is different from the number of objects returned in the current page (in the `entities` field).
     fn get_count(&self) -> i64 {
         self.count
@@ -42,14 +36,10 @@ impl Connection for AccountToPaymentRequestsConnection {
         self.page_info.clone()
     }
 
-
     fn type_name(&self) -> &'static str {
         "AccountToPaymentRequestsConnection"
     }
 }
-
-
-
 
 pub const FRAGMENT: &str = "
 fragment AccountToPaymentRequestsConnectionFragment on AccountToPaymentRequestsConnection {
@@ -67,6 +57,3 @@ fragment AccountToPaymentRequestsConnectionFragment on AccountToPaymentRequestsC
     }
 }
 ";
-
-
-
