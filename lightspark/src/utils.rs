@@ -8,6 +8,7 @@ pub fn value_millisatoshi(amount: &CurrencyAmount) -> Result<i64, Error> {
         crate::objects::currency_unit::CurrencyUnit::Satoshi => Ok(amount.original_value * 1000),
         crate::objects::currency_unit::CurrencyUnit::Millisatoshi => Ok(amount.original_value),
         crate::objects::currency_unit::CurrencyUnit::Usd => Err(Error::InvalidCurrencyConversion),
+        crate::objects::currency_unit::CurrencyUnit::Mxn => Err(Error::InvalidCurrencyConversion),
         crate::objects::currency_unit::CurrencyUnit::Nanobitcoin => Ok(amount.original_value * 100),
         crate::objects::currency_unit::CurrencyUnit::Microbitcoin => {
             Ok(amount.original_value * 100_000)
