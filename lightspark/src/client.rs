@@ -470,11 +470,10 @@ impl<K: OperationSigningKey> LightsparkClient<K> {
     }
 
     fn get_node_signing_key(&self, node_id: &str) -> Result<K, Error> {
-        return self
-            .signing_keys
+        self.signing_keys
             .get(node_id)
             .cloned()
-            .ok_or(Error::SigningKeyNotFound);
+            .ok_or(Error::SigningKeyNotFound)
     }
 
     pub async fn get_decoded_payment_request(

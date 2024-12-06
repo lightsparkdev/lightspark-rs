@@ -10,6 +10,7 @@ use crate::objects::account_to_withdrawal_requests_connection::AccountToWithdraw
 use crate::objects::bitcoin_network::BitcoinNetwork;
 use crate::objects::blockchain_balance::BlockchainBalance;
 use crate::objects::currency_amount::CurrencyAmount;
+use crate::objects::currency_amount_input::CurrencyAmountInput;
 use crate::objects::entity::Entity;
 use crate::objects::lightspark_node_owner::LightsparkNodeOwner;
 use crate::objects::transaction_failures::TransactionFailures;
@@ -807,11 +808,13 @@ impl Account {
         lightning_node_id: Option<String>,
         statuses: Option<Vec<TransactionStatus>>,
         exclude_failures: Option<TransactionFailures>,
+        max_amount: Option<CurrencyAmountInput>,
+        min_amount: Option<CurrencyAmountInput>,
     ) -> Result<AccountToTransactionsConnection, Error> {
-        let query = "query FetchAccountToTransactionsConnection($entity_id: ID!, $first: Int, $after: String, $types: [TransactionType!], $after_date: DateTime, $before_date: DateTime, $bitcoin_network: BitcoinNetwork, $lightning_node_id: ID, $statuses: [TransactionStatus!], $exclude_failures: TransactionFailures) {
+        let query = "query FetchAccountToTransactionsConnection($entity_id: ID!, $first: Int, $after: String, $types: [TransactionType!], $after_date: DateTime, $before_date: DateTime, $bitcoin_network: BitcoinNetwork, $lightning_node_id: ID, $statuses: [TransactionStatus!], $exclude_failures: TransactionFailures, $max_amount: CurrencyAmountInput, $min_amount: CurrencyAmountInput) {
     entity(id: $entity_id) {
         ... on Account {
-            transactions(, first: $first, after: $after, types: $types, after_date: $after_date, before_date: $before_date, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id, statuses: $statuses, exclude_failures: $exclude_failures) {
+            transactions(, first: $first, after: $after, types: $types, after_date: $after_date, before_date: $before_date, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id, statuses: $statuses, exclude_failures: $exclude_failures, max_amount: $max_amount, min_amount: $min_amount) {
                 __typename
                 account_to_transactions_connection_count: count
                 account_to_transactions_connection_page_info: page_info {
@@ -1413,6 +1416,14 @@ impl Account {
             "exclude_failures",
             serde_json::to_value(&exclude_failures).map_err(Error::ConversionError)?,
         );
+        variables.insert(
+            "max_amount",
+            serde_json::to_value(&max_amount).map_err(Error::ConversionError)?,
+        );
+        variables.insert(
+            "min_amount",
+            serde_json::to_value(&min_amount).map_err(Error::ConversionError)?,
+        );
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;
@@ -1431,11 +1442,13 @@ impl Account {
         before_date: Option<DateTime<Utc>>,
         bitcoin_network: Option<BitcoinNetwork>,
         lightning_node_id: Option<String>,
+        max_amount: Option<CurrencyAmountInput>,
+        min_amount: Option<CurrencyAmountInput>,
     ) -> Result<AccountToPaymentRequestsConnection, Error> {
-        let query = "query FetchAccountToPaymentRequestsConnection($entity_id: ID!, $first: Int, $after: String, $after_date: DateTime, $before_date: DateTime, $bitcoin_network: BitcoinNetwork, $lightning_node_id: ID) {
+        let query = "query FetchAccountToPaymentRequestsConnection($entity_id: ID!, $first: Int, $after: String, $after_date: DateTime, $before_date: DateTime, $bitcoin_network: BitcoinNetwork, $lightning_node_id: ID, $max_amount: CurrencyAmountInput, $min_amount: CurrencyAmountInput) {
     entity(id: $entity_id) {
         ... on Account {
-            payment_requests(, first: $first, after: $after, after_date: $after_date, before_date: $before_date, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id) {
+            payment_requests(, first: $first, after: $after, after_date: $after_date, before_date: $before_date, bitcoin_network: $bitcoin_network, lightning_node_id: $lightning_node_id, max_amount: $max_amount, min_amount: $min_amount) {
                 __typename
                 account_to_payment_requests_connection_count: count
                 account_to_payment_requests_connection_page_info: page_info {
@@ -1768,6 +1781,14 @@ impl Account {
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("bitcoin_network", bitcoin_network.into());
         variables.insert("lightning_node_id", lightning_node_id.into());
+        variables.insert(
+            "max_amount",
+            serde_json::to_value(&max_amount).map_err(Error::ConversionError)?,
+        );
+        variables.insert(
+            "min_amount",
+            serde_json::to_value(&min_amount).map_err(Error::ConversionError)?,
+        );
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;
@@ -1788,11 +1809,13 @@ impl Account {
         idempotency_keys: Option<Vec<String>>,
         after_date: Option<DateTime<Utc>>,
         before_date: Option<DateTime<Utc>>,
+        max_amount: Option<CurrencyAmountInput>,
+        min_amount: Option<CurrencyAmountInput>,
     ) -> Result<AccountToWithdrawalRequestsConnection, Error> {
-        let query = "query FetchAccountToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: String, $bitcoin_networks: [BitcoinNetwork!], $statuses: [WithdrawalRequestStatus!], $node_ids: [ID!], $idempotency_keys: [String!], $after_date: DateTime, $before_date: DateTime) {
+        let query = "query FetchAccountToWithdrawalRequestsConnection($entity_id: ID!, $first: Int, $after: String, $bitcoin_networks: [BitcoinNetwork!], $statuses: [WithdrawalRequestStatus!], $node_ids: [ID!], $idempotency_keys: [String!], $after_date: DateTime, $before_date: DateTime, $max_amount: CurrencyAmountInput, $min_amount: CurrencyAmountInput) {
     entity(id: $entity_id) {
         ... on Account {
-            withdrawal_requests(, first: $first, after: $after, bitcoin_networks: $bitcoin_networks, statuses: $statuses, node_ids: $node_ids, idempotency_keys: $idempotency_keys, after_date: $after_date, before_date: $before_date) {
+            withdrawal_requests(, first: $first, after: $after, bitcoin_networks: $bitcoin_networks, statuses: $statuses, node_ids: $node_ids, idempotency_keys: $idempotency_keys, after_date: $after_date, before_date: $before_date, max_amount: $max_amount, min_amount: $min_amount) {
                 __typename
                 account_to_withdrawal_requests_connection_count: count
                 account_to_withdrawal_requests_connection_page_info: page_info {
@@ -1871,6 +1894,14 @@ impl Account {
         variables.insert("idempotency_keys", idempotency_keys.into());
         variables.insert("after_date", after_date.map(|dt| dt.to_rfc3339()).into());
         variables.insert("before_date", before_date.map(|dt| dt.to_rfc3339()).into());
+        variables.insert(
+            "max_amount",
+            serde_json::to_value(&max_amount).map_err(Error::ConversionError)?,
+        );
+        variables.insert(
+            "min_amount",
+            serde_json::to_value(&min_amount).map_err(Error::ConversionError)?,
+        );
 
         let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
         let result = requester.execute_graphql(query, Some(value)).await?;
