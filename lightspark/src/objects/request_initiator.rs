@@ -12,9 +12,9 @@ pub enum RequestInitiator {
     Lightspark,
 }
 
-impl From<RequestInitiator> for Value {
-    fn from(val: RequestInitiator) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for RequestInitiator {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

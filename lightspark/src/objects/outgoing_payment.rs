@@ -5,6 +5,7 @@ use crate::objects::entity::Entity;
 use crate::objects::lightning_transaction::LightningTransaction;
 use crate::objects::outgoing_payment_to_attempts_connection::OutgoingPaymentToAttemptsConnection;
 use crate::objects::payment_failure_reason::PaymentFailureReason;
+use crate::objects::payment_request_data::PaymentRequestData;
 use crate::objects::payment_request_data::PaymentRequestDataEnum;
 use crate::objects::post_transaction_data::PostTransactionData;
 use crate::objects::rich_text::RichText;
@@ -586,10 +587,10 @@ impl OutgoingPayment {
         variables.insert("first", first.into());
         variables.insert("after", after.into());
 
-        let value = serde_json::to_value(variables).map_err(Error::ConversionError)?;
-        let result = requester.execute_graphql(query, Some(value)).await?;
+        let value = serde_json::to_value(variables).map_err(|err| Error::ConversionError(err))?;
+        let result = requester.execute_graphql(&query, Some(value)).await?;
         let json = result["entity"]["attempts"].clone();
-        let result = serde_json::from_value(json).map_err(Error::JsonError)?;
+        let result = serde_json::from_value(json).map_err(|err| Error::JsonError(err))?;
         Ok(result)
     }
 }

@@ -10,9 +10,9 @@ pub enum ComplianceProvider {
     Chainalysis,
 }
 
-impl From<ComplianceProvider> for Value {
-    fn from(val: ComplianceProvider) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for ComplianceProvider {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

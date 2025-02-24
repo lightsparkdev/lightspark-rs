@@ -16,9 +16,9 @@ pub enum NodeAddressType {
     Tor,
 }
 
-impl From<NodeAddressType> for Value {
-    fn from(val: NodeAddressType) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for NodeAddressType {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

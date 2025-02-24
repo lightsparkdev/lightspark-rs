@@ -49,9 +49,9 @@ pub enum Permission {
     AccountManage,
 }
 
-impl From<Permission> for Value {
-    fn from(val: Permission) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for Permission {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

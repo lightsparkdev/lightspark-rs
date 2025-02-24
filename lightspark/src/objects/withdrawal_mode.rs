@@ -13,9 +13,9 @@ pub enum WithdrawalMode {
     WalletThenChannels,
 }
 
-impl From<WithdrawalMode> for Value {
-    fn from(val: WithdrawalMode) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for WithdrawalMode {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

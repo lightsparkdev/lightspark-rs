@@ -16,9 +16,9 @@ pub enum OutgoingPaymentAttemptStatus {
     Failed,
 }
 
-impl From<OutgoingPaymentAttemptStatus> for Value {
-    fn from(val: OutgoingPaymentAttemptStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for OutgoingPaymentAttemptStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
