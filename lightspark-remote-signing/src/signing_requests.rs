@@ -323,6 +323,7 @@ fn bitcoin_network_from_webhook_event(event: &WebhookEvent) -> Result<BitcoinNet
         "MAINNET" => Ok(BitcoinNetwork::Mainnet),
         "TESTNET" => Ok(BitcoinNetwork::Testnet),
         "REGTEST" => Ok(BitcoinNetwork::Regtest),
+        "SIGNET" => Ok(BitcoinNetwork::Signet),
         _ => Err(Error::WebhookEventDataMissing),
     }
 }

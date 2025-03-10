@@ -36,6 +36,15 @@ pub enum Permission {
     #[serde(rename = "REGTEST_MANAGE")]
     RegtestManage,
 
+    #[serde(rename = "SIGNET_VIEW")]
+    SignetView,
+
+    #[serde(rename = "SIGNET_TRANSACT")]
+    SignetTransact,
+
+    #[serde(rename = "SIGNET_MANAGE")]
+    SignetManage,
+
     #[serde(rename = "USER_VIEW")]
     UserView,
 
@@ -68,6 +77,9 @@ impl fmt::Display for Permission {
             Self::RegtestView => write!(f, "REGTEST_VIEW"),
             Self::RegtestTransact => write!(f, "REGTEST_TRANSACT"),
             Self::RegtestManage => write!(f, "REGTEST_MANAGE"),
+            Self::SignetView => write!(f, "SIGNET_VIEW"),
+            Self::SignetTransact => write!(f, "SIGNET_TRANSACT"),
+            Self::SignetManage => write!(f, "SIGNET_MANAGE"),
             Self::UserView => write!(f, "USER_VIEW"),
             Self::UserManage => write!(f, "USER_MANAGE"),
             Self::AccountView => write!(f, "ACCOUNT_VIEW"),
