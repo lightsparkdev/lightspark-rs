@@ -125,7 +125,17 @@ mutation SetInvoicePaymentHash(
 }";
 
 impl Response {
-    pub fn ecdh_response(node_id: &str, shared_secret: &str) -> Response {
+    fn validate_str(input: &str, param_name: &str) -> Result<(), String> {
+        if input.is_empty() {
+            return Err(format!("Parameter '{}' cannot be empty.", param_name));
+        }
+        Ok(())
+    }
+	
+    pub fn ecdh_response(node_id: &str, shared_secret: &str) -> Result<Response, String> {
+        Self::validate_str(node_id, "node_id")?;
+        Self::validate_str(shared_secret, "shared_secret")?;
+
         let variables = json!({
             "node_id": node_id,
             "shared_secret": shared_secret,
@@ -135,14 +145,17 @@ impl Response {
             UPDATE_NODE_SHARED_SECRET_MUTATION,
             update_node_shared_secret_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 
     pub fn get_channel_per_commitment_response(
         channel_id: &str,
         per_commitment_point: &str,
         per_commitment_point_index: u64,
-    ) -> Response {
+    ) -> Result<Response, String> {
+        Self::validate_str(channel_id, "channel_id")?;
+        Self::validate_str(per_commitment_point, "per_commitment_point")?;
+
         let variables = json!({
             "channel_id": channel_id,
             "per_commitment_point": per_commitment_point,
@@ -153,14 +166,17 @@ impl Response {
             UPDATE_CHANNEL_PER_COMMITMENT_POINT_MUTATION,
             update_channel_per_commitment_point_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 
     pub fn release_channel_per_commitment_secret_response(
         channel_id: &str,
         per_commitment_secret: &str,
         per_commitment_index: u64,
-    ) -> Response {
+    ) -> Result<Response, String> {
+        Self::validate_str(channel_id, "channel_id")?;
+        Self::validate_str(per_commitment_secret, "per_commitment_secret")?;
+
         let variables = json!({
             "channel_id": channel_id,
             "per_commitment_secret": per_commitment_secret,
@@ -171,10 +187,17 @@ impl Response {
             RELEASE_CHANNEL_PER_COMMITMENT_SECRET_MUTATION,
             release_channel_per_commitment_secret_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 
-    pub fn sign_invoice_response(invoice_id: &str, signature: &str, recovery_id: i32) -> Response {
+    pub fn sign_invoice_response(
+        invoice_id: &str, 
+        signature: &str, 
+        recovery_id: i32
+    ) -> Result<Response, String> {
+        Self::validate_str(invoice_id, "invoice_id")?;
+        Self::validate_str(signature, "signature")?;
+
         let variables = json!({
             "invoice_id": invoice_id,
             "signature": signature,
@@ -185,10 +208,16 @@ impl Response {
             SIGN_INVOICE_MUTATION,
             sign_invoice_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 
-    pub fn release_payment_preimage_response(invoice_id: &str, payment_preimage: &str) -> Response {
+    pub fn release_payment_preimage_response(
+        invoice_id: &str, 
+        payment_preimage: &str
+    ) -> Result<Response, String> {
+        Self::validate_str(invoice_id, "invoice_id")?;
+        Self::validate_str(payment_preimage, "payment_preimage")?;
+
         let variables = json!({
             "invoice_id": invoice_id,
             "payment_preimage": payment_preimage,
@@ -198,10 +227,17 @@ impl Response {
             RELEASE_PAYMENT_PREIMAGE_MUTATION,
             release_payment_preimage_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 
-    pub fn sign_messages_response(signatures: Vec<IdAndSignature>) -> Response {
+
+    pub fn sign_messages_response(
+        signatures: Vec<IdAndSignature>
+    ) -> Result<Response, String> {
+        if signatures.is_empty() {
+            return Err("The 'signatures' vector cannot be empty.".to_string());
+        }
+
         let variables = json!({
             "signatures": signatures,
         });
@@ -210,10 +246,16 @@ impl Response {
             SIGN_MESSAGES_MUTATION,
             sign_messages_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 
-    pub fn decline_to_sign_message_response(payload_ids: &[String]) -> Response {
+    pub fn decline_to_sign_message_response(
+        payload_ids: &[String]
+    ) -> Result<Response, String> {
+        if payload_ids.is_empty() {
+            return Err("The 'payload_ids' array cannot be empty.".to_string());
+        }
+
         let variables = json!({
             "payload_ids": payload_ids,
         });
@@ -222,24 +264,27 @@ impl Response {
             DECLINE_TO_SIGN_MESSAGES_MUTATION,
             decline_to_sign_messages_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 
     pub fn set_invoice_payment_hash_response(
         invoice_id: &str,
         payment_hash: &str,
-        pre_image_nonce: Option<&str>,
-    ) -> Response {
+        preimage_nonce: Option<&str>,
+    ) -> Result<Response, String> {
+        Self::validate_str(invoice_id, "invoice_id")?;
+        Self::validate_str(payment_hash, "payment_hash")?;
+
         let variables = json!({
             "invoice_id": invoice_id,
             "payment_hash": payment_hash,
-            "preimage_nonce": pre_image_nonce,
+            "preimage_nonce": preimage_nonce,
         });
         let query = format!(
             "{}\n{}",
             SET_INVOICE_PAYMENT_HASH,
             set_invoice_payment_hash_output::FRAGMENT
         );
-        Response { query, variables }
+        Ok(Response { query, variables })
     }
 }
