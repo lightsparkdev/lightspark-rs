@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.0
+- Added Signet Bitcoin network support.
+
 ## v0.3.0
 - Handle REVEAL_COUNTERPARTY_PER_COMMITMENT_SECRET webhook.
 

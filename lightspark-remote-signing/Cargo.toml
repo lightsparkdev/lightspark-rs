@@ -2,7 +2,7 @@
 name = "lightspark-remote-signing"
 description = "Lightspark Remote Signing SDK for Rust"
 authors = ["Lightspark Group, Inc. <info@lightspark.com>"]
-version = "0.3.0"
+version = "0.5.0"
 edition = "2021"
 documentation = "https://docs.lightspark.com/lightspark-sdk/getting-started?language=Rust"
 homepage = "https://www.lightspark.com/"

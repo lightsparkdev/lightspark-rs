@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.11.0
+- Added Signet Bitcoin network support.
+
 # v0.10.1
 - Fix: Removes default params on graphql mutation `PayUmaInvoice`
 
