@@ -32,9 +32,9 @@ pub enum IncentivesIneligibilityReason {
     NotCrossBorder,
 }
 
-impl From<IncentivesIneligibilityReason> for Value {
-    fn from(val: IncentivesIneligibilityReason) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for IncentivesIneligibilityReason {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

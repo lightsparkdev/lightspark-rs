@@ -44,9 +44,9 @@ pub enum WalletStatus {
     Terminated,
 }
 
-impl From<WalletStatus> for Value {
-    fn from(val: WalletStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for WalletStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

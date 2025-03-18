@@ -34,9 +34,9 @@ pub enum RemoteSigningSubEventType {
     VlsMessage,
 }
 
-impl From<RemoteSigningSubEventType> for Value {
-    fn from(val: RemoteSigningSubEventType) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for RemoteSigningSubEventType {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

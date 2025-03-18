@@ -36,15 +36,6 @@ pub enum Permission {
     #[serde(rename = "REGTEST_MANAGE")]
     RegtestManage,
 
-    #[serde(rename = "SIGNET_VIEW")]
-    SignetView,
-
-    #[serde(rename = "SIGNET_TRANSACT")]
-    SignetTransact,
-
-    #[serde(rename = "SIGNET_MANAGE")]
-    SignetManage,
-
     #[serde(rename = "USER_VIEW")]
     UserView,
 
@@ -58,9 +49,9 @@ pub enum Permission {
     AccountManage,
 }
 
-impl From<Permission> for Value {
-    fn from(val: Permission) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for Permission {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -77,9 +68,6 @@ impl fmt::Display for Permission {
             Self::RegtestView => write!(f, "REGTEST_VIEW"),
             Self::RegtestTransact => write!(f, "REGTEST_TRANSACT"),
             Self::RegtestManage => write!(f, "REGTEST_MANAGE"),
-            Self::SignetView => write!(f, "SIGNET_VIEW"),
-            Self::SignetTransact => write!(f, "SIGNET_TRANSACT"),
-            Self::SignetManage => write!(f, "SIGNET_MANAGE"),
             Self::UserView => write!(f, "USER_VIEW"),
             Self::UserManage => write!(f, "USER_MANAGE"),
             Self::AccountView => write!(f, "ACCOUNT_VIEW"),

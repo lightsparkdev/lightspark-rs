@@ -24,9 +24,9 @@ pub enum BitcoinNetwork {
     Testnet,
 }
 
-impl From<BitcoinNetwork> for Value {
-    fn from(val: BitcoinNetwork) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for BitcoinNetwork {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

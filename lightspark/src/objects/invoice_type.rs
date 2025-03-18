@@ -16,9 +16,9 @@ pub enum InvoiceType {
     Amp,
 }
 
-impl From<InvoiceType> for Value {
-    fn from(val: InvoiceType) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for InvoiceType {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

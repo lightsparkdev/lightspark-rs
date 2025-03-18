@@ -43,9 +43,9 @@ pub enum PaymentFailureReason {
     InsufficientBalanceOnSinglePathInvoice,
 }
 
-impl From<PaymentFailureReason> for Value {
-    fn from(val: PaymentFailureReason) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for PaymentFailureReason {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

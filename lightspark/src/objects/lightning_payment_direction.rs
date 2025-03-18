@@ -16,9 +16,9 @@ pub enum LightningPaymentDirection {
     Outgoing,
 }
 
-impl From<LightningPaymentDirection> for Value {
-    fn from(val: LightningPaymentDirection) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for LightningPaymentDirection {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

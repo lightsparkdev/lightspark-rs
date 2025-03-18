@@ -13,9 +13,9 @@ pub enum PaymentRequestStatus {
     Closed,
 }
 
-impl From<PaymentRequestStatus> for Value {
-    fn from(val: PaymentRequestStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for PaymentRequestStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
