@@ -48,9 +48,9 @@ pub enum TransactionType {
     Route,
 }
 
-impl From<TransactionType> for Value {
-    fn from(val: TransactionType) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for TransactionType {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

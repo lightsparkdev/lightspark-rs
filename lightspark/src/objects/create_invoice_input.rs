@@ -16,4 +16,10 @@ pub struct CreateInvoiceInput {
 
     /// The expiry of the invoice in seconds. Default value is 86400 (1 day).
     pub expiry_secs: Option<i64>,
+
+    /// The payment hash of the invoice. It should only be set if your node is a remote signing node. If not set, it will be requested through REMOTE_SIGNING webhooks with sub event type REQUEST_INVOICE_PAYMENT_HASH.
+    pub payment_hash: Option<String>,
+
+    /// The 32-byte nonce used to generate the invoice preimage if applicable. It will later be included in RELEASE_PAYMENT_PREIMAGE webhook to help recover the raw preimage. This can only be specified when `payment_hash` is specified.
+    pub preimage_nonce: Option<String>,
 }

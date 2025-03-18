@@ -16,9 +16,9 @@ pub enum RoutingTransactionFailureReason {
     ForwardingFailure,
 }
 
-impl From<RoutingTransactionFailureReason> for Value {
-    fn from(val: RoutingTransactionFailureReason) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for RoutingTransactionFailureReason {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

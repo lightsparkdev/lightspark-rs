@@ -20,9 +20,9 @@ pub enum IncentivesStatus {
     Ineligible,
 }
 
-impl From<IncentivesStatus> for Value {
-    fn from(val: IncentivesStatus) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for IncentivesStatus {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 

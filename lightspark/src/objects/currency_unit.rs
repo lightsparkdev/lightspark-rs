@@ -26,6 +26,14 @@ pub enum CurrencyUnit {
 
     #[serde(rename = "MXN")]
     Mxn,
+    /// Philippine Peso.
+
+    #[serde(rename = "PHP")]
+    Php,
+    /// Euro.
+
+    #[serde(rename = "EUR")]
+    Eur,
     /// 0.000000001 (10e-9) Bitcoin or a billionth of a Bitcoin. We recommend using the Satoshi unit instead when possible.
 
     #[serde(rename = "NANOBITCOIN")]
@@ -40,9 +48,9 @@ pub enum CurrencyUnit {
     Millibitcoin,
 }
 
-impl From<CurrencyUnit> for Value {
-    fn from(val: CurrencyUnit) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for CurrencyUnit {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
@@ -54,6 +62,8 @@ impl fmt::Display for CurrencyUnit {
             Self::Millisatoshi => write!(f, "MILLISATOSHI"),
             Self::Usd => write!(f, "USD"),
             Self::Mxn => write!(f, "MXN"),
+            Self::Php => write!(f, "PHP"),
+            Self::Eur => write!(f, "EUR"),
             Self::Nanobitcoin => write!(f, "NANOBITCOIN"),
             Self::Microbitcoin => write!(f, "MICROBITCOIN"),
             Self::Millibitcoin => write!(f, "MILLIBITCOIN"),

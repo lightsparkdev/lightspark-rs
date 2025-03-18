@@ -52,9 +52,9 @@ pub enum WebhookEventType {
     ChannelOpeningFees,
 }
 
-impl From<WebhookEventType> for Value {
-    fn from(val: WebhookEventType) -> Self {
-        Value::from(val.to_string())
+impl Into<Value> for WebhookEventType {
+    fn into(self) -> Value {
+        Value::from(self.to_string())
     }
 }
 
