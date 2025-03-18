@@ -11,11 +11,11 @@ pub struct Config {
 
 impl Config {
     pub fn new_from_env() -> Self {
-        let api_endpoint = std::env::var("RK_API_ENDPOINT").ok();
-        let api_client_id = std::env::var("RK_API_CLIENT_ID").ok();
-        let api_client_secret = std::env::var("RK_API_CLIENT_SECRET").ok();
-        let webhook_secret = std::env::var("RK_WEBHOOK_SECRET").ok();
-        let master_seed_hex = std::env::var("RK_MASTER_SEED_HEX").ok();
+        let api_endpoint = std::env::var("API_ENDPOINT").ok();
+        let api_client_id = std::env::var("API_CLIENT_ID").ok();
+        let api_client_secret = std::env::var("API_CLIENT_SECRET").ok();
+        let webhook_secret = std::env::var("WEBHOOK_SECRET").ok();
+        let master_seed_hex = std::env::var("MASTER_SEED_HEX").ok();
         let api_port = std::env::var("PORT").ok();
         let respond_directly = std::env::var("RESPOND_DIRECTLY").is_ok();
 
