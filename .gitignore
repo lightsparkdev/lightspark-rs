@@ -10,3 +10,9 @@ Cargo.lock
 **/*.rs.bk
 
 .idea/
+
+# macos
+.DS_Store
+
+# env
+**/..env
