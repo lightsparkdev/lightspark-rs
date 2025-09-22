@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::fmt;
 
 /// This is an enum of the potential event types that can be associated with your Lightspark wallets.
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub enum WebhookEventType {
     #[serde(rename = "PAYMENT_FINISHED")]
     PaymentFinished,

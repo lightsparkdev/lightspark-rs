@@ -21,7 +21,6 @@ client = ["base", "objects", "dep:reqwest"]
 
 [dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls", "zstd"], optional = true }
-futures = "0.3"
 base64 = "0.21.0"
 serde_json = "1.0.94"
 serde = { version = "1.0.155", features = ["derive"] }
@@ -29,7 +28,6 @@ regex = "1.7.1"
 chrono = "0.4.35"
 aes-gcm = "0.10.1"
 rand = "0.8.5"
-block-modes = "0.9.1"
 os-version = "0.2.0"
 version_check = "0.9.4"
 hex = "0.4.3"
