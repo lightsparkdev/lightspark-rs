@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.10.2
+- Fix: Improve webhook request validation and test coverage
+
 # v0.10.1
 - Fix: Removes default params on graphql mutation `PayUmaInvoice`
 
